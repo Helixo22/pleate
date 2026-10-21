@@ -21,6 +21,7 @@
 @keyframes pl-typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.45; } 30% { transform: translateY(-4px); opacity: 1; } }
 @keyframes pl-shine { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 @keyframes pl-blink { 50% { opacity: 0; } }
+@keyframes pl-gradient { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
 @keyframes pl-spin { to { transform: rotate(360deg); } }
 @keyframes pl-spoke { from { opacity: 1; } to { opacity: 0.18; } }
 @keyframes pl-shimmer { from { background-position: 150% 0; } to { background-position: -50% 0; } }

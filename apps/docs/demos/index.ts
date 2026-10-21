@@ -1,5 +1,12 @@
 // Component pages: description, import path, the examples (each file in demos/<slug>/<id>.tsx) and the main props.
 import type { ComponentType } from "react";
+import AnimatedTextHeadline from "./animated-text/headline";
+import AnimatedTextNumbers from "./animated-text/numbers";
+import AnimatedTextScroll from "./animated-text/scroll";
+import HoverEffectsBasic from "./hover-effects/basic";
+import PageTransitionBasic from "./page-transition/basic";
+import RevealBasic from "./reveal/basic";
+import RevealProgress from "./reveal/progress";
 import BotFaceStates from "./bot-face/states";
 import BotFaceVariants from "./bot-face/variants";
 import BotFaceVoice from "./bot-face/voice";
@@ -93,6 +100,70 @@ export type ComponentDoc = {
 const SIZE = (sizes: string, d = "md"): PropRow => ({ name: "size", type: sizes, default: `"${d}"`, description: "Height, padding and type size." });
 
 export const DOCS: Record<string, ComponentDoc> = {
+
+  "animated-text": {
+    name: "Animated Text",
+    description: "Text that moves with intent: blur-in, rotating words, palette gradients, shine, decrypting, counting numbers and words that light up as you scroll. Readers always get the plain text.",
+    importName: "BlurText, RotatingText, GradientText, ShinyText, DecryptedText, CountUp, ScrollRevealText",
+    importPath: "pleate/effects/animated-text",
+    demos: [
+      { id: "headline", title: "Headlines", align: "stretch", Component: AnimatedTextHeadline },
+      { id: "numbers", title: "Numbers and codes", align: "stretch", Component: AnimatedTextNumbers },
+      { id: "scroll", title: "Scroll-lit statement", description: "Scroll the page: words light up as they pass.", Component: AnimatedTextScroll },
+    ],
+    props: [
+      { name: "BlurText", type: 'text, by: "word" | "letter", as, stagger, delay, distance, once', description: "Rise out of blur on view." },
+      { name: "RotatingText", type: "words, interval, pillClassName", description: "Rolling word, resizing smoothly." },
+      { name: "GradientText / ShinyText", type: "colors, speed / base, shine, speed", description: "Animated fills (palette by default)." },
+      { name: "DecryptedText", type: 'text, trigger: "view" | "hover", speed, characters', description: "Scramble then resolve." },
+      { name: "CountUp", type: "to, from, duration, format (Intl), locale", description: "Counts on view." },
+      { name: "ScrollRevealText", type: "text, as", description: "Words light up with scroll." },
+    ],
+    a11y: ["Split text is aria-hidden with the full sentence in a visually hidden copy.", "Reduced motion shows the final state immediately."],
+  },
+  reveal: {
+    name: "Reveal",
+    description: "Content that enters as it scrolls into view — alone or in sequence — plus a reading progress bar and parallax.",
+    importName: "Reveal, RevealGroup, RevealItem, ScrollProgress, Parallax",
+    importPath: "pleate/effects/reveal",
+    demos: [
+      { id: "basic", title: "Effects and staggered groups", description: "Reload or scroll back to replay (once={false} replays every time).", align: "stretch", Component: RevealBasic },
+      { id: "progress", title: "Progress bar and parallax", align: "stretch", Component: RevealProgress },
+    ],
+    props: [
+      { name: "effect", type: '"fade" | "up" | "down" | "left" | "right" | "zoom" | "blur"', default: '"up"', description: "Entrance." },
+      { name: "distance / delay / duration", type: "number", description: "Motion amounts." },
+      { name: "once / amount", type: "boolean / 0–1", default: "true / 0.25", description: "Replay and visibility threshold." },
+      { name: "RevealGroup stagger", type: "number", default: "0.08", description: "Seconds between RevealItems." },
+      { name: "ScrollProgress target / position / fixed", type: "ref / top | bottom / boolean", description: "Page or element progress." },
+      { name: "Parallax speed", type: "-1…1", default: "0.2", description: "Drift relative to scroll." },
+    ],
+  },
+  "page-transition": {
+    name: "Page Transition",
+    description: "Animated page entrances for the App Router, used in app/template.tsx. \"slide\" mimics an iOS push and reverses on Back. This docs site uses it.",
+    importName: "PageTransition, useNavigationDirection",
+    importPath: "pleate/effects/page-transition",
+    demos: [{ id: "basic", title: "Variants", description: "Switch pages between the docs to see fade-up in action.", Component: PageTransitionBasic }],
+    props: [
+      { name: "variant", type: '"fade" | "fade-up" | "slide"', default: '"fade-up"', description: "Entrance." },
+      { name: "useNavigationDirection()", type: '→ "forward" | "back"', description: "How the current page was reached." },
+    ],
+    a11y: ["Scrolls to the top on forward navigation; Back keeps the browser's restored position.", "No animation with reduced motion."],
+  },
+  "hover-effects": {
+    name: "Hover Effects",
+    description: "Pointer effects for desktop: magnetic buttons, a spotlight that follows the cursor, 3D tilt with glare, and click sparks. Touch and reduced motion get the plain content.",
+    importName: "Magnet, Spotlight, Tilt, ClickSpark",
+    importPath: "pleate/effects/hover",
+    demos: [{ id: "basic", title: "All four", align: "stretch", Component: HoverEffectsBasic }],
+    props: [
+      { name: "Magnet", type: "padding, strength", default: "60 / 0.3", description: "Pull toward the cursor." },
+      { name: "Spotlight", type: "size, color", default: "320 / soft accent", description: "Light following the cursor." },
+      { name: "Tilt", type: "max, glare, scale", default: "10 / true / 1.02", description: "3D tilt." },
+      { name: "ClickSpark", type: "color, count, radius", default: "accent / 8 / 22", description: "Sparks on click." },
+    ],
+  },
 
   "bot-face": {
     name: "Bot Face",

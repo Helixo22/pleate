@@ -74,7 +74,8 @@ Tokens are CSS variables prefixed `--pl-` (`--pl-accent`, `--pl-surface`, `--pl-
 - [x] Data: Table (sortable, stacks on phones), List (iOS Settings, swipe actions), Accordion, Timeline, StatCard
 - [x] Forms: Form + FormField (validation), Calendar, DatePicker (single, range, presets), SearchBar, FileUpload
 - [x] AI (`pleate/ai/*`): BotFace (voice-reactive), ChatThread + Message, Composer, StreamingText, PromptSuggestions, ResultCard + sources, ModelPicker, Reasoning
-- [ ] Effects · Marketing
+- [x] Effects (`pleate/effects/*`): animated text (blur, rotating, gradient, shiny, decrypted, count-up, scroll-lit), Reveal + groups, ScrollProgress, Parallax, PageTransition, Magnet, Spotlight, Tilt, ClickSpark
+- [ ] Marketing
 
 ## License
 
