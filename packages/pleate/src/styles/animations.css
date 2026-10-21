@@ -15,6 +15,9 @@
 @keyframes pl-alert-in { from { opacity: 0; transform: scale(1.12); } }
 @keyframes pl-drawer-in { from { transform: translateX(var(--pl-drawer-from, -100%)); } }
 @keyframes pl-drawer-out { to { transform: translateX(var(--pl-drawer-from, -100%)); } }
+@keyframes pl-accordion-down { from { height: 0; opacity: 0; } to { height: var(--radix-accordion-content-height); opacity: 1; } }
+@keyframes pl-accordion-up { from { height: var(--radix-accordion-content-height); opacity: 1; } to { height: 0; opacity: 0; } }
+@keyframes pl-indeterminate { from { translate: -100% 0; } to { translate: 250% 0; } }
 @keyframes pl-spin { to { transform: rotate(360deg); } }
 @keyframes pl-spoke { from { opacity: 1; } to { opacity: 0.18; } }
 @keyframes pl-shimmer { from { background-position: 150% 0; } to { background-position: -50% 0; } }
@@ -67,4 +70,11 @@
 @utility pl-alert {
   &[data-state="open"] { animation: pl-alert-in var(--pl-duration-base) var(--pl-ease-out); }
   &[data-state="closed"] { animation: pl-fade-out var(--pl-duration-fast) var(--pl-ease-in-out) forwards; }
+}
+
+/* Accordion panels: height follows the content (Radix measures it). */
+@utility pl-collapsible {
+  overflow: hidden;
+  &[data-state="open"] { animation: pl-accordion-down var(--pl-duration-base) var(--pl-ease-ios); }
+  &[data-state="closed"] { animation: pl-accordion-up var(--pl-duration-fast) var(--pl-ease-in-out); }
 }
