@@ -1,5 +1,13 @@
 // Component pages: description, import path, the examples (each file in demos/<slug>/<id>.tsx) and the main props.
 import type { ComponentType } from "react";
+import ActionSheetBasic from "./action-sheet/basic";
+import AlertBasic from "./alert/basic";
+import AlertDialogBasic from "./alert-dialog/basic";
+import BottomSheetBasic from "./bottom-sheet/basic";
+import ModalBasic from "./modal/basic";
+import PopoverBasic from "./popover/basic";
+import ToastBasic from "./toast/basic";
+import TooltipBasic from "./tooltip/basic";
 import BreadcrumbBasic from "./breadcrumb/basic";
 import DropdownBasic from "./dropdown/basic";
 import MenuBasic from "./menu/basic";
@@ -61,6 +69,106 @@ export type ComponentDoc = {
 const SIZE = (sizes: string, d = "md"): PropRow => ({ name: "size", type: sizes, default: `"${d}"`, description: "Height, padding and type size." });
 
 export const DOCS: Record<string, ComponentDoc> = {
+
+  modal: {
+    name: "Modal",
+    description: "A dialog over the page. Centered on desktop; on phones a sheet that slides up from the bottom, or centered if you prefer.",
+    importName: "Modal, ModalTrigger, ModalContent, ModalHeader, ModalTitle, ModalDescription, ModalBody, ModalFooter, ModalClose",
+    demos: [{ id: "basic", title: "Form and long content", description: "Resize to a phone width to see the sheet.", Component: ModalBasic }],
+    props: [
+      { name: "Modal", type: "open, defaultOpen, onOpenChange", description: "Radix Dialog root." },
+      { name: "ModalContent size", type: '"sm" | "md" | "lg" | "xl" | "full"', default: '"md"', description: "Desktop width." },
+      { name: "ModalContent mobile", type: '"sheet" | "center"', default: '"sheet"', description: "Phone presentation." },
+      { name: "showClose / closeLabel", type: "boolean / string", default: "true", description: "Corner close button." },
+    ],
+    a11y: ["Focus is trapped inside and returns to the trigger.", "Escape and backdrop click close it; the page behind can't scroll.", "Labelled by ModalTitle, described by ModalDescription."],
+  },
+  "bottom-sheet": {
+    name: "Bottom Sheet",
+    description: "The iOS sheet: drag between snap points, flick down to close. The footer stays on the visible edge at every height.",
+    importName: "BottomSheet",
+    demos: [{ id: "basic", title: "Snap points and simple sheet", Component: BottomSheetBasic }],
+    props: [
+      { name: "open / onOpenChange", type: "boolean", description: "Controlled state." },
+      { name: "snapPoints", type: "number[]", default: "[0.92]", description: "Heights as fractions of the viewport." },
+      { name: "defaultSnap / onSnapChange", type: "number", default: "0", description: "Opening snap point / settled index." },
+      { name: "title / description / footer", type: "ReactNode", description: "Header and pinned footer." },
+      { name: "dismissible / showClose", type: "boolean", default: "true / false", description: "Drag-to-close and close button." },
+    ],
+    a11y: ["Modal dialog: focus trap, Escape closes (when dismissible).", "Without motion the sheet appears without the spring."],
+  },
+  "action-sheet": {
+    name: "Action Sheet",
+    description: "A short list of choices from the bottom with a separate Cancel, as on iOS. A centered card on wide screens.",
+    importName: "ActionSheet",
+    demos: [{ id: "basic", title: "Photo actions", Component: ActionSheetBasic }],
+    props: [
+      { name: "actions", type: "{ label, onSelect?, icon?, destructive?, disabled? }[]", description: "Choices." },
+      { name: "title / message", type: "ReactNode", description: "Optional header." },
+      { name: "trigger / open / onOpenChange", type: "—", description: "Uncontrolled with a trigger, or controlled." },
+      { name: "cancelLabel", type: "ReactNode", default: '"Cancel"', description: "Cancel button text." },
+    ],
+  },
+  "alert-dialog": {
+    name: "Alert Dialog",
+    description: "The iOS alert for decisions that need an answer. Two buttons sit side by side, more stack; the cancel action is bold and focused first.",
+    importName: "AlertDialog",
+    demos: [{ id: "basic", title: "Destructive and three-way", Component: AlertDialogBasic }],
+    props: [
+      { name: "title / description", type: "ReactNode", description: "Question and context." },
+      { name: "actions", type: '{ label, onSelect?, role?: "default" | "cancel" | "destructive" }[]', description: "Buttons, in order." },
+      { name: "trigger / open / onOpenChange", type: "—", description: "Uncontrolled or controlled." },
+      { name: "children", type: "ReactNode", description: "Extra content (e.g. a text field)." },
+    ],
+    a11y: ["role=alertdialog; it does not close on outside click.", "Focus starts on the cancel action."],
+  },
+  popover: {
+    name: "Popover",
+    description: "Interactive content anchored to a trigger: filters, pickers, short forms.",
+    importName: "Popover, PopoverTrigger, PopoverContent, PopoverClose",
+    demos: [{ id: "basic", title: "Filters", Component: PopoverBasic }],
+    props: [
+      { name: "PopoverContent", type: "side, align, sideOffset, arrow", description: "Placement and optional arrow." },
+      { name: "Popover", type: "open, onOpenChange, modal", description: "Radix Popover root." },
+    ],
+  },
+  tooltip: {
+    name: "Tooltip",
+    description: "A short label on hover or keyboard focus, for icon buttons. Not for essential information.",
+    importName: "Tooltip",
+    demos: [{ id: "basic", title: "On icon buttons", Component: TooltipBasic }],
+    props: [
+      { name: "content", type: "ReactNode", description: "The label." },
+      { name: "side / align", type: "string", default: '"top" / "center"', description: "Placement." },
+      { name: "delayDuration", type: "number", default: "400", description: "Hover delay in ms." },
+      { name: "disabled", type: "boolean", description: "Render the child without a tooltip." },
+    ],
+  },
+  toast: {
+    name: "Toast",
+    description: "Brief notifications from anywhere with toast(). They drop in from the top like iOS banners, pause on hover and can be swiped away.",
+    importName: "Toaster, toast",
+    demos: [{ id: "basic", title: "Tones, action, promise", Component: ToastBasic }],
+    props: [
+      { name: "toast(title, options)", type: "→ id", description: "Also toast.success / error / warning / info / loading / promise / update / dismiss." },
+      { name: "options", type: "description, action, duration, icon, dismissible, id", description: "Per toast." },
+      { name: "<Toaster position>", type: '"top-center" | "top-right" | "bottom-center" | "bottom-right"', default: '"top-center"', description: "Mount once." },
+      { name: "<Toaster visible / duration>", type: "number", default: "3 / 4000", description: "Stack size and default time." },
+    ],
+    a11y: ["Polite live region; error toasts use role=alert.", "Timers pause while hovered or focused."],
+  },
+  alert: {
+    name: "Alert",
+    description: "Inline messages in the page: info, success, warning, danger — with actions and an optional dismiss.",
+    importName: "Alert",
+    demos: [{ id: "basic", title: "Tones and variants", align: "stretch", Component: AlertBasic }],
+    props: [
+      { name: "tone", type: '"info" | "success" | "warning" | "danger" | "accent" | "neutral"', default: '"info"', description: "Meaning and color." },
+      { name: "variant", type: '"soft" | "surface" | "outline"', default: '"soft"', description: "Look." },
+      { name: "title / actions / icon", type: "ReactNode", description: "Content (icon={false} hides it)." },
+      { name: "onDismiss", type: "() => void", description: "Shows a close button." },
+    ],
+  },
 
   tabs: {
     name: "Tabs",

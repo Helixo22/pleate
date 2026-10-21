@@ -69,7 +69,8 @@ Tokens are CSS variables prefixed `--pl-` (`--pl-accent`, `--pl-surface`, `--pl-
 - [x] Base: Button, IconButton, Input, Textarea, Select, Checkbox, Radio, Switch, Slider, Badge, Avatar, Tag, Label, Spinner
 - [x] Layout: Container, Stack, Grid, Card, Divider, Section, Navbar, NavigationBar (iOS large title), Sidebar, Footer, TabBar
 - [x] Navigation: Tabs, SegmentedControl, Breadcrumb, Pagination, Menu, ContextMenu, Dropdown
-- [ ] Overlay · Feedback · Data · Forms
+- [x] Overlay: Modal, BottomSheet (drag + snap points), ActionSheet, AlertDialog, Popover, Tooltip, Toast, Alert
+- [ ] Feedback · Data · Forms
 - [ ] AI: BotFace, chat, composer, prompt suggestions, model picker, reasoning
 - [ ] Effects · Marketing
 

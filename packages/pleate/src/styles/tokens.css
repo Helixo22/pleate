@@ -15,9 +15,11 @@
   --pl-surface: #ffffff;
   --pl-surface-2: #f7f7fa;
   --pl-elevated: #ffffff;
-  --pl-fill: #e5e5ea;
-  --pl-fill-2: #eeeef2;
-  --pl-fill-3: #f4f4f7;
+  /* Fills are tints of gray over whatever solid surface they sit on (the iOS system fills), so a field reads the
+     same on the page, on a card and inside a sheet. They are never layered over content: no glass effect. */
+  --pl-fill: rgb(120 120 128 / 0.2);
+  --pl-fill-2: rgb(118 118 128 / 0.12);
+  --pl-fill-3: rgb(118 118 128 / 0.07);
   --pl-overlay: rgb(0 0 0 / 0.36);
 
   /* Content */
@@ -61,9 +63,9 @@
   --pl-surface: #1c1c1e;
   --pl-surface-2: #242426;
   --pl-elevated: #2c2c2e;
-  --pl-fill: #3a3a3c;
-  --pl-fill-2: #2c2c2e;
-  --pl-fill-3: #232325;
+  --pl-fill: rgb(120 120 128 / 0.36);
+  --pl-fill-2: rgb(118 118 128 / 0.24);
+  --pl-fill-3: rgb(118 118 128 / 0.14);
   --pl-overlay: rgb(0 0 0 / 0.6);
 
   --pl-fg: #ffffff;
