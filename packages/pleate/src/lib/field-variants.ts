@@ -29,4 +29,4 @@ export const fieldVariants = cva(
 export type FieldVariantProps = VariantProps<typeof fieldVariants>;
 
 export const fieldControl =
-  "min-w-0 flex-1 self-stretch bg-transparent outline-none placeholder:text-fg-subtle disabled:cursor-not-allowed";
+  "w-0 min-w-0 flex-1 self-stretch bg-transparent outline-none placeholder:text-fg-subtle disabled:cursor-not-allowed";

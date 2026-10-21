@@ -1,5 +1,9 @@
 // Component pages: description, import path, the examples (each file in demos/<slug>/<id>.tsx) and the main props.
 import type { ComponentType } from "react";
+import DatePickerBasic from "./date-picker/basic";
+import FileUploadBasic from "./file-upload/basic";
+import FormFieldBooking from "./form-field/booking";
+import SearchBarBasic from "./search-bar/basic";
 import AccordionVariants from "./accordion/variants";
 import EmptyStateBasic from "./empty-state/basic";
 import ListSettings from "./list/settings";
@@ -77,6 +81,66 @@ export type ComponentDoc = {
 const SIZE = (sizes: string, d = "md"): PropRow => ({ name: "size", type: sizes, default: `"${d}"`, description: "Height, padding and type size." });
 
 export const DOCS: Record<string, ComponentDoc> = {
+
+  "form-field": {
+    name: "Form Field",
+    description: "Accessible validation without a form library. Rules run on blur, live once an error shows, and for every field on submit — then focus jumps to the first problem.",
+    importName: "Form, FormField, useForm, useFormField",
+    demos: [{ id: "booking", title: "Booking request", description: "Submit it empty to see every message; values are read from the form itself.", align: "stretch", Component: FormFieldBooking }],
+    props: [
+      { name: "Form onSubmit", type: "(values, event) => void | Promise", description: "Runs only when valid; useForm().submitting is true while it awaits." },
+      { name: "Form onInvalid", type: "(errors) => void", description: "Called when a submit is blocked." },
+      { name: "FormField name / label / description / hint", type: "string / ReactNode", description: "name must match the control." },
+      { name: "required / minLength / maxLength / min / max / pattern / type", type: "value | { value, message }", description: "Built-in rules, with your own messages." },
+      { name: "validate", type: "(value, values) => string | undefined | Promise", description: "Custom (and cross-field, async) checks." },
+      { name: "error", type: "string", description: "Controlled message (e.g. from the server)." },
+    ],
+    a11y: ["Label, description and error are linked with for/aria-describedby; aria-invalid on errors.", "Errors are announced (polite live region); focus moves to the first invalid field on submit."],
+  },
+  "date-picker": {
+    name: "Date Picker",
+    description: "A field that opens a calendar: popover on desktop, bottom sheet on phones. Single dates or ranges, presets, limits, localized names.",
+    importName: "DatePicker, Calendar",
+    demos: [{ id: "basic", title: "Single, range with presets, standalone calendar", align: "stretch", Component: DatePickerBasic }],
+    props: [
+      { name: "mode", type: '"single" | "range"', default: '"single"', description: "One day or from–to." },
+      { name: "value / defaultValue / onValueChange", type: "Date | null  ·  { from, to }", description: "Selection." },
+      { name: "min / max / isDisabled", type: "Date / Date / (date) => boolean", description: "Limits." },
+      { name: "presets", type: "{ label, value: () => V }[]", description: "Quick picks." },
+      { name: "locale / weekStartsOn / formatOptions", type: "string / 0–6 / Intl options", description: "Localization." },
+      { name: "name", type: "string", description: "Hidden ISO value for forms (yyyy-mm-dd or yyyy-mm-dd/yyyy-mm-dd)." },
+    ],
+    a11y: ["The calendar is a grid: arrows, Page Up/Down (Shift for years), Home/End, Enter.", "Every day has its full date as label; today is aria-current=\"date\"."],
+  },
+  "search-bar": {
+    name: "Search Bar",
+    description: "The iOS search field: clear button, a Cancel that slides in while focused, debounced input, loading state and a focus shortcut.",
+    importName: "SearchBar",
+    demos: [{ id: "basic", title: "Filter, shortcut, loading", description: "Press / to focus the first one.", align: "stretch", Component: SearchBarBasic }],
+    props: [
+      { name: "value / defaultValue / onValueChange", type: "string", description: "Text." },
+      { name: "debounce", type: "number", default: "0", description: "ms before onValueChange while typing." },
+      { name: "onSearch", type: "(value) => void", description: "Enter." },
+      { name: "cancelable / loading", type: "boolean", description: "iOS Cancel button; spinner instead of clear." },
+      { name: "shortcut", type: '"/" | "mod+k"', description: "Global focus shortcut with a hint." },
+      { name: "size / variant", type: '"sm" | "md" / "filled" | "surface"', description: "Look." },
+    ],
+    a11y: ["A search landmark around a type=search input.", "Escape clears; Enter searches."],
+  },
+  "file-upload": {
+    name: "File Upload",
+    description: "Drop files, click, or use the keyboard. Type, size and count checks, image previews, per-file progress and removal.",
+    importName: "FileUpload",
+    demos: [{ id: "basic", title: "Dropzone with progress, compact button", align: "stretch", Component: FileUploadBasic }],
+    props: [
+      { name: "value / defaultValue / onValueChange", type: "File[]", description: "Selected files." },
+      { name: "accept / maxSize / maxFiles / multiple", type: "string / bytes / number / boolean", description: "Checks; rejections are listed and sent to onReject." },
+      { name: "progress", type: "Record<fileName, 0–100>", description: "Upload bars." },
+      { name: "variant", type: '"dropzone" | "button"', default: '"dropzone"', description: "Look." },
+      { name: "name", type: "string", description: "Include the files in the form submission." },
+    ],
+    a11y: ["The zone is a button: Enter/Space opens the picker.", "Rejections are announced (role=alert); every file has a named remove button."],
+  },
 
   skeleton: {
     name: "Skeleton",

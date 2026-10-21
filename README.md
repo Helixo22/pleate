@@ -72,7 +72,7 @@ Tokens are CSS variables prefixed `--pl-` (`--pl-accent`, `--pl-surface`, `--pl-
 - [x] Overlay: Modal, BottomSheet (drag + snap points), ActionSheet, AlertDialog, Popover, Tooltip, Toast, Alert
 - [x] Feedback: Skeleton, Progress (bar + ring), EmptyState
 - [x] Data: Table (sortable, stacks on phones), List (iOS Settings, swipe actions), Accordion, Timeline, StatCard
-- [ ] Forms
+- [x] Forms: Form + FormField (validation), Calendar, DatePicker (single, range, presets), SearchBar, FileUpload
 - [ ] AI: BotFace, chat, composer, prompt suggestions, model picker, reasoning
 - [ ] Effects · Marketing
 
