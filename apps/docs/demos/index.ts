@@ -1,5 +1,15 @@
 // Component pages: description, import path, the examples (each file in demos/<slug>/<id>.tsx) and the main props.
 import type { ComponentType } from "react";
+import BotFaceStates from "./bot-face/states";
+import BotFaceVariants from "./bot-face/variants";
+import BotFaceVoice from "./bot-face/voice";
+import ChatFull from "./chat/full";
+import ComposerBasic from "./composer/basic";
+import ModelPickerBasic from "./model-picker/basic";
+import PromptSuggestionsBasic from "./prompt-suggestions/basic";
+import ReasoningBasic from "./reasoning/basic";
+import ResultCardBasic from "./result-card/basic";
+import StreamingTextBasic from "./streaming-text/basic";
 import DatePickerBasic from "./date-picker/basic";
 import FileUploadBasic from "./file-upload/basic";
 import FormFieldBooking from "./form-field/booking";
@@ -73,6 +83,8 @@ export type ComponentDoc = {
   name: string;
   description: string;
   importName: string;
+  /** Module path when it isn't pleate/<slug> (e.g. "pleate/ai/chat"). */
+  importPath?: string;
   demos: Demo[];
   props: PropRow[];
   a11y?: string[];
@@ -81,6 +93,119 @@ export type ComponentDoc = {
 const SIZE = (sizes: string, d = "md"): PropRow => ({ name: "size", type: sizes, default: `"${d}"`, description: "Height, padding and type size." });
 
 export const DOCS: Record<string, ComponentDoc> = {
+
+  "bot-face": {
+    name: "Bot Face",
+    description: "An expressive assistant avatar: idle, listening, thinking, speaking and more. Eyes live on an imaginary sphere, the body squashes and stretches, and it can follow your voice.",
+    importName: "BotFace, useAudioLevel",
+    importPath: "pleate/ai/bot-face",
+    demos: [
+      { id: "states", title: "States", description: "Idle follows your pointer.", Component: BotFaceStates },
+      { id: "voice", title: "Driven by your voice", description: "useAudioLevel turns a microphone stream into a level the face reacts to.", Component: BotFaceVoice },
+      { id: "variants", title: "Sizes, shapes, colors", description: "Defaults to the palette accent — switch palette to see it follow.", Component: BotFaceVariants },
+    ],
+    props: [
+      { name: "state", type: '"idle" | "listening" | "thinking" | "speaking" | "waiting" | "happy" | "error" | "offline"', default: '"idle"', description: "Expression." },
+      { name: "size", type: "number", default: "64", description: "Pixels." },
+      { name: "level", type: "number | MotionValue<number>", description: "0–1 loudness for listening/speaking." },
+      { name: "track", type: "boolean", description: "Follow the pointer while idle." },
+      { name: "seed / color / eyeColor", type: "string", description: "Body shape; colors (accent and on-accent by default)." },
+      { name: "dot / decorative / labels / animated", type: "—", description: "Status dot, hide from AT, state labels, still mode." },
+    ],
+    a11y: ["role=img with a label per state (customizable).", "With reduced motion every state is a still pose."],
+  },
+  chat: {
+    name: "Chat",
+    description: "A complete AI chat: thread that follows the stream, bubbles or document-style answers, reasoning, sources and message actions — composed from the AI components.",
+    importName: "ChatThread, Message, MessageAction",
+    importPath: "pleate/ai/chat",
+    demos: [{ id: "full", title: "Trip assistant", description: "Pick a suggestion or type. Try Stop while it streams, and scroll up during a reply.", align: "stretch", Component: ChatFull }],
+    props: [
+      { name: "ChatThread", type: "threshold, latestLabel, contentClassName", description: "Auto-scroll while at the bottom; a jump button otherwise. role=log." },
+      { name: "Message role / variant", type: '"user" | "assistant" | "system" / "bubble" | "document"', description: "Who and how." },
+      { name: "avatar / name / time / status", type: "—", description: "Header and delivery state." },
+      { name: "actions / footer / continued", type: "ReactNode / ReactNode / boolean", description: "Hover actions, attachments or sources, grouping." },
+    ],
+    a11y: ["New messages are announced politely (role=log).", "Actions stay reachable by keyboard (shown on focus)."],
+  },
+  composer: {
+    name: "Composer",
+    description: "The prompt box: grows with text, attachments by button, drag & drop or paste, a toolbar slot, voice, and Send that becomes Stop.",
+    importName: "Composer",
+    importPath: "pleate/ai/composer",
+    demos: [{ id: "basic", title: "Full and minimal", description: "Paste an image, or drop files on it.", align: "stretch", Component: ComposerBasic }],
+    props: [
+      { name: "onSubmit", type: "({ text, files }) => void", description: "Enter or the send button; clears after." },
+      { name: "generating / onStop", type: "boolean / () => void", description: "Stop mode." },
+      { name: "accept / maxFiles", type: "string / number", default: "— / 8", description: "Enables attachments." },
+      { name: "onVoice / listening", type: "() => void / boolean", description: "Mic button." },
+      { name: "toolbar", type: "ReactNode", description: "Model picker, tools." },
+      { name: "value / onValueChange / labels", type: "—", description: "Controlled text and translatable labels." },
+    ],
+    a11y: ["Enter sends, Shift+Enter breaks the line; IME composition is respected."],
+  },
+  "streaming-text": {
+    name: "Streaming Text",
+    description: "Text that arrives in pieces: each new chunk fades in and a caret blinks while streaming. Plus the typing indicator.",
+    importName: "StreamingText, TypingIndicator",
+    importPath: "pleate/ai/streaming-text",
+    demos: [{ id: "basic", title: "Simulated stream", align: "stretch", Component: StreamingTextBasic }],
+    props: [
+      { name: "text", type: "string", description: "The whole text so far." },
+      { name: "streaming", type: "boolean", description: "Caret and aria-busy." },
+      { name: "animate", type: "boolean", default: "true", description: "Fade new chunks." },
+    ],
+  },
+  "prompt-suggestions": {
+    name: "Prompt Suggestions",
+    description: "Starter prompts for an empty chat: cards with icons, or chips that scroll on phones.",
+    importName: "PromptSuggestions",
+    importPath: "pleate/ai/prompt-suggestions",
+    demos: [{ id: "basic", title: "Grid and chips", align: "stretch", Component: PromptSuggestionsBasic }],
+    props: [
+      { name: "suggestions", type: "{ title, description?, icon?, prompt }[]", description: "Items." },
+      { name: "onSelect", type: "(prompt, suggestion) => void", description: "Choice." },
+      { name: "variant", type: '"grid" | "chips"', default: '"grid"', description: "Look." },
+    ],
+  },
+  "result-card": {
+    name: "Result Card",
+    description: "Results and sources: rich cards, numbered citation chips inside answers, and a row of compact sources.",
+    importName: "ResultCard, SourceChip, SourceList",
+    importPath: "pleate/ai/result-card",
+    demos: [{ id: "basic", title: "Cards, citations, sources", align: "stretch", Component: ResultCardBasic }],
+    props: [
+      { name: "ResultCard", type: "title, href, site, favicon, snippet, image, meta, tags, actions, index, layout", description: "Whole card is the link." },
+      { name: "SourceChip", type: "index, href, site, title", description: "Inline citation." },
+      { name: "SourceList", type: "sources[]", description: "Horizontal list." },
+    ],
+  },
+  "model-picker": {
+    name: "Model Picker",
+    description: "Choose the model: a quiet trigger, and a menu with icons, descriptions, badges and groups.",
+    importName: "ModelPicker",
+    importPath: "pleate/ai/model-picker",
+    demos: [{ id: "basic", title: "Grouped, and field style", Component: ModelPickerBasic }],
+    props: [
+      { name: "models", type: "{ id, name, description?, icon?, badges?, group?, disabled? }[]", description: "Options." },
+      { name: "value / onValueChange", type: "string", description: "Selection." },
+      { name: "variant", type: '"ghost" | "field"', default: '"ghost"', description: "Trigger look." },
+      { name: "align / side", type: "string", description: "Placement." },
+    ],
+  },
+  reasoning: {
+    name: "Reasoning",
+    description: "Show the work: a thinking panel with a live timer that folds into \"Thought for 12s\", step lists for tool calls, and shimmering status text.",
+    importName: "Reasoning, ReasoningSteps, ShimmerText",
+    importPath: "pleate/ai/reasoning",
+    demos: [{ id: "basic", title: "Steps and shimmer", align: "stretch", Component: ReasoningBasic }],
+    props: [
+      { name: "Reasoning active", type: "boolean", description: "Open with a timer while true; collapses when done." },
+      { name: "duration / activeLabel / doneLabel", type: "number / ReactNode / (s) => ReactNode", description: "Labels." },
+      { name: "ReasoningSteps steps", type: '{ label, detail?, status: "pending" | "active" | "done" | "error" }[]', description: "Progress list." },
+      { name: "ShimmerText", type: "active", description: "Animated label." },
+    ],
+  },
 
   "form-field": {
     name: "Form Field",

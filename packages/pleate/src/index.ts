@@ -57,3 +57,12 @@ export * from "./components/textarea/index.ts";
 export * from "./components/timeline/index.ts";
 export * from "./components/toast/index.ts";
 export * from "./components/tooltip/index.ts";
+
+export * from "./ai/bot-face/index.ts";
+export * from "./ai/chat/index.ts";
+export * from "./ai/composer/index.ts";
+export * from "./ai/model-picker/index.ts";
+export * from "./ai/prompt-suggestions/index.ts";
+export * from "./ai/reasoning/index.ts";
+export * from "./ai/result-card/index.ts";
+export * from "./ai/streaming-text/index.ts";

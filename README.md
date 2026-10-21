@@ -73,7 +73,7 @@ Tokens are CSS variables prefixed `--pl-` (`--pl-accent`, `--pl-surface`, `--pl-
 - [x] Feedback: Skeleton, Progress (bar + ring), EmptyState
 - [x] Data: Table (sortable, stacks on phones), List (iOS Settings, swipe actions), Accordion, Timeline, StatCard
 - [x] Forms: Form + FormField (validation), Calendar, DatePicker (single, range, presets), SearchBar, FileUpload
-- [ ] AI: BotFace, chat, composer, prompt suggestions, model picker, reasoning
+- [x] AI (`pleate/ai/*`): BotFace (voice-reactive), ChatThread + Message, Composer, StreamingText, PromptSuggestions, ResultCard + sources, ModelPicker, Reasoning
 - [ ] Effects · Marketing
 
 ## License

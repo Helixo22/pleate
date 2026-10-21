@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["dom", "dom.iterable", "ES2023"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "ES2023"
+    ],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
@@ -14,16 +18,43 @@
     "allowImportingTsExtensions": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "plugins": [{ "name": "next" }],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
-      "@/*": ["./*"],
-      "pleate": ["../../packages/pleate/src/index.ts"],
-      "pleate/theme": ["../../packages/pleate/src/theme/index.ts"],
-      "pleate/motion": ["../../packages/pleate/src/motion/index.ts"],
-      "pleate/lib": ["../../packages/pleate/src/lib/index.ts"],
-      "pleate/*": ["../../packages/pleate/src/components/*/index.ts"]
+      "@/*": [
+        "./*"
+      ],
+      "pleate": [
+        "../../packages/pleate/src/index.ts"
+      ],
+      "pleate/theme": [
+        "../../packages/pleate/src/theme/index.ts"
+      ],
+      "pleate/motion": [
+        "../../packages/pleate/src/motion/index.ts"
+      ],
+      "pleate/lib": [
+        "../../packages/pleate/src/lib/index.ts"
+      ],
+      "pleate/ai/*": [
+        "../../packages/pleate/src/ai/*/index.ts"
+      ],
+      "pleate/*": [
+        "../../packages/pleate/src/components/*/index.ts"
+      ]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
