@@ -1,5 +1,11 @@
 // Component pages: description, import path, the examples (each file in demos/<slug>/<id>.tsx) and the main props.
 import type { ComponentType } from "react";
+import CtaBasic from "./cta/basic";
+import FeatureGridVariants from "./feature-grid/variants";
+import HeroVariants from "./hero/variants";
+import LogoMarqueeBasic from "./logo-marquee/basic";
+import PricingBasic from "./pricing/basic";
+import TestimonialLayouts from "./testimonial/layouts";
 import AnimatedTextHeadline from "./animated-text/headline";
 import AnimatedTextNumbers from "./animated-text/numbers";
 import AnimatedTextScroll from "./animated-text/scroll";
@@ -100,6 +106,83 @@ export type ComponentDoc = {
 const SIZE = (sizes: string, d = "md"): PropRow => ({ name: "size", type: sizes, default: `"${d}"`, description: "Height, padding and type size." });
 
 export const DOCS: Record<string, ComponentDoc> = {
+
+  hero: {
+    name: "Hero",
+    description: "The opening of a page: announcement pill, display title, description, actions, footnote and a visual — centered or split, on the page, a soft wash or a dark band.",
+    importName: "Hero",
+    importPath: "pleate/marketing/hero",
+    demos: [{ id: "variants", title: "Centered wash and dark split", align: "stretch", Component: HeroVariants }],
+    props: [
+      { name: "title / description / eyebrow / footnote", type: "ReactNode", description: "Copy (title takes RotatingText, GradientText…)." },
+      { name: "actions / media", type: "ReactNode", description: "Buttons and the visual." },
+      { name: "layout", type: '"center" | "split"', default: '"center"', description: "Arrangement." },
+      { name: "background", type: '"plain" | "wash" | "dark"', default: '"plain"', description: "Backdrop; dark pins its own theme." },
+      { name: "size", type: '"md" | "lg"', default: '"lg"', description: "Type scale and padding." },
+    ],
+  },
+  "feature-grid": {
+    name: "Feature Grid",
+    description: "What the product does: cards, plain columns, or a bento layout with spans and visuals. Items enter one after another.",
+    importName: "FeatureGrid",
+    importPath: "pleate/marketing/feature-grid",
+    demos: [{ id: "variants", title: "Cards, bento, plain", align: "stretch", Component: FeatureGridVariants }],
+    props: [
+      { name: "features", type: "{ icon, title, description, href?, linkLabel?, media?, span?, rowSpan? }[]", description: "Items; href makes the whole card a link." },
+      { name: "columns", type: "2 | 3 | 4", default: "3", description: "Columns on large screens." },
+      { name: "variant", type: '"cards" | "plain" | "bento"', default: '"cards"', description: "Look." },
+    ],
+  },
+  pricing: {
+    name: "Pricing",
+    description: "Plans with a monthly/yearly switch — prices roll to the new amount and the saving is shown. Highlight a plan; mark what's included.",
+    importName: "Pricing",
+    importPath: "pleate/marketing/pricing",
+    demos: [{ id: "basic", title: "Three plans", align: "stretch", Component: PricingBasic }],
+    props: [
+      { name: "plans", type: "{ id, name, description, price: { monthly, yearly } | null, features, cta, highlighted?, badge? }[]", description: "Plans (yearly = monthly equivalent)." },
+      { name: "currency / locale", type: "string", default: '"EUR"', description: "Intl formatting." },
+      { name: "billing / defaultBilling / onBillingChange", type: '"monthly" | "yearly"', default: '"yearly"', description: "Period." },
+      { name: "labels", type: "object", description: "Translatable texts." },
+    ],
+    a11y: ["Excluded features are announced as not included.", "The period switch is a radio group."],
+  },
+  testimonial: {
+    name: "Testimonial",
+    description: "Quotes with people behind them: a big featured quote, balanced columns, or a swipeable carousel with snap.",
+    importName: "Testimonials, TestimonialCard",
+    importPath: "pleate/marketing/testimonial",
+    demos: [{ id: "layouts", title: "Featured, grid, carousel", align: "stretch", Component: TestimonialLayouts }],
+    props: [
+      { name: "items", type: "{ quote, name, role?, avatar?, rating? }[]", description: "Testimonials." },
+      { name: "layout", type: '"grid" | "carousel" | "featured"', default: '"grid"', description: "Arrangement." },
+    ],
+  },
+  cta: {
+    name: "CTA",
+    description: "The closing call to action — in the accent color, on a surface or dark, with an optional visual — and a newsletter signup.",
+    importName: "CTA, Newsletter",
+    importPath: "pleate/marketing/cta",
+    demos: [{ id: "basic", title: "Accent, dark with media, newsletter", align: "stretch", Component: CtaBasic }],
+    props: [
+      { name: "CTA title / description / actions / media", type: "ReactNode", description: "Content." },
+      { name: "tone", type: '"accent" | "surface" | "dark"', default: '"accent"', description: "Band color." },
+      { name: "align", type: '"center" | "start"', default: '"center"', description: "Text alignment." },
+      { name: "Newsletter onSubscribe", type: "(email) => void | Promise", description: "Loading while the promise runs, then the success message." },
+    ],
+  },
+  "logo-marquee": {
+    name: "Logo Marquee",
+    description: "An endless row of logos or names drifting sideways with faded edges. Pauses on hover; static and wrapped with reduced motion.",
+    importName: "LogoMarquee",
+    importPath: "pleate/marketing/logo-marquee",
+    demos: [{ id: "basic", title: "Names and chips", align: "stretch", Component: LogoMarqueeBasic }],
+    props: [
+      { name: "duration / reverse", type: "number / boolean", default: "30 / false", description: "Seconds per loop and direction." },
+      { name: "gap / fade", type: "CSS length / boolean", default: '"3rem" / true', description: "Spacing and edge fade." },
+      { name: "label", type: "string", description: "Names the region for screen readers." },
+    ],
+  },
 
   "animated-text": {
     name: "Animated Text",

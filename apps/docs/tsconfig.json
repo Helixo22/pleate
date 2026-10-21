@@ -45,6 +45,9 @@
       "pleate/effects/*": [
         "../../packages/pleate/src/effects/*/index.ts"
       ],
+      "pleate/marketing/*": [
+        "../../packages/pleate/src/marketing/*/index.ts"
+      ],
       "pleate/*": [
         "../../packages/pleate/src/components/*/index.ts"
       ]

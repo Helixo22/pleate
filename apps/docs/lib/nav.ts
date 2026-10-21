@@ -55,7 +55,8 @@ export const NAV: NavSection[] = [
     ],
   },
   { title: "Effects", items: [c("Animated Text", true), c("Reveal", true), c("Page Transition", true), c("Hover Effects", true)] },
-  { title: "Marketing", items: [c("Hero"), c("Feature Grid"), c("Pricing"), c("Testimonial"), c("CTA")] },
+  { title: "Marketing", items: [c("Hero", true), c("Feature Grid", true), c("Pricing", true), c("Testimonial", true), c("CTA", true), c("Logo Marquee", true)] },
+  { title: "Examples", items: [{ name: "Landing page", href: "/examples/landing", ready: true }] },
 ];
 
 export const READY_COMPONENTS = NAV.flatMap((section) => section.items).filter(

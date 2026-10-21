@@ -31,7 +31,7 @@ export default function Demo() {
             title="Airplane Mode"
             trailing={<Switch aria-label="Airplane Mode" tone="success" checked={airplane} onCheckedChange={setAirplane} />}
           />
-          <ListItem icon={<Wifi />} iconColor="var(--pl-info)" title="Wi-Fi" value={airplane ? "Off" : "Helpintrip"} href="#settings" />
+          <ListItem icon={<Wifi />} iconColor="var(--pl-info)" title="Wi-Fi" value={airplane ? "Off" : "Home"} href="#settings" />
           <ListItem icon={<Bluetooth />} iconColor="var(--pl-info)" title="Bluetooth" value="On" href="#settings" />
         </ListSection>
 

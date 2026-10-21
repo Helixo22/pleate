@@ -68,10 +68,14 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 export function Shell({ children }: { children: ReactNode }) {
   const [menu, setMenu] = useState(false);
   const pathname = usePathname();
+  // Example pages are full-bleed sites of their own: no docs chrome.
+  const bare = pathname.startsWith("/examples/");
   useEffect(() => setMenu(false), [pathname]);
   useEffect(() => {
     document.body.style.overflow = menu ? "hidden" : "";
   }, [menu]);
+
+  if (bare) return <>{children}</>;
 
   return (
     <div className="min-h-dvh">
