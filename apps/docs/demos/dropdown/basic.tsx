@@ -25,7 +25,7 @@ export default function Demo() {
           </button>
         }
         items={[
-          { type: "label", label: "sofia@helpintrip.es" },
+          { type: "label", label: "sofia@plate.app" },
           { label: "Profile", icon: <User /> },
           { label: "Settings", icon: <Settings />, shortcut: "⌘," },
           { type: "separator" },

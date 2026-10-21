@@ -6,7 +6,7 @@ export default function Demo() {
     <div className="w-full overflow-hidden rounded-2xl shadow-[inset_0_0_0_1px_var(--pl-separator)]">
       <Navbar
         sticky={false}
-        brand={<a href="#basic" className="text-headline font-bold">helpintrip</a>}
+        brand={<a href="#basic" className="text-headline font-bold">Plate</a>}
         actions={<Button size="sm">Sign in</Button>}
         panelFooter={<Button size="lg" fullWidth>Start planning</Button>}
       >

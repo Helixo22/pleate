@@ -5,7 +5,8 @@ iOS-inspired React components, design tokens and themes for Next.js (App Router)
 - **Solid, not glass** — opaque surfaces, soft shadows, generous radii, airy spacing.
 - **Themes at runtime** — light / dark / system, ten palettes, or a full palette generated from one color (OKLCH, WCAG AA checked).
 - **Accessible** — Radix primitives, keyboard support, visible focus, `prefers-reduced-motion` respected everywhere.
-- **Tree-shakable** — one module per component (`pleate/button`, `pleate/select`…), `"use client"` only where needed.
+- **Tree-shakable** — one module per component (`pleate/button`, `pleate/ai/chat`, `pleate/effects/reveal`, `pleate/marketing/hero`…), `"use client"` only where needed.
+- **AI-ready** — chat, composer, streaming text, reasoning, sources and an expressive, voice-reactive assistant avatar.
 
 ## Install
 
@@ -61,7 +62,7 @@ Tokens are CSS variables prefixed `--pl-` (`--pl-accent`, `--pl-surface`, `--pl-
 | Path | |
 |---|---|
 | `packages/pleate` | the library (`npm run build -w pleate`, `npm run palettes -w pleate`) |
-| `apps/docs` | documentation and demos (`npm run dev`) |
+| `apps/docs` | documentation, live demos and an example landing page (`npm run dev`) |
 
 ## Roadmap
 
@@ -75,7 +76,7 @@ Tokens are CSS variables prefixed `--pl-` (`--pl-accent`, `--pl-surface`, `--pl-
 - [x] Forms: Form + FormField (validation), Calendar, DatePicker (single, range, presets), SearchBar, FileUpload
 - [x] AI (`pleate/ai/*`): BotFace (voice-reactive), ChatThread + Message, Composer, StreamingText, PromptSuggestions, ResultCard + sources, ModelPicker, Reasoning
 - [x] Effects (`pleate/effects/*`): animated text (blur, rotating, gradient, shiny, decrypted, count-up, scroll-lit), Reveal + groups, ScrollProgress, Parallax, PageTransition, Magnet, Spotlight, Tilt, ClickSpark
-- [ ] Marketing
+- [x] Marketing (`pleate/marketing/*`): Hero, FeatureGrid (cards, bento), Pricing, Testimonials, CTA + Newsletter, LogoMarquee
 
 ## License
 

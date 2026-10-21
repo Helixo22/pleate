@@ -71,3 +71,10 @@ export * from "./effects/animated-text/index.ts";
 export * from "./effects/hover/index.ts";
 export * from "./effects/page-transition/index.ts";
 export * from "./effects/reveal/index.ts";
+
+export * from "./marketing/cta/index.ts";
+export * from "./marketing/feature-grid/index.ts";
+export * from "./marketing/hero/index.ts";
+export * from "./marketing/logo-marquee/index.ts";
+export * from "./marketing/pricing/index.ts";
+export * from "./marketing/testimonial/index.ts";

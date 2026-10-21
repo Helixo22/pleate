@@ -6,7 +6,9 @@ import type { HTMLAttributes, ReactNode, Ref } from "react";
 import { cn } from "../../lib/cn.ts";
 import { Container, type ContainerProps } from "../container/container.tsx";
 
-export const sectionVariants = cva("relative w-full text-fg", {
+// overflow-x-clip: content entering from the side (Reveal left/right) never widens the page; unlike hidden it
+// keeps sticky children working.
+export const sectionVariants = cva("relative w-full overflow-x-clip text-fg", {
   variants: {
     spacing: {
       none: "",

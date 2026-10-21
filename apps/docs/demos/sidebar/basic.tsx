@@ -40,8 +40,8 @@ export default function Demo() {
           selection={filled ? "filled" : "soft"}
         >
           <SidebarHeader>
-            <span className="grid size-8 place-items-center rounded-[30%] bg-accent text-headline text-on-accent">h</span>
-            {!collapsed && <span className="text-headline">helpintrip</span>}
+            <span className="grid size-8 place-items-center rounded-[30%] bg-accent text-headline text-on-accent">P</span>
+            {!collapsed && <span className="text-headline">Plate</span>}
           </SidebarHeader>
           <SidebarContent>
             <SidebarGroup label="Plan">

@@ -34,7 +34,7 @@ export function Showcase() {
           <div className="group/row">
             <Row icon={<Wifi />} tile="var(--pl-info)">
               <span className="text-body">Wi-Fi</span>
-              <span className="text-body text-fg-muted">Helpintrip</span>
+              <span className="text-body text-fg-muted">Home</span>
             </Row>
           </div>
           <div className="group/row">

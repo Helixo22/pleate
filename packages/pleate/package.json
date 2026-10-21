@@ -42,6 +42,10 @@
       "types": "./dist/effects/*/index.d.ts",
       "default": "./dist/effects/*/index.js"
     },
+    "./marketing/*": {
+      "types": "./dist/marketing/*/index.d.ts",
+      "default": "./dist/marketing/*/index.js"
+    },
     "./*": {
       "types": "./dist/components/*/index.d.ts",
       "default": "./dist/components/*/index.js"

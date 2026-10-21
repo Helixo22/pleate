@@ -13,7 +13,7 @@ export default function Demo() {
       <Footer
         brand={
           <>
-            <span className="text-headline text-fg">helpintrip</span>
+            <span className="text-headline text-fg">Plate</span>
             <p>Plan trips together, from the first idea to the last photo.</p>
           </>
         }
@@ -30,7 +30,7 @@ export default function Demo() {
           ))}
         </FooterColumns>
         <FooterBottom>
-          <span>© 2026 helpintrip. All rights reserved.</span>
+          <span>© 2026 Plate. All rights reserved.</span>
           <div className="flex gap-4">
             <a href="#basic" className="hover:text-fg">Privacy</a>
             <a href="#basic" className="hover:text-fg">Terms</a>

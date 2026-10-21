@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <div className="mx-auto max-w-5xl">
       <section className="pt-4 pb-14 md:pt-10 md:pb-20">
-        <p className="mb-4 text-subhead font-semibold text-accent-ink">pleate · v0.1</p>
+        <p className="mb-4 text-subhead font-semibold text-accent-ink">pleate · v0.1 · 90+ components</p>
         <h1 className="max-w-4xl text-display-xl">Interfaces that feel native.</h1>
         <p className="mt-6 max-w-2xl text-title3 font-normal text-fg-muted">
           iOS-inspired React components, design tokens and themes for Next.js. Rounded, airy, precise — and yours,
@@ -28,6 +28,9 @@ export default function Home() {
             </Link>
           </Button>
           <Button asChild size="lg" variant="tinted">
+            <Link href="/examples/landing">Example landing page</Link>
+          </Button>
+          <Button asChild size="lg" variant="plain">
             <Link href="/theming">Theming</Link>
           </Button>
         </div>
