@@ -130,8 +130,8 @@
   --pl-ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
 
   /* Layers */
+  --pl-z-sticky: 40;
   --pl-z-dropdown: 50;
-  --pl-z-sticky: 60;
   --pl-z-overlay: 80;
   --pl-z-modal: 90;
   --pl-z-toast: 100;

@@ -184,3 +184,11 @@
 @utility pl-tabular {
   font-variant-numeric: tabular-nums;
 }
+
+/* Horizontal scrollers (tab lists, chip rows) without a visible scrollbar. */
+@utility pl-no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

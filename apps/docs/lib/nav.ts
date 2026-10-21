@@ -33,7 +33,10 @@ export const NAV: NavSection[] = [
       c("Navbar", true), c("Navigation Bar", true), c("Sidebar", true), c("Footer", true), c("Tab Bar", true),
     ],
   },
-  { title: "Navigation", items: [c("Tabs"), c("Segmented Control"), c("Breadcrumb"), c("Pagination"), c("Menu"), c("Dropdown")] },
+  {
+    title: "Navigation",
+    items: [c("Tabs", true), c("Segmented Control", true), c("Breadcrumb", true), c("Pagination", true), c("Menu", true), c("Dropdown", true)],
+  },
   { title: "Overlay", items: [c("Modal"), c("Bottom Sheet"), c("Action Sheet"), c("Popover"), c("Tooltip"), c("Toast"), c("Alert")] },
   { title: "Feedback", items: [c("Skeleton"), c("Progress"), c("Empty State")] },
   { title: "Data", items: [c("Table"), c("List"), c("Accordion"), c("Timeline"), c("Stat Card")] },
