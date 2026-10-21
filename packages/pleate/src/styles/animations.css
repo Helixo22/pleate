@@ -12,6 +12,8 @@
 @keyframes pl-zoom-out { to { opacity: 0; transform: translate(-50%, -48%) scale(0.96); } }
 @keyframes pl-sheet-in { from { transform: translateY(100%); } }
 @keyframes pl-sheet-out { to { transform: translateY(100%); } }
+@keyframes pl-drawer-in { from { transform: translateX(var(--pl-drawer-from, -100%)); } }
+@keyframes pl-drawer-out { to { transform: translateX(var(--pl-drawer-from, -100%)); } }
 @keyframes pl-spin { to { transform: rotate(360deg); } }
 @keyframes pl-spoke { from { opacity: 1; } to { opacity: 0.18; } }
 @keyframes pl-shimmer { from { background-position: 150% 0; } to { background-position: -50% 0; } }
@@ -42,4 +44,11 @@
   background: linear-gradient(90deg, var(--pl-fill-2) 0%, var(--pl-fill-2) 40%, var(--pl-fill-3) 50%, var(--pl-fill-2) 60%, var(--pl-fill-2) 100%);
   background-size: 300% 100%;
   animation: pl-shimmer 1.6s linear infinite;
+}
+
+/* Side drawers (Sidebar on phones): slide from the start edge (or the end edge with data-side="end"). */
+@utility pl-drawer {
+  &[data-side="end"] { --pl-drawer-from: 100%; }
+  &[data-state="open"] { animation: pl-drawer-in var(--pl-duration-slow) var(--pl-ease-ios); }
+  &[data-state="closed"] { animation: pl-drawer-out var(--pl-duration-base) var(--pl-ease-in-out) forwards; }
 }
