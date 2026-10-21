@@ -1,5 +1,12 @@
 // Component pages: description, import path, the examples (each file in demos/<slug>/<id>.tsx) and the main props.
 import type { ComponentType } from "react";
+import BreadcrumbBasic from "./breadcrumb/basic";
+import DropdownBasic from "./dropdown/basic";
+import MenuBasic from "./menu/basic";
+import MenuContext from "./menu/context";
+import PaginationVariants from "./pagination/variants";
+import SegmentedControlBasic from "./segmented-control/basic";
+import TabsVariants from "./tabs/variants";
 import CardComposed from "./card/composed";
 import CardVariants from "./card/variants";
 import ContainerSizes from "./container/sizes";
@@ -54,6 +61,85 @@ export type ComponentDoc = {
 const SIZE = (sizes: string, d = "md"): PropRow => ({ name: "size", type: sizes, default: `"${d}"`, description: "Height, padding and type size." });
 
 export const DOCS: Record<string, ComponentDoc> = {
+
+  tabs: {
+    name: "Tabs",
+    description: "Switch between views of the same content. Underline with a sliding bar, pill with a sliding capsule, or soft chips.",
+    importName: "Tabs, TabsList, TabsTrigger, TabsContent",
+    demos: [{ id: "variants", title: "Underline, pill, soft", align: "stretch", Component: TabsVariants }],
+    props: [
+      { name: "value / defaultValue / onValueChange", type: "string", description: "Selected tab." },
+      { name: "variant", type: '"underline" | "pill" | "soft"', default: '"underline"', description: "Look." },
+      { name: "size", type: '"sm" | "md"', default: '"md"', description: "Trigger height and type." },
+      { name: "activationMode", type: '"automatic" | "manual"', default: '"automatic"', description: "Select on focus or on Enter (Radix)." },
+    ],
+    a11y: ["tablist / tab / tabpanel roles with aria-selected and aria-controls.", "Arrow keys, Home and End move between tabs."],
+  },
+  "segmented-control": {
+    name: "Segmented Control",
+    description: "The iOS segmented picker: a thumb slides under the selected segment. Text, icons, or both.",
+    importName: "SegmentedControl",
+    demos: [{ id: "basic", title: "Text, icons, sizes", align: "stretch", Component: SegmentedControlBasic }],
+    props: [
+      { name: "options", type: "{ value, label, icon?, disabled?, aria-label? }[]", description: "Segments." },
+      { name: "value / defaultValue / onValueChange", type: "string", description: "Selection (one is always selected)." },
+      { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', description: "Height." },
+      { name: "fullWidth", type: "boolean", description: "Equal segments across the container." },
+    ],
+    a11y: ["A radio group: arrow keys move and select.", "Icon-only segments need an aria-label."],
+  },
+  breadcrumb: {
+    name: "Breadcrumb",
+    description: "Shows where the page sits in the hierarchy. Long paths collapse their middle into an expandable ellipsis.",
+    importName: "Breadcrumb",
+    demos: [{ id: "basic", title: "Icons and collapsing", align: "start", Component: BreadcrumbBasic }],
+    props: [
+      { name: "items", type: "{ label, href?, icon? }[]", description: "The path; the last item is the current page." },
+      { name: "maxItems", type: "number", description: "Collapse the middle beyond this count." },
+      { name: "renderLink", type: "(item, props) => ReactNode", description: "Render links with Next <Link>." },
+      { name: "separator", type: "ReactNode", description: "Custom separator (chevron by default)." },
+    ],
+  },
+  pagination: {
+    name: "Pagination",
+    description: "Move through pages: numbered with ellipses (fewer on phones), compact \"3 of 12\", or the iOS page-control dots.",
+    importName: "Pagination",
+    demos: [{ id: "variants", title: "Pages, compact, dots", Component: PaginationVariants }],
+    props: [
+      { name: "page / pageCount", type: "number", description: "Current page (1-based) and total." },
+      { name: "onPageChange / getHref", type: "function", description: "Buttons, or links for crawlable pages." },
+      { name: "variant", type: '"pages" | "compact" | "dots"', default: '"pages"', description: "Look." },
+      { name: "siblings", type: "number", default: "1", description: "Pages on each side of the current one." },
+      { name: "size", type: '"sm" | "md"', default: '"md"', description: "Button size." },
+    ],
+  },
+  menu: {
+    name: "Menu",
+    description: "Action menus with the iOS look: trailing icons, shortcuts, destructive rows, checkmarks, submenus. ContextMenu opens the same menu on right click or long press.",
+    importName: "Menu, MenuTrigger, MenuContent, MenuItem, …",
+    demos: [
+      { id: "basic", title: "Everything in one menu", Component: MenuBasic },
+      { id: "context", title: "Context menu", description: "import { ContextMenu, … } from \"pleate/context-menu\"", Component: MenuContext },
+    ],
+    props: [
+      { name: "MenuItem", type: "icon, shortcut, destructive, inset, disabled, onSelect", description: "One action." },
+      { name: "MenuCheckboxItem / MenuRadioItem", type: "checked / value", description: "Toggles and single choice." },
+      { name: "MenuSub, MenuSubTrigger, MenuSubContent", type: "—", description: "Nested menu." },
+      { name: "MenuContent", type: "align, side, sideOffset", description: "Placement (Radix)." },
+    ],
+    a11y: ["menu / menuitem roles, arrow keys, typeahead, Escape.", "Focus returns to the trigger on close."],
+  },
+  dropdown: {
+    name: "Dropdown",
+    description: "A Menu described as data: give it a trigger (or a label for a ready-made button) and a list of entries.",
+    importName: "Dropdown",
+    demos: [{ id: "basic", title: "Button and avatar triggers", Component: DropdownBasic }],
+    props: [
+      { name: "items", type: "DropdownEntry[]", description: "item | separator | label | submenu." },
+      { name: "trigger / label", type: "ReactNode", description: "Custom trigger, or text for a gray Button with a chevron." },
+      { name: "align / side", type: "string", default: '"start"', description: "Placement." },
+    ],
+  },
 
   container: {
     name: "Container",

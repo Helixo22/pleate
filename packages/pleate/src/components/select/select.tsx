@@ -43,6 +43,7 @@ export function SelectContent({
   children,
   position = "popper",
   sideOffset = 6,
+  collisionPadding = 8,
   ...props
 }: ComponentProps<typeof SelectPrimitive.Content>) {
   return (
@@ -50,6 +51,7 @@ export function SelectContent({
       <SelectPrimitive.Content
         position={position}
         sideOffset={sideOffset}
+        collisionPadding={collisionPadding}
         className={cn(
           "pl-pop relative z-(--pl-z-dropdown) overflow-hidden rounded-xl bg-elevated text-fg shadow-lg",
           "max-h-(--radix-select-content-available-height) min-w-[max(var(--radix-select-trigger-width),10rem)]",
