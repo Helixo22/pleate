@@ -1,0 +1,17 @@
+@import "tailwindcss";
+@import "../../../packages/pleate/src/styles/index.css";
+@source "../../../packages/pleate/src";
+
+/* Docs chrome only. */
+@layer base {
+  html {
+    scroll-padding-top: 5rem;
+  }
+}
+
+/* View Transition used by ThemeProvider for theme and palette switches: a quick cross-fade. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+  animation-timing-function: var(--pl-ease-out);
+}

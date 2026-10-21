@@ -1,0 +1,186 @@
+/* ---------------------------------------------------------------------------------------------------------------
+   pleate/styles/theme.css — maps the tokens onto Tailwind v4 (colors, radii, shadows, type scale, easing) and
+   defines the variants the components rely on. Utilities read the variables at use time (@theme inline), so palette
+   and theme switches need no rebuild.
+   --------------------------------------------------------------------------------------------------------------- */
+
+/* Dark mode follows data-theme (set by ThemeScript / ThemeProvider), not the media query: "system" is resolved there. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Animations stop with the system "reduce motion" setting or with data-motion="off" on any ancestor. */
+@custom-variant motion-safe {
+  @media (prefers-reduced-motion: no-preference) {
+    &:where(:not([data-motion="off"], [data-motion="off"] *)) {
+      @slot;
+    }
+  }
+}
+@custom-variant motion-reduce {
+  @media (prefers-reduced-motion: reduce) {
+    @slot;
+  }
+  &:where([data-motion="off"], [data-motion="off"] *) {
+    @slot;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--pl-bg);
+  --color-surface: var(--pl-surface);
+  --color-surface-2: var(--pl-surface-2);
+  --color-elevated: var(--pl-elevated);
+  --color-fill: var(--pl-fill);
+  --color-fill-2: var(--pl-fill-2);
+  --color-fill-3: var(--pl-fill-3);
+  --color-fill-hover: var(--pl-fill-hover);
+  --color-overlay: var(--pl-overlay);
+
+  --color-fg: var(--pl-fg);
+  --color-fg-muted: var(--pl-fg-muted);
+  --color-fg-subtle: var(--pl-fg-subtle);
+  --color-separator: var(--pl-separator);
+  --color-border: var(--pl-border);
+
+  --color-accent: var(--pl-accent);
+  --color-accent-hover: var(--pl-accent-hover);
+  --color-accent-active: var(--pl-accent-active);
+  --color-accent-soft: var(--pl-accent-soft);
+  --color-accent-soft-hover: var(--pl-accent-soft-hover);
+  --color-accent-ink: var(--pl-accent-ink);
+  --color-on-accent: var(--pl-on-accent);
+  --color-ring: var(--pl-ring);
+  --color-accent-50: var(--pl-accent-50);
+  --color-accent-100: var(--pl-accent-100);
+  --color-accent-200: var(--pl-accent-200);
+  --color-accent-300: var(--pl-accent-300);
+  --color-accent-400: var(--pl-accent-400);
+  --color-accent-500: var(--pl-accent-500);
+  --color-accent-600: var(--pl-accent-600);
+  --color-accent-700: var(--pl-accent-700);
+  --color-accent-800: var(--pl-accent-800);
+  --color-accent-900: var(--pl-accent-900);
+  --color-accent-950: var(--pl-accent-950);
+
+  --color-success: var(--pl-success);
+  --color-success-ink: var(--pl-success-ink);
+  --color-success-soft: var(--pl-success-soft);
+  --color-success-vivid: var(--pl-success-vivid);
+  --color-warning: var(--pl-warning);
+  --color-warning-ink: var(--pl-warning-ink);
+  --color-warning-soft: var(--pl-warning-soft);
+  --color-danger: var(--pl-danger);
+  --color-danger-ink: var(--pl-danger-ink);
+  --color-danger-soft: var(--pl-danger-soft);
+  --color-info: var(--pl-info);
+  --color-info-ink: var(--pl-info-ink);
+  --color-info-soft: var(--pl-info-soft);
+  --color-on-status: var(--pl-on-status);
+  --color-knob: var(--pl-knob);
+
+  --font-sans: var(--pl-font-sans);
+  --font-display: var(--pl-font-display);
+  --font-mono: var(--pl-font-mono);
+
+  --radius-xs: calc(0.375rem * var(--pl-roundness));
+  --radius-sm: calc(0.5rem * var(--pl-roundness));
+  --radius-md: calc(0.75rem * var(--pl-roundness));
+  --radius-lg: calc(1rem * var(--pl-roundness));
+  --radius-xl: calc(1.25rem * var(--pl-roundness));
+  --radius-2xl: calc(1.5rem * var(--pl-roundness));
+  --radius-3xl: calc(2rem * var(--pl-roundness));
+  --radius-4xl: calc(2.5rem * var(--pl-roundness));
+
+  --shadow-xs: var(--pl-edge), var(--pl-shadow-xs);
+  --shadow-sm: var(--pl-edge), var(--pl-shadow-sm);
+  --shadow-md: var(--pl-edge), var(--pl-shadow-md);
+  --shadow-lg: var(--pl-edge), var(--pl-shadow-lg);
+  --shadow-xl: var(--pl-edge), var(--pl-shadow-xl);
+  --shadow-knob: var(--pl-knob-shadow);
+
+  --ease-ios: var(--pl-ease-ios);
+  --ease-out: var(--pl-ease-out);
+  --ease-in-out: var(--pl-ease-in-out);
+  --ease-spring: var(--pl-ease-spring);
+}
+
+/* iOS Dynamic Type scale (sizes at the default "Large" setting) plus display sizes for marketing pages. */
+@theme {
+  --text-display-xl: clamp(3rem, 2rem + 4.5vw, 5.5rem);
+  --text-display-xl--line-height: 1.04;
+  --text-display-xl--letter-spacing: -0.035em;
+  --text-display-xl--font-weight: 700;
+  --text-display: clamp(2.5rem, 1.9rem + 2.6vw, 4rem);
+  --text-display--line-height: 1.06;
+  --text-display--letter-spacing: -0.03em;
+  --text-display--font-weight: 700;
+  --text-display-sm: clamp(2rem, 1.6rem + 1.6vw, 3rem);
+  --text-display-sm--line-height: 1.1;
+  --text-display-sm--letter-spacing: -0.025em;
+  --text-display-sm--font-weight: 700;
+
+  --text-large-title: 2.125rem;
+  --text-large-title--line-height: 2.5625rem;
+  --text-large-title--letter-spacing: 0.012em;
+  --text-large-title--font-weight: 700;
+  --text-title1: 1.75rem;
+  --text-title1--line-height: 2.125rem;
+  --text-title1--letter-spacing: 0.013em;
+  --text-title1--font-weight: 700;
+  --text-title2: 1.375rem;
+  --text-title2--line-height: 1.75rem;
+  --text-title2--letter-spacing: -0.008em;
+  --text-title2--font-weight: 700;
+  --text-title3: 1.25rem;
+  --text-title3--line-height: 1.5625rem;
+  --text-title3--letter-spacing: -0.012em;
+  --text-title3--font-weight: 600;
+  --text-headline: 1.0625rem;
+  --text-headline--line-height: 1.375rem;
+  --text-headline--letter-spacing: -0.026em;
+  --text-headline--font-weight: 600;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.375rem;
+  --text-body--letter-spacing: -0.026em;
+  --text-callout: 1rem;
+  --text-callout--line-height: 1.3125rem;
+  --text-callout--letter-spacing: -0.02em;
+  --text-subhead: 0.9375rem;
+  --text-subhead--line-height: 1.25rem;
+  --text-subhead--letter-spacing: -0.015em;
+  --text-footnote: 0.8125rem;
+  --text-footnote--line-height: 1.125rem;
+  --text-footnote--letter-spacing: -0.005em;
+  --text-caption1: 0.75rem;
+  --text-caption1--line-height: 1rem;
+  --text-caption2: 0.6875rem;
+  --text-caption2--line-height: 0.8125rem;
+  --text-caption2--letter-spacing: 0.006em;
+}
+
+/* Focus ring shared by every interactive component: visible on keyboard focus only. */
+@utility pl-focus-ring {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  &:focus-visible {
+    outline-color: var(--pl-ring);
+  }
+}
+@utility pl-focus-within-ring {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  &:has(:focus-visible) {
+    outline-color: var(--pl-ring);
+  }
+}
+
+/* Native-app touch behavior: no tap flash, no text selection on long press. */
+@utility pl-touch {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+@utility pl-tabular {
+  font-variant-numeric: tabular-nums;
+}

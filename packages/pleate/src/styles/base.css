@@ -1,0 +1,38 @@
+/* ---------------------------------------------------------------------------------------------------------------
+   pleate/styles/base.css — page defaults (in the base layer, so app styles win) and the global reduced-motion rule.
+   --------------------------------------------------------------------------------------------------------------- */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body {
+    background-color: var(--pl-bg);
+    color: var(--pl-fg);
+    font-family: var(--pl-font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background-color: color-mix(in oklab, var(--pl-accent-ink) 26%, transparent);
+  }
+}
+
+/* Reduced motion: system setting, or data-motion="off" on any ancestor. Animations end at once (Radix still gets
+   its animationend) and loops stop on their first frame. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+[data-motion="off"], [data-motion="off"] *, [data-motion="off"] *::before, [data-motion="off"] *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+  scroll-behavior: auto !important;
+}

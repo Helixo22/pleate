@@ -1,0 +1,146 @@
+/* ---------------------------------------------------------------------------------------------------------------
+   pleate/styles/tokens.css — design tokens as CSS variables (prefix --pl-).
+   Neutral surfaces follow iOS system colors; all surfaces are solid (no translucency, no blur).
+   Light values live on :root and [data-theme="light"], dark ones on [data-theme="dark"], so a subtree can pin its own
+   theme. The accent comes from palettes.css; hover/pressed/soft/ring shades are derived below from whatever accent is
+   in effect, so they follow presets, custom palettes and theme islands alike.
+   --------------------------------------------------------------------------------------------------------------- */
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Surfaces: page → card → raised (sheets, popovers). Fills are neutral wells (fields, gray buttons, tracks). */
+  --pl-bg: #f2f2f7;
+  --pl-surface: #ffffff;
+  --pl-surface-2: #f7f7fa;
+  --pl-elevated: #ffffff;
+  --pl-fill: #e5e5ea;
+  --pl-fill-2: #eeeef2;
+  --pl-fill-3: #f4f4f7;
+  --pl-overlay: rgb(0 0 0 / 0.36);
+
+  /* Content */
+  --pl-fg: #000000;
+  --pl-fg-muted: #6c6c72;
+  --pl-fg-subtle: #8e8e93;
+  --pl-separator: #d8d8dd;
+  --pl-border: #c7c7cc;
+
+  /* Status: fill (white text on top, AA) · ink (text and icons on the page, AA) · soft (tinted wells) */
+  --pl-success: #1f7a35;
+  --pl-success-ink: #1f7a35;
+  --pl-warning: #b25000;
+  --pl-warning-ink: #a34a00;
+  --pl-danger: #d70015;
+  --pl-danger-ink: #c4001a;
+  --pl-info: #0a63c9;
+  --pl-info-ink: #0a63c9;
+  --pl-on-status: #ffffff;
+  --pl-success-vivid: #34c759; /* iOS system green: switches and live dots, never behind text */
+
+  /* Elevation: soft, diffuse, never heavy */
+  --pl-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.05);
+  --pl-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.04), 0 2px 8px rgb(0 0 0 / 0.04);
+  --pl-shadow-md: 0 2px 4px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.07);
+  --pl-shadow-lg: 0 4px 10px rgb(0 0 0 / 0.04), 0 16px 40px -8px rgb(0 0 0 / 0.14);
+  --pl-shadow-xl: 0 8px 16px rgb(0 0 0 / 0.05), 0 28px 64px -16px rgb(0 0 0 / 0.22);
+  --pl-edge: 0 0 0 0 transparent; /* hairline added to raised surfaces in dark mode */
+
+  --pl-mix: #000000; /* what hover and pressed states mix the accent with */
+
+  /* Knobs (switch and slider thumbs): white in both themes, as on iOS */
+  --pl-knob: #ffffff;
+  --pl-knob-shadow: 0 3px 8px rgb(0 0 0 / 0.15), 0 3px 1px rgb(0 0 0 / 0.06), 0 0 0 0.5px rgb(0 0 0 / 0.04);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --pl-bg: #000000;
+  --pl-surface: #1c1c1e;
+  --pl-surface-2: #242426;
+  --pl-elevated: #2c2c2e;
+  --pl-fill: #3a3a3c;
+  --pl-fill-2: #2c2c2e;
+  --pl-fill-3: #232325;
+  --pl-overlay: rgb(0 0 0 / 0.6);
+
+  --pl-fg: #ffffff;
+  --pl-fg-muted: #98989f;
+  --pl-fg-subtle: #6e6e73;
+  --pl-separator: #38383a;
+  --pl-border: #48484a;
+
+  --pl-success: #23803a;
+  --pl-success-ink: #30d158;
+  --pl-warning: #b35a00;
+  --pl-warning-ink: #ffb340;
+  --pl-danger: #e0262f;
+  --pl-danger-ink: #ff6961;
+  --pl-info: #1f6fd1;
+  --pl-info-ink: #64a8ff;
+  --pl-success-vivid: #30d158;
+
+  --pl-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.5);
+  --pl-shadow-sm: 0 1px 3px rgb(0 0 0 / 0.5);
+  --pl-shadow-md: 0 4px 16px rgb(0 0 0 / 0.5);
+  --pl-shadow-lg: 0 12px 36px -6px rgb(0 0 0 / 0.65);
+  --pl-shadow-xl: 0 24px 64px -12px rgb(0 0 0 / 0.75);
+  --pl-edge: inset 0 0 0 0.5px rgb(255 255 255 / 0.1);
+
+  --pl-mix: #ffffff;
+}
+
+/* Derived shades, recomputed wherever the theme or the palette changes. */
+:root,
+[data-theme],
+[data-palette] {
+  --pl-accent-hover: color-mix(in oklab, var(--pl-accent) 90%, var(--pl-mix));
+  --pl-accent-active: color-mix(in oklab, var(--pl-accent) 80%, var(--pl-mix));
+  --pl-accent-soft: color-mix(in oklab, var(--pl-accent-ink) 13%, transparent);
+  --pl-accent-soft-hover: color-mix(in oklab, var(--pl-accent-ink) 19%, transparent);
+  --pl-ring: color-mix(in oklab, var(--pl-accent-ink) 55%, transparent);
+  --pl-success-soft: color-mix(in oklab, var(--pl-success-ink) 14%, transparent);
+  --pl-warning-soft: color-mix(in oklab, var(--pl-warning-ink) 15%, transparent);
+  --pl-danger-soft: color-mix(in oklab, var(--pl-danger-ink) 13%, transparent);
+  --pl-info-soft: color-mix(in oklab, var(--pl-info-ink) 13%, transparent);
+  --pl-fill-hover: color-mix(in oklab, var(--pl-fill) 85%, var(--pl-mix) 15%);
+}
+
+/* Non-color tokens: shared by both themes. */
+:root {
+  /* One knob for the whole library's corner radius: 1 = pleate default, 0.75 = tighter, 1.25 = rounder. */
+  --pl-roundness: 1;
+
+  --pl-font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", var(--font-inter, system-ui),
+    system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --pl-font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", var(--font-inter, system-ui), system-ui,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --pl-font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* Motion. JS twins in src/motion/tokens.ts. */
+  --pl-duration-instant: 100ms;
+  --pl-duration-fast: 160ms;
+  --pl-duration-base: 240ms;
+  --pl-duration-slow: 400ms;
+  --pl-ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  --pl-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --pl-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --pl-ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  /* Layers */
+  --pl-z-dropdown: 50;
+  --pl-z-sticky: 60;
+  --pl-z-overlay: 80;
+  --pl-z-modal: 90;
+  --pl-z-toast: 100;
+  --pl-z-tooltip: 110;
+
+  /* Touch */
+  --pl-tap: 44px;
+  --pl-safe-top: env(safe-area-inset-top, 0px);
+  --pl-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --pl-safe-left: env(safe-area-inset-left, 0px);
+  --pl-safe-right: env(safe-area-inset-right, 0px);
+}
