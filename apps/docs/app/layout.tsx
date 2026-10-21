@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { MotionProvider } from "pleate/motion";
 import { ThemeProvider, ThemeScript } from "pleate/theme";
+import { Toaster } from "pleate/toast";
 import { Shell } from "@/components/shell";
 import "./globals.css";
 
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <MotionProvider>
             <Shell>{children}</Shell>
+            <Toaster />
           </MotionProvider>
         </ThemeProvider>
       </body>

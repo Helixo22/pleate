@@ -8,10 +8,11 @@
 @keyframes pl-fade-out { to { opacity: 0; } }
 @keyframes pl-pop-in { from { opacity: 0; transform: scale(0.94) translateY(var(--pl-pop-y, -4px)); } }
 @keyframes pl-pop-out { to { opacity: 0; transform: scale(0.96); } }
-@keyframes pl-zoom-in { from { opacity: 0; transform: translate(-50%, -48%) scale(0.92); } }
-@keyframes pl-zoom-out { to { opacity: 0; transform: translate(-50%, -48%) scale(0.96); } }
+@keyframes pl-zoom-in { from { opacity: 0; transform: scale(0.94); } }
+@keyframes pl-zoom-out { to { opacity: 0; transform: scale(0.97); } }
 @keyframes pl-sheet-in { from { transform: translateY(100%); } }
 @keyframes pl-sheet-out { to { transform: translateY(100%); } }
+@keyframes pl-alert-in { from { opacity: 0; transform: scale(1.12); } }
 @keyframes pl-drawer-in { from { transform: translateX(var(--pl-drawer-from, -100%)); } }
 @keyframes pl-drawer-out { to { transform: translateX(var(--pl-drawer-from, -100%)); } }
 @keyframes pl-spin { to { transform: rotate(360deg); } }
@@ -51,4 +52,19 @@
   &[data-side="end"] { --pl-drawer-from: 100%; }
   &[data-state="open"] { animation: pl-drawer-in var(--pl-duration-slow) var(--pl-ease-ios); }
   &[data-state="closed"] { animation: pl-drawer-out var(--pl-duration-base) var(--pl-ease-in-out) forwards; }
+}
+
+/* Dialogs: centered zoom on desktop, slide up from the bottom on phones (when the dialog is a sheet there). */
+@utility pl-dialog {
+  &[data-state="open"] { animation: pl-zoom-in var(--pl-duration-base) var(--pl-ease-out); }
+  &[data-state="closed"] { animation: pl-zoom-out var(--pl-duration-fast) var(--pl-ease-in-out) forwards; }
+}
+@utility pl-dialog-sheet {
+  &[data-state="open"] { animation: pl-sheet-in var(--pl-duration-slow) var(--pl-ease-ios); }
+  &[data-state="closed"] { animation: pl-sheet-out var(--pl-duration-base) var(--pl-ease-in-out) forwards; }
+}
+/* iOS alerts pop in slightly larger and settle. */
+@utility pl-alert {
+  &[data-state="open"] { animation: pl-alert-in var(--pl-duration-base) var(--pl-ease-out); }
+  &[data-state="closed"] { animation: pl-fade-out var(--pl-duration-fast) var(--pl-ease-in-out) forwards; }
 }
