@@ -1,5 +1,13 @@
 // Component pages: description, import path, the examples (each file in demos/<slug>/<id>.tsx) and the main props.
 import type { ComponentType } from "react";
+import AccordionVariants from "./accordion/variants";
+import EmptyStateBasic from "./empty-state/basic";
+import ListSettings from "./list/settings";
+import ProgressBasic from "./progress/basic";
+import SkeletonBasic from "./skeleton/basic";
+import StatCardBasic from "./stat-card/basic";
+import TableBasic from "./table/basic";
+import TimelineBasic from "./timeline/basic";
 import ActionSheetBasic from "./action-sheet/basic";
 import AlertBasic from "./alert/basic";
 import AlertDialogBasic from "./alert-dialog/basic";
@@ -69,6 +77,108 @@ export type ComponentDoc = {
 const SIZE = (sizes: string, d = "md"): PropRow => ({ name: "size", type: sizes, default: `"${d}"`, description: "Height, padding and type size." });
 
 export const DOCS: Record<string, ComponentDoc> = {
+
+  skeleton: {
+    name: "Skeleton",
+    description: "Shimmering placeholders that keep the layout steady while content loads.",
+    importName: "Skeleton, SkeletonText",
+    demos: [{ id: "basic", title: "Card placeholder", Component: SkeletonBasic }],
+    props: [
+      { name: "shape", type: '"rect" | "circle" | "text"', default: '"rect"', description: "Form." },
+      { name: "width / height", type: "CSS length", description: "Size (text follows the font size)." },
+      { name: "SkeletonText lines / lastLineWidth", type: "number / string", default: '3 / "60%"', description: "Paragraph placeholder." },
+    ],
+    a11y: ["Skeletons are aria-hidden; put aria-busy and a visually hidden label on the loading region."],
+  },
+  progress: {
+    name: "Progress",
+    description: "How far a task has got: a bar or a ring, determinate or indeterminate.",
+    importName: "Progress, ProgressCircle",
+    demos: [{ id: "basic", title: "Bars and rings", align: "stretch", Component: ProgressBasic }],
+    props: [
+      { name: "value / max", type: "number | null / number", default: "— / 100", description: "null = indeterminate." },
+      { name: "tone", type: '"accent" | "success" | "warning" | "danger" | "neutral"', default: '"accent"', description: "Fill color." },
+      { name: "Progress size / label / valueLabel", type: '"sm" | "md" | "lg" / ReactNode / ReactNode | true', description: "Bar height, caption, value text." },
+      { name: "ProgressCircle size / thickness / children", type: "number / number / ReactNode", default: "48 / 4", description: "Ring geometry and center content." },
+    ],
+  },
+  "empty-state": {
+    name: "Empty State",
+    description: "What to show when there's nothing yet: an icon, a title, one helpful sentence and the action that fixes it.",
+    importName: "EmptyState",
+    demos: [{ id: "basic", title: "First run and no results", align: "stretch", Component: EmptyStateBasic }],
+    props: [
+      { name: "icon / illustration", type: "ReactNode", description: "Tile icon, or a larger visual." },
+      { name: "title / description / actions", type: "ReactNode", description: "Content." },
+      { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', description: "Scale." },
+      { name: "bordered", type: "boolean", description: "Dashed outline." },
+    ],
+  },
+  table: {
+    name: "Table",
+    description: "Rows and columns on a rounded surface: sortable headers, density, stripes, sticky header — and cards on phones.",
+    importName: "Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption, TableFooter",
+    demos: [{ id: "basic", title: "Sortable, stacks on phones", align: "stretch", Component: TableBasic }],
+    props: [
+      { name: "density", type: '"comfortable" | "compact"', default: '"comfortable"', description: "Row height." },
+      { name: "striped / hoverable / stickyHeader", type: "boolean", default: "false / true / false", description: "Row styling." },
+      { name: "stackOnMobile", type: "boolean", description: "Rows become cards below md; set TableCell label." },
+      { name: "TableHead sort / onSort / align", type: '"asc" | "desc" | false / () => void / "start" | "center" | "end"', description: "Sortable column." },
+    ],
+    a11y: ["Sortable headers are buttons inside th with aria-sort.", "Stacked rows keep the real table semantics; headers stay for screen readers."],
+  },
+  list: {
+    name: "List",
+    description: "The iOS Settings list: grouped sections, icon tiles, values, controls, checkmarks, chevrons and swipe actions.",
+    importName: "List, ListSection, ListItem",
+    demos: [{ id: "settings", title: "Settings screen", description: "Try the switch, the language rows and swiping a trip.", Component: ListSettings }],
+    props: [
+      { name: "ListSection header / footer / variant", type: 'ReactNode / ReactNode / "inset" | "plain"', default: '"inset"', description: "Group." },
+      { name: "ListItem title / subtitle / value", type: "ReactNode", description: "Text content." },
+      { name: "icon / iconColor / leading", type: "ReactNode / CSS color / ReactNode", description: "Tile glyph and color, or custom leading content." },
+      { name: "trailing / selected / chevron", type: "ReactNode / boolean / boolean", description: "End accessories." },
+      { name: "href / onClick / asChild", type: "—", description: "Makes the row interactive." },
+      { name: "swipeActions", type: "{ label, icon?, tone?, onSelect }[]", description: "Revealed by swiping left or by keyboard focus." },
+    ],
+    a11y: ["Rows are links or buttons only when interactive.", "Swipe actions are real buttons: Tab reaches them and reveals the row."],
+  },
+  accordion: {
+    name: "Accordion",
+    description: "Sections that expand in place — grouped like an iOS list, as separate cards, or with hairlines only.",
+    importName: "Accordion, AccordionItem, AccordionTrigger, AccordionContent",
+    demos: [{ id: "variants", title: "Inset, separated, plain", align: "stretch", Component: AccordionVariants }],
+    props: [
+      { name: "type", type: '"single" | "multiple"', description: "One or many open (Radix)." },
+      { name: "collapsible / defaultValue / value", type: "—", description: "State (Radix)." },
+      { name: "variant", type: '"inset" | "separated" | "plain"', default: '"inset"', description: "Look." },
+      { name: "AccordionTrigger icon / subtitle", type: "ReactNode", description: "Leading icon and second line." },
+    ],
+    a11y: ["Headers are buttons with aria-expanded inside headings.", "Arrow keys move between headers."],
+  },
+  timeline: {
+    name: "Timeline",
+    description: "Events in order along a line, with done, current and upcoming states.",
+    importName: "Timeline, TimelineItem",
+    demos: [{ id: "basic", title: "Booking status and day plan", align: "stretch", Component: TimelineBasic }],
+    props: [
+      { name: "title / time / description", type: "ReactNode", description: "Content." },
+      { name: "status", type: '"done" | "current" | "upcoming"', default: '"done"', description: "Marker and line style; current gets aria-current." },
+      { name: "tone / icon", type: '"accent" | "success" | "warning" | "danger" / ReactNode', description: "Marker color and glyph." },
+    ],
+  },
+  "stat-card": {
+    name: "Stat Card",
+    description: "One number that matters: it counts up into view, shows the change with a colored trend and a sparkline.",
+    importName: "StatCard",
+    demos: [{ id: "basic", title: "Dashboard row", align: "stretch", Component: StatCardBasic }],
+    props: [
+      { name: "label / value / format", type: "ReactNode / number / (v) => string", description: "The metric." },
+      { name: "delta / deltaLabel / invertTrend", type: "number / ReactNode / boolean", description: "Change (0.12 = +12%); invert when down is good." },
+      { name: "trend", type: "number[]", description: "Sparkline data." },
+      { name: "icon / animated", type: "ReactNode / boolean", default: "— / true", description: "Tile icon; count-up animation." },
+    ],
+    a11y: ["Screen readers read the final value, not the animation.", "No count-up with reduced motion."],
+  },
 
   modal: {
     name: "Modal",

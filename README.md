@@ -70,7 +70,9 @@ Tokens are CSS variables prefixed `--pl-` (`--pl-accent`, `--pl-surface`, `--pl-
 - [x] Layout: Container, Stack, Grid, Card, Divider, Section, Navbar, NavigationBar (iOS large title), Sidebar, Footer, TabBar
 - [x] Navigation: Tabs, SegmentedControl, Breadcrumb, Pagination, Menu, ContextMenu, Dropdown
 - [x] Overlay: Modal, BottomSheet (drag + snap points), ActionSheet, AlertDialog, Popover, Tooltip, Toast, Alert
-- [ ] Feedback · Data · Forms
+- [x] Feedback: Skeleton, Progress (bar + ring), EmptyState
+- [x] Data: Table (sortable, stacks on phones), List (iOS Settings, swipe actions), Accordion, Timeline, StatCard
+- [ ] Forms
 - [ ] AI: BotFace, chat, composer, prompt suggestions, model picker, reasoning
 - [ ] Effects · Marketing
 
