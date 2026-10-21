@@ -42,6 +42,9 @@
       "pleate/ai/*": [
         "../../packages/pleate/src/ai/*/index.ts"
       ],
+      "pleate/effects/*": [
+        "../../packages/pleate/src/effects/*/index.ts"
+      ],
       "pleate/*": [
         "../../packages/pleate/src/components/*/index.ts"
       ]

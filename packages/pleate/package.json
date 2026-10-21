@@ -38,6 +38,10 @@
       "types": "./dist/ai/*/index.d.ts",
       "default": "./dist/ai/*/index.js"
     },
+    "./effects/*": {
+      "types": "./dist/effects/*/index.d.ts",
+      "default": "./dist/effects/*/index.js"
+    },
     "./*": {
       "types": "./dist/components/*/index.d.ts",
       "default": "./dist/components/*/index.js"

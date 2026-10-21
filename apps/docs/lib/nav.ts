@@ -54,7 +54,7 @@ export const NAV: NavSection[] = [
       c("Result Card", true), c("Model Picker", true), c("Reasoning", true),
     ],
   },
-  { title: "Effects", items: [c("Animated Text"), c("Reveal"), c("Page Transition"), c("Hover Effects")] },
+  { title: "Effects", items: [c("Animated Text", true), c("Reveal", true), c("Page Transition", true), c("Hover Effects", true)] },
   { title: "Marketing", items: [c("Hero"), c("Feature Grid"), c("Pricing"), c("Testimonial"), c("CTA")] },
 ];
 

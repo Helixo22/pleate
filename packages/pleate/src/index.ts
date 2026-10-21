@@ -66,3 +66,8 @@ export * from "./ai/prompt-suggestions/index.ts";
 export * from "./ai/reasoning/index.ts";
 export * from "./ai/result-card/index.ts";
 export * from "./ai/streaming-text/index.ts";
+
+export * from "./effects/animated-text/index.ts";
+export * from "./effects/hover/index.ts";
+export * from "./effects/page-transition/index.ts";
+export * from "./effects/reveal/index.ts";
