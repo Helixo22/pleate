@@ -71,13 +71,18 @@ function modeVars(mode: PaletteMode) {
 }
 
 // CSS for a palette bound to a selector, e.g. `[data-palette="ocean"]`. Dark values apply when the element or an
-// ancestor carries data-theme="dark".
+// ancestor carries data-theme="dark", and on theme islands inside the palette (a dark section on a light page).
 export function paletteToCss(selector: string, palette: Palette, { includeRoot = false } = {}) {
   const scale = SCALE_STEPS.map((step) => `--pl-accent-${step}: ${palette.scale[step]};`).join(" ");
-  const light = includeRoot ? `:root, ${selector}` : selector;
+  const light = [
+    ...(includeRoot ? [":root"] : []),
+    selector,
+    `${selector} [data-theme="light"]`,
+  ].join(", ");
   const dark = [
     `[data-theme="dark"]${selector}`,
     `[data-theme="dark"] ${selector}`,
+    `${selector} [data-theme="dark"]`,
     ...(includeRoot ? [`:root[data-theme="dark"]:not([data-palette])`] : []),
   ].join(", ");
   return `${light} { ${modeVars(palette.light)} ${scale} }\n${dark} { ${modeVars(palette.dark)} }\n`;

@@ -1,5 +1,17 @@
 // Component pages: description, import path, the examples (each file in demos/<slug>/<id>.tsx) and the main props.
 import type { ComponentType } from "react";
+import CardComposed from "./card/composed";
+import CardVariants from "./card/variants";
+import ContainerSizes from "./container/sizes";
+import DividerBasic from "./divider/basic";
+import FooterBasic from "./footer/basic";
+import GridBasic from "./grid/basic";
+import NavbarBasic from "./navbar/basic";
+import NavigationBarLargeTitle from "./navigation-bar/large-title";
+import SectionTones from "./section/tones";
+import SidebarBasic from "./sidebar/basic";
+import StackBasic from "./stack/basic";
+import TabBarVariants from "./tab-bar/variants";
 import AvatarBasic from "./avatar/basic";
 import BadgeVariants from "./badge/variants";
 import ButtonFullWidth from "./button/full-width";
@@ -42,6 +54,148 @@ export type ComponentDoc = {
 const SIZE = (sizes: string, d = "md"): PropRow => ({ name: "size", type: sizes, default: `"${d}"`, description: "Height, padding and type size." });
 
 export const DOCS: Record<string, ComponentDoc> = {
+
+  container: {
+    name: "Container",
+    description: "Centers content with a max width and side gutters that respect the iPhone safe areas.",
+    importName: "Container",
+    demos: [{ id: "sizes", title: "Sizes", align: "stretch", Component: ContainerSizes }],
+    props: [
+      { name: "size", type: '"sm" | "md" | "lg" | "xl" | "2xl" | "full"', default: '"xl"', description: "Max width (42 → 90rem)." },
+      { name: "gutter", type: '"none" | "sm" | "md" | "lg"', default: '"md"', description: "Side padding, never less than the safe area." },
+      { name: "asChild", type: "boolean", description: "Apply to your own element (main, section…)." },
+    ],
+  },
+  stack: {
+    name: "Stack",
+    description: "Flex column or row with a gap on the spacing scale. HStack and VStack are shorthands; direction=\"responsive\" stacks on phones.",
+    importName: "Stack, HStack, VStack",
+    demos: [{ id: "basic", title: "Rows, columns, responsive", align: "stretch", Component: StackBasic }],
+    props: [
+      { name: "direction", type: '"column" | "row" | "responsive"', default: '"column"', description: "Main axis." },
+      { name: "gap", type: "number", default: "4", description: "Spacing steps of 0.25rem." },
+      { name: "align / justify", type: "flex keywords", description: "Cross and main axis alignment." },
+      { name: "wrap / inline / asChild", type: "boolean", description: "Wrapping, inline-flex, render on your element." },
+    ],
+  },
+  grid: {
+    name: "Grid",
+    description: "Equal columns per breakpoint, or an auto-fill grid that fits as many columns as the minimum width allows.",
+    importName: "Grid",
+    demos: [{ id: "basic", title: "Responsive and auto-fill", align: "stretch", Component: GridBasic }],
+    props: [
+      { name: "columns", type: "number | { base, sm, md, lg, xl }", default: "1", description: "Each breakpoint inherits the one below." },
+      { name: "minItemWidth", type: "string", description: "CSS length; switches to auto-fill." },
+      { name: "gap / rowGap", type: "number", default: "4", description: "Spacing steps of 0.25rem." },
+    ],
+  },
+  card: {
+    name: "Card",
+    description: "Solid rounded surface for grouped content, composed of media, header, content and footer. Interactive cards lift and press in.",
+    importName: "Card, CardMedia, CardHeader, CardTitle, CardDescription, CardContent, CardFooter",
+    demos: [
+      { id: "variants", title: "Variants", align: "stretch", Component: CardVariants },
+      { id: "composed", title: "Media, footer, interactive", align: "stretch", Component: CardComposed },
+    ],
+    props: [
+      { name: "variant", type: '"elevated" | "flat" | "filled" | "outline" | "raised"', default: '"elevated"', description: "Surface and shadow." },
+      { name: "padding", type: '"none" | "sm" | "md" | "lg"', default: '"md"', description: "Inner padding; CardMedia bleeds past it." },
+      { name: "radius", type: '"lg" | "xl" | "2xl" | "3xl"', default: '"2xl"', description: "Corner radius." },
+      { name: "interactive", type: "boolean", description: "Hover lift, press, focus ring (pair with asChild + a link)." },
+    ],
+  },
+  divider: {
+    name: "Divider",
+    description: "Hairline separator: horizontal, vertical, inset like iOS list rows, or with a label.",
+    importName: "Divider",
+    demos: [{ id: "basic", title: "Inset, label, vertical", align: "stretch", Component: DividerBasic }],
+    props: [
+      { name: "orientation", type: '"horizontal" | "vertical"', default: '"horizontal"', description: "Direction." },
+      { name: "inset", type: "number", description: "Start inset in spacing steps." },
+      { name: "label", type: "ReactNode", description: "Centered text (\"or\")." },
+      { name: "decorative", type: "boolean", default: "true", description: "false exposes role=separator." },
+    ],
+  },
+  section: {
+    name: "Section",
+    description: "Full-width page band with vertical rhythm, an optional heading block and a container. tone=\"dark\" pins its own theme.",
+    importName: "Section",
+    demos: [{ id: "tones", title: "Dark and tinted bands", align: "stretch", Component: SectionTones }],
+    props: [
+      { name: "tone", type: '"default" | "surface" | "muted" | "accent-soft" | "dark" | "light"', default: '"default"', description: "Background; dark/light set data-theme." },
+      { name: "spacing", type: '"none" | "sm" | "md" | "lg"', default: '"md"', description: "Vertical padding." },
+      { name: "eyebrow / title / description", type: "ReactNode", description: "Heading block." },
+      { name: "align", type: '"start" | "center"', default: '"start"', description: "Heading alignment." },
+      { name: "size", type: 'Container size | "none"', default: '"xl"', description: "Inner container width." },
+    ],
+  },
+  navbar: {
+    name: "Navbar",
+    description: "Site header: brand, links and actions on desktop; a full-width menu with large links on phones. Hairline on scroll, optional hide-on-scroll.",
+    importName: "Navbar, NavbarLink",
+    demos: [{ id: "basic", title: "Site header", description: "Narrow the window to see the phone menu.", align: "stretch", Component: NavbarBasic }],
+    props: [
+      { name: "brand / actions", type: "ReactNode", description: "Start and end of the bar." },
+      { name: "children", type: "NavbarLink[]", description: "Shown in the bar and in the phone menu." },
+      { name: "panelFooter", type: "ReactNode", description: "Bottom of the phone menu." },
+      { name: "sticky / hideOnScroll", type: "boolean", default: "true / false", description: "Scroll behavior." },
+      { name: "NavbarLink active / asChild", type: "boolean", description: "Current page; use with Next <Link>." },
+    ],
+    a11y: ["Menu button has aria-expanded and aria-controls.", "Escape closes the phone menu; body scroll locks while open.", "Active link gets aria-current=\"page\"."],
+  },
+  "navigation-bar": {
+    name: "Navigation Bar",
+    description: "The iOS app bar: back button, centered title, actions. With largeTitle the title starts big and collapses into the bar as you scroll.",
+    importName: "NavigationBar, NavigationBarBack",
+    demos: [{ id: "large-title", title: "Large title", description: "Scroll inside the phone.", Component: NavigationBarLargeTitle }],
+    props: [
+      { name: "title / largeTitle / subtitle", type: "ReactNode / boolean", description: "Title and the large-title mode." },
+      { name: "leading / trailing", type: "ReactNode", description: "Back button, actions." },
+      { name: "accessory", type: "ReactNode", description: "Under the large title (search, segmented control)." },
+      { name: "background", type: '"bg" | "surface"', default: '"bg"', description: "Match the screen behind." },
+      { name: "scrollContainer", type: "RefObject<HTMLElement>", description: "When the scroller is not the window." },
+    ],
+  },
+  sidebar: {
+    name: "Sidebar",
+    description: "iPadOS-style navigation: a sticky column (collapsible to icons) from a breakpoint up, a drawer below it.",
+    importName: "Sidebar, SidebarHeader, SidebarContent, SidebarGroup, SidebarItem, SidebarFooter",
+    demos: [{ id: "basic", title: "Groups, badges, collapse, drawer", align: "stretch", Component: SidebarBasic }],
+    props: [
+      { name: "open / onOpenChange", type: "boolean", description: "Drawer state below the breakpoint." },
+      { name: "collapsed", type: "boolean", description: "Icon rail on desktop." },
+      { name: "breakpoint", type: '"md" | "lg"', default: '"lg"', description: "Column from here up." },
+      { name: "variant / selection", type: '"plain" | "surface" / "soft" | "filled"', description: "Background and selected-row style." },
+      { name: "sticky / top", type: "boolean / string", description: "Sticky column and its offset." },
+      { name: "SidebarItem", type: "icon, active, badge, asChild", description: "One row; closes the drawer on press." },
+    ],
+    a11y: ["Drawer is a modal dialog: focus trap, Escape, scroll lock.", "Collapsed rows keep their label for screen readers."],
+  },
+  footer: {
+    name: "Footer",
+    description: "Quiet, small-type footer. Link columns become tap-to-open rows on phones.",
+    importName: "Footer, FooterColumns, FooterColumn, FooterLink, FooterBottom",
+    demos: [{ id: "basic", title: "Site footer", align: "stretch", Component: FooterBasic }],
+    props: [
+      { name: "brand", type: "ReactNode", description: "Logo and pitch above the columns." },
+      { name: "FooterColumn title", type: "ReactNode", description: "Column heading / disclosure button on phones." },
+      { name: "FooterLink asChild", type: "boolean", description: "Use with Next <Link>." },
+    ],
+  },
+  "tab-bar": {
+    name: "Tab Bar",
+    description: "iOS bottom tabs for phone layouts: classic edge-to-edge, or the floating capsule with a sliding pill. Icons swap to their filled version when active.",
+    importName: "TabBar, TabBarItem, TabBarSpacer",
+    demos: [{ id: "variants", title: "Classic and floating", Component: TabBarVariants }],
+    props: [
+      { name: "value / onValueChange", type: "string", description: "Value-driven tabs (or use active on link items)." },
+      { name: "variant", type: '"classic" | "floating"', default: '"classic"', description: "Look." },
+      { name: "hideFrom", type: '"never" | "md" | "lg"', default: '"never"', description: "Hide on wider screens." },
+      { name: "position", type: '"fixed" | "static"', default: '"fixed"', description: "Pinned to the viewport bottom." },
+      { name: "TabBarItem", type: "icon, activeIcon, label, badge, value, active, asChild", description: "One tab." },
+    ],
+    a11y: ["Rendered as a nav landmark; the current tab has aria-current=\"page\".", "Respects the home-indicator safe area."],
+  },
   button: {
     name: "Button",
     description: "The primary action. Capsule-shaped like iOS, with six looks, four tones and five sizes. Presses scale down slightly; loading keeps the width.",
