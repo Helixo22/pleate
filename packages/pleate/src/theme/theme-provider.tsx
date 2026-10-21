@@ -66,7 +66,7 @@ function createStore(config: ReturnType<typeof resolveConfig>) {
     const state: ThemeState = {
       theme,
       resolvedTheme,
-      palette: stored.palette ?? config.defaultPalette,
+      palette: stored.palette && config.palettes.includes(stored.palette) ? stored.palette : config.defaultPalette,
       customColor: stored.custom ?? null,
       motion: stored.motion ?? "system",
     };
@@ -135,10 +135,12 @@ function createStore(config: ReturnType<typeof resolveConfig>) {
 }
 
 export function ThemeProvider({ children, ...config }: ThemeConfig & { children: ReactNode }) {
-  const { storageKey, defaultTheme, defaultPalette } = resolveConfig(config);
+  const resolved = resolveConfig(config);
+  const { storageKey, defaultTheme, defaultPalette } = resolved;
+  const known = resolved.palettes.join(",");
   const store = useMemo(
-    () => createStore({ storageKey, defaultTheme, defaultPalette }),
-    [storageKey, defaultTheme, defaultPalette],
+    () => createStore(resolveConfig({ storageKey, defaultTheme, defaultPalette, palettes: known.split(",") })),
+    [storageKey, defaultTheme, defaultPalette, known],
   );
   const state = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getServerSnapshot);
 

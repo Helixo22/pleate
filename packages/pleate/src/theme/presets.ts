@@ -2,7 +2,7 @@
 // (npm run palettes). The first one is the default, applied when <html> has no data-palette.
 
 export const PALETTES = {
-  helpintrip: { label: "Helpintrip", seed: "#2563eb" },
+  blue: { label: "Blue", seed: "#2563eb" },
   violet: { label: "Violet", seed: "#5e4cf0" },
   indigo: { label: "Indigo", seed: "#4f46e5" },
   ocean: { label: "Ocean", seed: "#0284c7" },
@@ -15,5 +15,5 @@ export const PALETTES = {
 } as const;
 
 export type PaletteName = keyof typeof PALETTES;
-export const DEFAULT_PALETTE: PaletteName = "helpintrip";
+export const DEFAULT_PALETTE: PaletteName = "blue";
 export const CUSTOM_PALETTE = "custom";
