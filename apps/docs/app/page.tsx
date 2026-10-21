@@ -63,8 +63,8 @@ import { ThemeProvider, ThemeScript } from "pleate/theme";
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head><ThemeScript defaultPalette="helpintrip" /></head>
-      <body><ThemeProvider defaultPalette="helpintrip">{children}</ThemeProvider></body>
+      <head><ThemeScript defaultPalette="blue" /></head>
+      <body><ThemeProvider defaultPalette="blue">{children}</ThemeProvider></body>
     </html>
   );
 }`}</CodeLine>

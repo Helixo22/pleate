@@ -1,6 +1,6 @@
 // Shared theme settings: what is stored, under which key, and how it is written onto <html>.
 // Used both by the inline boot script (serialized, runs before paint) and by the client store.
-import { DEFAULT_PALETTE } from "./presets.ts";
+import { CUSTOM_PALETTE, DEFAULT_PALETTE, PALETTES } from "./presets.ts";
 
 export type ThemePreference = "light" | "dark" | "system";
 export type ResolvedTheme = "light" | "dark";
@@ -12,6 +12,9 @@ export type ThemeConfig = {
   defaultTheme?: ThemePreference;
   /** A preset name from PALETTES (or any name your own CSS defines). */
   defaultPalette?: string;
+  /** Extra palette names defined in your own CSS. A stored palette that is neither a preset, "custom" nor listed
+   *  here is ignored (e.g. a preset that was renamed), so the page falls back to the default. */
+  palettes?: string[];
 };
 
 export type StoredTheme = {
@@ -26,16 +29,18 @@ export type StoredTheme = {
 export const CUSTOM_STYLE_ID = "pleate-custom-palette";
 
 export function resolveConfig(config: ThemeConfig = {}) {
+  const defaultPalette = config.defaultPalette ?? DEFAULT_PALETTE;
   return {
     storageKey: config.storageKey ?? "pleate",
     defaultTheme: config.defaultTheme ?? "system",
-    defaultPalette: config.defaultPalette ?? DEFAULT_PALETTE,
+    defaultPalette,
+    palettes: [...new Set([...Object.keys(PALETTES), CUSTOM_PALETTE, defaultPalette, ...(config.palettes ?? [])])],
   } as const;
 }
 
 // The boot script: tiny, dependency-free, safe to inline. It must mirror applyToDocument in store.ts.
 export function bootScript(config: ThemeConfig = {}) {
   const c = resolveConfig(config);
-  const args = [c.storageKey, c.defaultTheme, c.defaultPalette, CUSTOM_STYLE_ID].map((v) => JSON.stringify(v)).join(",");
-  return `(function(k,t,p,id){try{var s={};try{s=JSON.parse(localStorage.getItem(k)||"{}")||{}}catch(e){}var d=document.documentElement,m=s.theme||t,r=m==="system"?(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):m;d.setAttribute("data-theme",r);d.style.colorScheme=r;var n=s.palette||p;d.setAttribute("data-palette",n);if(n==="custom"&&s.css){var e=document.createElement("style");e.id=id;e.textContent=s.css;document.head.appendChild(e)}if(s.motion==="off")d.setAttribute("data-motion","off")}catch(e){}})(${args})`;
+  const args = [c.storageKey, c.defaultTheme, c.defaultPalette, CUSTOM_STYLE_ID, c.palettes].map((v) => JSON.stringify(v)).join(",");
+  return `(function(k,t,p,id,a){try{var s={};try{s=JSON.parse(localStorage.getItem(k)||"{}")||{}}catch(e){}var d=document.documentElement,m=s.theme||t,r=m==="system"?(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):m;d.setAttribute("data-theme",r);d.style.colorScheme=r;var n=s.palette&&a.indexOf(s.palette)>=0?s.palette:p;d.setAttribute("data-palette",n);if(n==="custom"&&s.css){var e=document.createElement("style");e.id=id;e.textContent=s.css;document.head.appendChild(e)}if(s.motion==="off")d.setAttribute("data-motion","off")}catch(e){}})(${args})`;
 }
