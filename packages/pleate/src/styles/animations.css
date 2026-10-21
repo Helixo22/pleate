@@ -1,0 +1,45 @@
+/* ---------------------------------------------------------------------------------------------------------------
+   pleate/styles/animations.css — CSS keyframes for what Radix mounts and unmounts (popovers, menus, tooltips,
+   dialogs read data-state and wait for animationend) plus small loops (spinner, skeleton). Motion-driven parts use
+   the springs in src/motion instead. Everything collapses under reduced motion (base.css).
+   --------------------------------------------------------------------------------------------------------------- */
+
+@keyframes pl-fade-in { from { opacity: 0; } }
+@keyframes pl-fade-out { to { opacity: 0; } }
+@keyframes pl-pop-in { from { opacity: 0; transform: scale(0.94) translateY(var(--pl-pop-y, -4px)); } }
+@keyframes pl-pop-out { to { opacity: 0; transform: scale(0.96); } }
+@keyframes pl-zoom-in { from { opacity: 0; transform: translate(-50%, -48%) scale(0.92); } }
+@keyframes pl-zoom-out { to { opacity: 0; transform: translate(-50%, -48%) scale(0.96); } }
+@keyframes pl-sheet-in { from { transform: translateY(100%); } }
+@keyframes pl-sheet-out { to { transform: translateY(100%); } }
+@keyframes pl-spin { to { transform: rotate(360deg); } }
+@keyframes pl-spoke { from { opacity: 1; } to { opacity: 0.18; } }
+@keyframes pl-shimmer { from { background-position: 150% 0; } to { background-position: -50% 0; } }
+@keyframes pl-pulse { 50% { opacity: 0.55; } }
+@keyframes pl-check { from { stroke-dashoffset: var(--pl-check-length, 24); } to { stroke-dashoffset: 0; } }
+
+/* Popover-like surfaces (Select, Dropdown, Popover, Menu): grow from their trigger. */
+@utility pl-pop {
+  transform-origin: var(
+    --radix-popper-transform-origin,
+    var(--radix-select-content-transform-origin, var(--radix-dropdown-menu-content-transform-origin, center))
+  );
+  &[data-side="top"] { --pl-pop-y: 4px; }
+  &[data-state="open"], &[data-state="delayed-open"], &[data-state="instant-open"] {
+    animation: pl-pop-in var(--pl-duration-base) var(--pl-ease-out);
+  }
+  &[data-state="closed"] {
+    animation: pl-pop-out var(--pl-duration-fast) var(--pl-ease-in-out) forwards;
+  }
+}
+
+@utility pl-fade {
+  &[data-state="open"] { animation: pl-fade-in var(--pl-duration-base) var(--pl-ease-out); }
+  &[data-state="closed"] { animation: pl-fade-out var(--pl-duration-fast) var(--pl-ease-in-out) forwards; }
+}
+
+@utility pl-skeleton {
+  background: linear-gradient(90deg, var(--pl-fill-2) 0%, var(--pl-fill-2) 40%, var(--pl-fill-3) 50%, var(--pl-fill-2) 60%, var(--pl-fill-2) 100%);
+  background-size: 300% 100%;
+  animation: pl-shimmer 1.6s linear infinite;
+}

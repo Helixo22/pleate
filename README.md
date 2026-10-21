@@ -1,0 +1,76 @@
+# pleate
+
+iOS-inspired React components, design tokens and themes for Next.js (App Router) and Tailwind CSS v4.
+
+- **Solid, not glass** — opaque surfaces, soft shadows, generous radii, airy spacing.
+- **Themes at runtime** — light / dark / system, ten palettes, or a full palette generated from one color (OKLCH, WCAG AA checked).
+- **Accessible** — Radix primitives, keyboard support, visible focus, `prefers-reduced-motion` respected everywhere.
+- **Tree-shakable** — one module per component (`pleate/button`, `pleate/select`…), `"use client"` only where needed.
+
+## Install
+
+```bash
+npm install pleate
+```
+
+```css
+/* app/globals.css */
+@import "tailwindcss";
+@import "pleate/styles.css";
+@source "../node_modules/pleate/dist";
+```
+
+```tsx
+// app/layout.tsx
+import { ThemeProvider, ThemeScript } from "pleate/theme";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+```tsx
+import { Button } from "pleate/button";
+
+<Button variant="tinted" size="lg">Book trip</Button>;
+```
+
+## Theming
+
+```tsx
+const { setTheme, setPalette, setCustomColor } = useTheme();
+setTheme("dark");
+setPalette("teal");
+setCustomColor("#ff2d55");
+```
+
+Tokens are CSS variables prefixed `--pl-` (`--pl-accent`, `--pl-surface`, `--pl-radius`…) exposed as Tailwind utilities
+(`bg-surface`, `text-accent-ink`, `rounded-xl`, `text-headline`). `--pl-roundness` scales every radius at once.
+
+## Repository
+
+| Path | |
+|---|---|
+| `packages/pleate` | the library (`npm run build -w pleate`, `npm run palettes -w pleate`) |
+| `apps/docs` | documentation and demos (`npm run dev`) |
+
+## Roadmap
+
+- [x] Tokens, palettes, theme runtime, motion
+- [x] Base: Button, IconButton, Input, Textarea, Select, Checkbox, Radio, Switch, Slider, Badge, Avatar, Tag, Label, Spinner
+- [ ] Layout · Navigation · Overlay · Feedback · Data · Forms
+- [ ] AI: BotFace, chat, composer, prompt suggestions, model picker, reasoning
+- [ ] Effects · Marketing
+
+## License
+
+MIT

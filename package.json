@@ -1,0 +1,15 @@
+{
+  "name": "pleate-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w docs",
+    "build": "npm run build -w pleate && npm run build -w docs",
+    "build:lib": "npm run build -w pleate",
+    "palettes": "npm run palettes -w pleate",
+    "typecheck": "npm run typecheck -w pleate && npm run typecheck -w docs"
+  }
+}
