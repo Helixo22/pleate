@@ -55,9 +55,10 @@ export function DemoFrame({
           <div
             role="tabpanel"
             className={cn(
-              "flex min-h-48 flex-wrap gap-4 p-6 md:p-10",
-              align === "center" && "items-center justify-center",
-              align === "start" && "items-start justify-start",
+              "flex min-h-48 gap-4 p-6 md:p-10",
+              align === "center" && "flex-wrap items-center justify-center",
+              align === "start" && "flex-wrap items-start justify-start",
+              // No wrap here: a wrapping column sizes itself to its widest child instead of the frame.
               align === "stretch" && "flex-col items-stretch",
             )}
           >

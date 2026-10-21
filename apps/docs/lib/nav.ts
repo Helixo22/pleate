@@ -47,7 +47,13 @@ export const NAV: NavSection[] = [
   { title: "Feedback", items: [c("Skeleton", true), c("Progress", true), c("Empty State", true)] },
   { title: "Data", items: [c("Table", true), c("List", true), c("Accordion", true), c("Timeline", true), c("Stat Card", true)] },
   { title: "Forms", items: [c("Form Field", true), c("Date Picker", true), c("Search Bar", true), c("File Upload", true)] },
-  { title: "AI", items: [c("Bot Face"), c("Chat"), c("Composer"), c("Prompt Suggestions"), c("Model Picker"), c("Reasoning")] },
+  {
+    title: "AI",
+    items: [
+      c("Bot Face", true), c("Chat", true), c("Composer", true), c("Streaming Text", true), c("Prompt Suggestions", true),
+      c("Result Card", true), c("Model Picker", true), c("Reasoning", true),
+    ],
+  },
   { title: "Effects", items: [c("Animated Text"), c("Reveal"), c("Page Transition"), c("Hover Effects")] },
   { title: "Marketing", items: [c("Hero"), c("Feature Grid"), c("Pricing"), c("Testimonial"), c("CTA")] },
 ];

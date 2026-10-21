@@ -18,6 +18,9 @@
 @keyframes pl-accordion-down { from { height: 0; opacity: 0; } to { height: var(--radix-accordion-content-height); opacity: 1; } }
 @keyframes pl-accordion-up { from { height: var(--radix-accordion-content-height); opacity: 1; } to { height: 0; opacity: 0; } }
 @keyframes pl-indeterminate { from { translate: -100% 0; } to { translate: 250% 0; } }
+@keyframes pl-typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.45; } 30% { transform: translateY(-4px); opacity: 1; } }
+@keyframes pl-shine { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@keyframes pl-blink { 50% { opacity: 0; } }
 @keyframes pl-spin { to { transform: rotate(360deg); } }
 @keyframes pl-spoke { from { opacity: 1; } to { opacity: 0.18; } }
 @keyframes pl-shimmer { from { background-position: 150% 0; } to { background-position: -50% 0; } }

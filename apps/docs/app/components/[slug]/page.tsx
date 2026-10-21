@@ -35,10 +35,10 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
         {doc.description}
       </PageHeader>
       <div className="mb-12">
-        <CodeLine>{`import { ${doc.importName} } from "pleate/${slug}";`}</CodeLine>
+        <CodeLine>{`import { ${doc.importName} } from "${doc.importPath ?? `pleate/${slug}`}";`}</CodeLine>
       </div>
 
-      <div className="grid gap-14">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-14">
         {doc.demos.map(({ id, title, description, align, Component }) => (
           <DemoFrame key={id} id={id} title={title} description={description} align={align} code={source(slug, id)}>
             <Component />
