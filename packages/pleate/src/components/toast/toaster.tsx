@@ -1,5 +1,5 @@
-// <Toaster />: renders the toasts queued with toast(). iOS-style notifications — solid rounded cards with an icon,
-// title, description and an optional action — stacked newest first, at the top center by default (like a banner
+// <Toaster />: renders the toasts queued with toast(). iOS-style notifications, solid rounded cards with an icon,
+// title, description and an optional action, stacked newest first, at the top center by default (like a banner
 // dropping in) or in a corner. Timers pause on hover and focus; swipe or drag a toast away to dismiss it.
 // Mount it once, near the root of the app.
 "use client";

@@ -1,4 +1,4 @@
-// StatCard: one number that matters — label, value (counting up into view), change against a previous period
+// StatCard: one number that matters, label, value (counting up into view), change against a previous period
 // with a colored trend, an optional icon tile and a sparkline drawn from your data.
 "use client";
 

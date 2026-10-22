@@ -1,4 +1,4 @@
-// Shared look of Menu and ContextMenu: an iOS context menu — wide rounded panel, 44px rows, icons trailing,
+// Shared look of Menu and ContextMenu: an iOS context menu, wide rounded panel, 44px rows, icons trailing,
 // destructive rows in red, thick gaps between groups.
 export const menuContent =
   "pl-pop z-(--pl-z-dropdown) min-w-56 max-w-[min(20rem,calc(100vw-1rem))] overflow-hidden rounded-xl bg-elevated p-1.5 text-fg shadow-xl outline-none " +

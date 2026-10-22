@@ -1,4 +1,4 @@
-// ActionSheet: the iOS action sheet — a short list of choices rising from the bottom, with a separate Cancel button.
+// ActionSheet: the iOS action sheet, a short list of choices rising from the bottom, with a separate Cancel button.
 // Destructive actions are red. On wider screens it appears as a centered card. Radix Dialog underneath.
 "use client";
 

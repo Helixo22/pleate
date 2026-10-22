@@ -8,7 +8,7 @@ export default function Demo() {
       <EmptyState
         icon={<MapPinned />}
         title="No trips yet"
-        description="Plan your first getaway — invite friends and build the itinerary together."
+        description="Plan your first getaway, invite friends and build the itinerary together."
         actions={<Button>New trip</Button>}
         bordered
       />

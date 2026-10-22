@@ -1,4 +1,4 @@
-// pleate — root entry. Every module is also importable on its own (pleate/button, pleate/theme…) for the smallest
+// pleate: root entry. Every module is also importable on its own (pleate/button, pleate/theme…) for the smallest
 // bundles; this barrel re-exports them all and stays tree-shakable (sideEffects: false except CSS).
 export * from "./lib/index.ts";
 export * from "./theme/index.ts";

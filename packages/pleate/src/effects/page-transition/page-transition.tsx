@@ -1,7 +1,7 @@
 // PageTransition: animates each new page in. Next's App Router re-mounts app/template.tsx on every navigation, so
 // wrap the template's children:
 //     export default function Template({ children }) { return <PageTransition>{children}</PageTransition>; }
-// "slide" mimics an iOS push — from the trailing side going forward, from the leading side on Back (the browser's
+// "slide" mimics an iOS push, from the trailing side going forward, from the leading side on Back (the browser's
 // back/forward buttons are detected). "fade" and "fade-up" are calmer. Instant with reduced motion.
 "use client";
 

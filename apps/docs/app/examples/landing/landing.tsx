@@ -106,7 +106,7 @@ export function Landing() {
             planned together.
           </>
         }
-        description="One shared plan for flights, stays, money and every “where do we eat?” — beautiful on every phone."
+        description="One shared plan for flights, stays, money and every “where do we eat?”, beautiful on every phone."
         actions={
           <>
             <Button size="lg" endIcon={<ArrowRight />}>Start planning</Button>
@@ -135,7 +135,7 @@ export function Landing() {
               rowSpan: 2,
               icon: <Map />,
               title: "One live itinerary",
-              description: "Flights, stays and plans in a single timeline everyone can edit — and it works offline.",
+              description: "Flights, stays and plans in a single timeline everyone can edit, and it works offline.",
               media: (
                 <div className="flex h-56 items-end justify-center gap-3 bg-[linear-gradient(180deg,transparent,var(--pl-accent-soft))] px-6">
                   {["Belém", "Sintra", "Alfama"].map((d, i) => (
@@ -184,7 +184,7 @@ export function Landing() {
             <p className="text-subhead font-semibold text-accent-ink">Assistant</p>
             <h2 className="mt-3 text-display-sm text-balance">Ask for a weekend. Get a plan.</h2>
             <p className="mt-4 text-title3 font-normal text-fg-muted">
-              It compares trains and flights, checks opening hours, keeps to your budget — and shows its sources.
+              It compares trains and flights, checks opening hours, keeps to your budget and shows its sources.
             </p>
             <Button size="lg" className="mt-8">Try the assistant</Button>
           </Reveal>
@@ -202,7 +202,7 @@ export function Landing() {
             { name: "Omar Haddad", role: "Backpacker", rating: 5, quote: "The assistant found a train I didn't know existed and saved us a whole day." },
             { name: "Chiara Bianchi", role: "Family of four", rating: 4, quote: "Splitting costs used to end in arguments. Now it ends in a single tap." },
             { name: "Jonas Berg", role: "Travel agent", rating: 5, quote: "My clients get a live itinerary instead of a PDF. It looks native on their phones." },
-            { name: "Aiko Tanaka", role: "Solo traveller", rating: 5, quote: "Offline maps and alerts in one place — it just feels calm to use." },
+            { name: "Aiko Tanaka", role: "Solo traveller", rating: 5, quote: "Offline maps and alerts in one place. It just feels calm to use." },
           ]}
         />
       </Section>
@@ -220,7 +220,7 @@ export function Landing() {
       <Section id="faq" eyebrow="FAQ" title="Questions, answered." size="md" align="center">
         <Accordion type="single" collapsible variant="separated">
           {[
-            ["Is it really free?", "Yes — up to 4 travellers per trip, forever. Voyager adds the assistant, bigger groups and alerts."],
+            ["Is it really free?", "Yes, up to 4 travellers per trip, forever. Voyager adds the assistant, bigger groups and alerts."],
             ["Does it work without a connection?", "Your itinerary, tickets and maps are stored on the phone, so they open anywhere."],
             ["Can I import bookings?", "Forward confirmation emails or share PDFs; flights and stays are added automatically."],
             ["Who can see my trips?", "Only the people you invite. We don't sell data or show ads."],
@@ -237,7 +237,7 @@ export function Landing() {
         <CTA
           title="Your next trip starts tonight."
           description="Create a plan, invite your people, and let the details sort themselves out."
-          actions={<Button size="lg" variant="surface" endIcon={<ArrowRight />}>Start planning — it's free</Button>}
+          actions={<Button size="lg" variant="surface" endIcon={<ArrowRight />}>Start planning, it's free</Button>}
         />
       </Container>
 

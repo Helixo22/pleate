@@ -17,7 +17,7 @@ export default function Demo() {
               Your next trip to <RotatingText words={["Lisbon", "Kyoto", "Naples", "Oaxaca"]} pillClassName="text-accent-ink" />
             </>
           }
-          description="Plan together, split costs and keep every booking in one place — on any device."
+          description="Plan together, split costs and keep every booking in one place, on any device."
           actions={
             <>
               <Button size="lg">Start planning</Button>
@@ -33,7 +33,7 @@ export default function Demo() {
           layout="split"
           background="dark"
           title="An assistant that actually listens."
-          description="Ask for a plan, get one — with sources, prices and a map. It even reacts to your voice."
+          description="Ask for a plan and get one, with sources, prices and a map. It even reacts to your voice."
           actions={<Button size="lg">Try the assistant</Button>}
           media={
             <div className="grid aspect-[4/3] place-items-center rounded-3xl bg-fill-3">

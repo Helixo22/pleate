@@ -1,6 +1,6 @@
 // Section: a full-width page band with generous vertical rhythm, an optional heading block (eyebrow, title,
-// description) and a centered Container. tone="dark" / "light" pins its own theme — the black bands of a product
-// page — and "surface" / "accent-soft" tint it.
+// description) and a centered Container. tone="dark" / "light" pins its own theme, the black bands of a product
+// page: and "surface" / "accent-soft" tint it.
 import { cva, type VariantProps } from "class-variance-authority";
 import type { HTMLAttributes, ReactNode, Ref } from "react";
 import { cn } from "../../lib/cn.ts";

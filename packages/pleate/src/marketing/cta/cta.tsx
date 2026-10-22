@@ -1,5 +1,5 @@
-// CTA: the closing call to action. A rounded band with a title, a line of text and buttons — in the accent color,
-// on a surface, or dark (its own theme) — with an optional visual. The "newsletter" form variant collects an email.
+// CTA: the closing call to action. A rounded band with a title, a line of text and buttons, in the accent color,
+// on a surface, or dark (its own theme), with an optional visual. The "newsletter" form variant collects an email.
 "use client";
 
 import { useId, useState, type FormEvent, type ReactNode } from "react";

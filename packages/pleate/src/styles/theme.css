@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------------------------------------------------
-   pleate/styles/theme.css — maps the tokens onto Tailwind v4 (colors, radii, shadows, type scale, easing) and
+   pleate/styles/theme.css, maps the tokens onto Tailwind v4 (colors, radii, shadows, type scale, easing) and
    defines the variants the components rely on. Utilities read the variables at use time (@theme inline), so palette
    and theme switches need no rebuild.
    --------------------------------------------------------------------------------------------------------------- */

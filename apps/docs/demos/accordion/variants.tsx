@@ -3,7 +3,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "pl
 
 const FAQ = [
   { id: "bags", icon: <Luggage />, q: "How much luggage can I bring?", a: "One cabin bag up to 8 kg and one personal item. Checked bags can be added until 2 hours before departure." },
-  { id: "change", icon: <Plane />, q: "Can I change my flight?", a: "Yes — changes are free up to 24 hours before departure; after that a fare difference may apply." },
+  { id: "change", icon: <Plane />, q: "Can I change my flight?", a: "Yes, changes are free up to 24 hours before departure; after that a fare difference may apply." },
   { id: "pay", icon: <CreditCard />, q: "Which payment methods are accepted?", a: "Cards, Apple Pay, Google Pay and bank transfer for bookings over €1,000." },
 ];
 

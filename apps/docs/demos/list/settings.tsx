@@ -11,7 +11,7 @@ import { useState } from "react";
 export default function Demo() {
   const [airplane, setAirplane] = useState(false);
   const [lang, setLang] = useState("English");
-  const [trips, setTrips] = useState(["Weekend in Lisbon", "Kyoto in spring", "Road trip — Andalusia"]);
+  const [trips, setTrips] = useState(["Weekend in Lisbon", "Kyoto in spring", "Road trip in Andalusia"]);
   return (
     <div className="w-full max-w-md rounded-3xl bg-bg p-4">
       <List>
@@ -46,7 +46,7 @@ export default function Demo() {
           ))}
         </ListSection>
 
-        <ListSection header="Trips" footer="Swipe a trip left — or Tab to its actions.">
+        <ListSection header="Trips" footer="Swipe a trip left, or Tab to its actions.">
           {trips.map((t) => (
             <ListItem
               key={t}

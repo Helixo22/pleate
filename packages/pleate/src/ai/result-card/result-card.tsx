@@ -96,7 +96,7 @@ export function SourceChip({ index, href, site, title, className }: SourceChipPr
   return (
     <Comp
       {...(href && { href, target: "_blank", rel: "noreferrer" })}
-      title={[title, host].filter(Boolean).join(" — ") || undefined}
+      title={[title, host].filter(Boolean).join(", ") || undefined}
       aria-label={`Source ${index}${host ? `: ${host}` : ""}`}
       className={cn(
         "pl-focus-ring mx-0.5 inline-flex h-[1.15rem] min-w-[1.15rem] -translate-y-px items-center justify-center rounded-md bg-fill-2 px-1 align-middle text-caption2 font-semibold text-fg-muted no-underline",

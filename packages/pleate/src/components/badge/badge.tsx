@@ -1,4 +1,4 @@
-// Badge: a small read-only label for status and counts — solid, soft or outlined, in six tones, with an optional dot.
+// Badge: a small read-only label for status and counts, solid, soft or outlined, in six tones, with an optional dot.
 import { cva, type VariantProps } from "class-variance-authority";
 import type { HTMLAttributes, Ref } from "react";
 import { cn } from "../../lib/cn.ts";

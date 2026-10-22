@@ -1,6 +1,6 @@
 // Chat building blocks.
 // - ChatThread: the scrolling list. Stays pinned to the bottom while new messages and streamed text arrive, unless
-//   the reader scrolled up — then a "latest" button appears. role="log" so new messages are announced politely.
+//   the reader scrolled up: then a "latest" button appears. role="log" so new messages are announced politely.
 // - Message: one turn. "bubble" (messaging look: user right in accent, assistant left in gray) or "document"
 //   (assistant text full width, as in AI chat apps). Avatar, name, time, status, and actions shown on hover/focus.
 "use client";

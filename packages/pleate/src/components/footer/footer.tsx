@@ -1,4 +1,4 @@
-// Footer: the site footer in the apple.com manner — small, quiet type; link columns that become tap-to-open rows on
+// Footer: the site footer in the apple.com manner, small, quiet type; link columns that become tap-to-open rows on
 // phones; a bottom bar for the legal line. Compose Footer, FooterColumns, FooterColumn, FooterLink and FooterBottom.
 "use client";
 

@@ -25,15 +25,15 @@ type Turn = {
 
 const ANSWER = `Here's a relaxed three-day plan for Lisbon.
 
-Day 1 — Alfama and the castle. Start at Miradouro de Santa Luzia for the view, wander down to the cathedral and end with fado in a small tasca.
+Day 1: Alfama and the castle. Start at Miradouro de Santa Luzia for the view, wander down to the cathedral and end with fado in a small tasca.
 
-Day 2 — Belém. Pastéis de Belém in the morning (go before 10), the Jerónimos Monastery, then a sunset walk along the river to LX Factory.
+Day 2: Belém. Pastéis de Belém in the morning (go before 10), the Jerónimos Monastery, then a sunset walk along the river to LX Factory.
 
-Day 3 — Sintra. Take the train from Rossio (about 40 min), see Pena Palace early to beat the crowds, and have lunch in the old town before heading back.`;
+Day 3: Sintra. Take the train from Rossio (about 40 min), see Pena Palace early to beat the crowds, and have lunch in the old town before heading back.`;
 
 const SOURCES = [
-  { href: "https://www.visitlisboa.com", title: "Visit Lisboa — official tourism guide", site: "visitlisboa.com" },
-  { href: "https://www.parquesdesintra.pt", title: "Parques de Sintra — tickets and hours", site: "parquesdesintra.pt" },
+  { href: "https://www.visitlisboa.com", title: "Visit Lisboa, official tourism guide", site: "visitlisboa.com" },
+  { href: "https://www.parquesdesintra.pt", title: "Parques de Sintra: tickets and hours", site: "parquesdesintra.pt" },
   { href: "https://www.cp.pt", title: "CP trains Lisbon–Sintra timetable", site: "cp.pt" },
 ];
 

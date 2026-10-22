@@ -5,7 +5,7 @@ const ITEMS = [
   { name: "Omar Haddad", role: "Backpacker", rating: 5, quote: "The assistant found a train I didn't know existed and saved us a whole day." },
   { name: "Chiara Bianchi", role: "Family of four", rating: 4, quote: "Splitting costs used to end in arguments. Now it ends in a single tap." },
   { name: "Jonas Berg", role: "Travel agent", rating: 5, quote: "My clients get a beautiful, live itinerary instead of a PDF. It looks native on their phones." },
-  { name: "Aiko Tanaka", role: "Solo traveller", rating: 5, quote: "Offline maps and alerts in one place — it just feels calm to use." },
+  { name: "Aiko Tanaka", role: "Solo traveller", rating: 5, quote: "Offline maps and alerts in one place. It just feels calm to use." },
 ];
 
 export default function Demo() {

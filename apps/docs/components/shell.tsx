@@ -13,11 +13,8 @@ import { PalettePicker, ThemeSwitch } from "./theme-controls";
 function Wordmark() {
   return (
     <Link href="/" className="pl-focus-ring flex items-center gap-2 rounded-md text-headline font-bold tracking-tight">
-      <span aria-hidden className="grid size-7 place-items-center rounded-[30%] bg-accent text-on-accent">
-        <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-          <path d="M5 8c3-3 5 3 7 0s4-3 7 0M5 16c3-3 5 3 7 0s4-3 7 0" />
-        </svg>
-      </span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/logo.svg" alt="" className="size-7" />
       pleate
     </Link>
   );

@@ -19,7 +19,7 @@ export default function Demo() {
           { label: "2026", href: "#basic" },
           { label: "Summer", href: "#basic" },
           { label: "Portugal", href: "#basic" },
-          { label: "Day 3 — Sintra" },
+          { label: "Day 3: Sintra" },
         ]}
       />
     </div>
