@@ -1,4 +1,4 @@
-// SearchBar: the iOS search field — filled capsule with a magnifier, a clear button once there is text, and an
+// SearchBar: the iOS search field, filled capsule with a magnifier, a clear button once there is text, and an
 // optional "Cancel" that slides in while focused (phones). Enter submits (onSearch); onValueChange can be debounced.
 // A keyboard shortcut (e.g. "/" or "mod+k") focuses it from anywhere.
 "use client";

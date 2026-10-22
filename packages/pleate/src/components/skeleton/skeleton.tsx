@@ -1,4 +1,4 @@
-// Skeleton: shimmering placeholders while content loads — blocks, circles and lines of text. Decorative: mark the
+// Skeleton: shimmering placeholders while content loads, blocks, circles and lines of text. Decorative: mark the
 // loading region with aria-busy="true" (and a visually hidden "Loading…") on its container.
 import type { CSSProperties, HTMLAttributes } from "react";
 import { cn } from "../../lib/cn.ts";

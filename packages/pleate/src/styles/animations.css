@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------------------------------------------------
-   pleate/styles/animations.css — CSS keyframes for what Radix mounts and unmounts (popovers, menus, tooltips,
+   pleate/styles/animations.css, CSS keyframes for what Radix mounts and unmounts (popovers, menus, tooltips,
    dialogs read data-state and wait for animationend) plus small loops (spinner, skeleton). Motion-driven parts use
    the springs in src/motion instead. Everything collapses under reduced motion (base.css).
    --------------------------------------------------------------------------------------------------------------- */

@@ -31,7 +31,7 @@ const MOTION = [
   ["--pl-duration-slow", "400ms", "Sheets and page-level movement"],
   ["--pl-ease-ios", "cubic-bezier(.32,.72,0,1)", "The iOS curve: quick start, long settle"],
   ["--pl-ease-spring", "cubic-bezier(.34,1.4,.64,1)", "A CSS spring with a small overshoot"],
-  ["spring.snap / sheet / soft / bouncy", "Motion springs", "pleate/motion — for JS animations"],
+  ["spring.snap / sheet / soft / bouncy", "Motion springs", "pleate/motion, for JS animations"],
 ];
 
 export default function TokensPage() {

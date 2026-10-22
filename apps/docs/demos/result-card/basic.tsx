@@ -27,7 +27,7 @@ export default function Demo() {
           image="https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=400&q=70"
           imageAlt="Yellow tram in Lisbon"
           href="https://example.com/tram-28"
-          title="Tram 28 — the classic ride"
+          title="Tram 28, the classic ride"
           snippet="Board at Martim Moniz to get a seat; the full loop takes about 50 minutes."
           actions={<Button size="xs" variant="tinted" startIcon={<Bookmark />}>Save</Button>}
         />
@@ -38,10 +38,10 @@ export default function Demo() {
       </p>
       <SourceList
         sources={[
-          { href: "https://www.visitlisboa.com", title: "Visit Lisboa — official tourism guide" },
-          { href: "https://www.parquesdesintra.pt", title: "Parques de Sintra — tickets and hours" },
+          { href: "https://www.visitlisboa.com", title: "Visit Lisboa, official tourism guide" },
+          { href: "https://www.parquesdesintra.pt", title: "Parques de Sintra: tickets and hours" },
           { href: "https://www.cp.pt", title: "CP trains timetable" },
-          { href: "https://en.wikipedia.org/wiki/Bel%C3%A9m_Tower", title: "Belém Tower — Wikipedia" },
+          { href: "https://en.wikipedia.org/wiki/Bel%C3%A9m_Tower", title: "Belém Tower (Wikipedia)" },
         ]}
       />
     </div>

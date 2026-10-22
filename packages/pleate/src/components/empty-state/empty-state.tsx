@@ -1,4 +1,4 @@
-// EmptyState: what to show when there is nothing yet — an icon in a soft tile (or your illustration), a title,
+// EmptyState: what to show when there is nothing yet, an icon in a soft tile (or your illustration), a title,
 // one helpful sentence and the action that fixes it.
 import type { HTMLAttributes, ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";

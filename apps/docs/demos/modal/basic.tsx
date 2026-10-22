@@ -15,7 +15,7 @@ export default function Demo() {
         <ModalContent>
           <ModalHeader>
             <ModalTitle>New trip</ModalTitle>
-            <ModalDescription>Give it a name — you can invite people later.</ModalDescription>
+            <ModalDescription>Give it a name. You can invite people later.</ModalDescription>
           </ModalHeader>
           <ModalBody className="grid gap-4">
             <div className="grid gap-2">
@@ -24,7 +24,7 @@ export default function Demo() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="trip-dates">Dates</Label>
-              <Input id="trip-dates" placeholder="12 – 15 June" />
+              <Input id="trip-dates" placeholder="12 to 15 June" />
             </div>
           </ModalBody>
           <ModalFooter>

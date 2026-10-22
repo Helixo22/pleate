@@ -1,5 +1,5 @@
-// Tabs: switch between views of the same context. Three looks — "underline" with a sliding bar, "pill" with a sliding
-// capsule, "soft" with tinted chips — all with Radix keyboard support (arrows, Home/End). Long lists scroll
+// Tabs: switch between views of the same context. Three looks, "underline" with a sliding bar, "pill" with a sliding
+// capsule, "soft" with tinted chips, all with Radix keyboard support (arrows, Home/End). Long lists scroll
 // sideways on phones. Panels fade in.
 "use client";
 

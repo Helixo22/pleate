@@ -21,7 +21,7 @@ export default function Demo() {
       setError(null);
       setStream(await navigator.mediaDevices.getUserMedia({ audio: true }));
     } catch {
-      setError("Microphone not available — use the slider instead.");
+      setError("Microphone not available. Use the slider instead.");
     }
   };
 

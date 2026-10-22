@@ -63,7 +63,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
                 <tr key={p.name} className="border-b border-separator last:border-0 align-top">
                   <td className="px-5 py-3 font-mono text-footnote font-semibold whitespace-nowrap text-accent-ink">{p.name}</td>
                   <td className="px-5 py-3 font-mono text-footnote text-fg-muted">{p.type}</td>
-                  <td className="px-5 py-3 font-mono text-footnote text-fg-muted">{p.default ?? "—"}</td>
+                  <td className="px-5 py-3 font-mono text-footnote text-fg-muted">{p.default ?? ""}</td>
                   <td className="px-5 py-3">{p.description}</td>
                 </tr>
               ))}

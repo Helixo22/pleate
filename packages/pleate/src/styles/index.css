@@ -1,4 +1,4 @@
-/* pleate/styles.css — import after Tailwind:
+/* pleate/styles.css: import after Tailwind:
      @import "tailwindcss";
      @import "pleate/styles.css";
      @source "../node_modules/pleate/dist";   (so Tailwind sees the classes the components use) */

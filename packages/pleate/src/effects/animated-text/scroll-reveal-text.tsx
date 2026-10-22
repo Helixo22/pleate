@@ -1,4 +1,4 @@
-// ScrollRevealText: a paragraph whose words light up one by one as it scrolls through the viewport — the large
+// ScrollRevealText: a paragraph whose words light up one by one as it scrolls through the viewport, the large
 // statement style of product pages. Static and fully lit with reduced motion.
 "use client";
 

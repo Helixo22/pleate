@@ -22,7 +22,7 @@ export default function Demo() {
       </div>
       <div className="flex items-center gap-6">
         <BotFace size={64} animated={false} state="thinking" />
-        <span className="text-footnote text-fg-muted">animated=false — still pose, no listeners</span>
+        <span className="text-footnote text-fg-muted">animated=false: still pose, no listeners</span>
       </div>
     </div>
   );

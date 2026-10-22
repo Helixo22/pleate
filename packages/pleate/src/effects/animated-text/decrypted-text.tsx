@@ -1,4 +1,4 @@
-// DecryptedText: characters scramble and settle into the real text, left to right — on view, or on hover/focus.
+// DecryptedText: characters scramble and settle into the real text, left to right, on view, or on hover/focus.
 "use client";
 
 import { useInView } from "motion/react";

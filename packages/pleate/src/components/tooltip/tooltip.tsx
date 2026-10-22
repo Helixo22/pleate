@@ -1,4 +1,4 @@
-// Tooltip: a short label on hover or keyboard focus — for icon buttons and truncated text, never for essential
+// Tooltip: a short label on hover or keyboard focus, for icon buttons and truncated text, never for essential
 // information (touch screens rarely show it). <Tooltip content="…"> wraps one focusable child; compose the parts
 // for more control, inside a single <TooltipProvider> so moving between tooltips skips the delay.
 "use client";

@@ -48,7 +48,7 @@ export default function Demo() {
           return (to.getTime() - from.getTime()) / 864e5 > 14 ? "Stays are limited to 14 nights." : undefined;
         }}
       >
-        <DatePicker mode="range" min={today} placeholder="Check-in – check-out" />
+        <DatePicker mode="range" min={today} placeholder="Check-in to check-out" />
       </FormField>
       <FormField name="guests" label="Guests" required min={{ value: 1, message: "At least one guest." }} max={8} hint="1–8">
         <Input type="number" inputMode="numeric" defaultValue={2} className="max-w-32" />

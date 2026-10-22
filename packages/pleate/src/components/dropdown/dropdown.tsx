@@ -1,4 +1,4 @@
-// Dropdown: a Menu described as data — a trigger (any element, or a Button made from `label`) plus a list of
+// Dropdown: a Menu described as data, a trigger (any element, or a Button made from `label`) plus a list of
 // actions, separators, labels and submenus. For anything custom, compose Menu directly.
 "use client";
 

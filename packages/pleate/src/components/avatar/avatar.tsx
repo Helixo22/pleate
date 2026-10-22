@@ -1,4 +1,4 @@
-// Avatar: photo with a graceful fallback — initials on a gradient whose hue comes from the name (stable per person),
+// Avatar: photo with a graceful fallback, initials on a gradient whose hue comes from the name (stable per person),
 // or a custom icon. Circle or rounded square, six sizes, optional presence dot. AvatarGroup overlaps a row of avatars
 // and folds the rest into "+N".
 "use client";

@@ -1,4 +1,4 @@
-// ShinyText: a band of light sweeping across the text, in the current text color — for labels that should catch
+// ShinyText: a band of light sweeping across the text, in the current text color, for labels that should catch
 // the eye without moving.
 import type { CSSProperties, ElementType, ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";

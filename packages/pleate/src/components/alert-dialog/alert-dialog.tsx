@@ -1,5 +1,5 @@
-// AlertDialog: the iOS alert. A small centered card with a title, a message and up to a few buttons — side by side
-// when there are two, stacked otherwise — for decisions that need an answer (Radix AlertDialog: it can't be closed
+// AlertDialog: the iOS alert. A small centered card with a title, a message and up to a few buttons, side by side
+// when there are two, stacked otherwise, for decisions that need an answer (Radix AlertDialog: it can't be closed
 // by clicking outside, focus starts on the safest action). Pass `actions` for the common case or compose freely.
 "use client";
 

@@ -1,4 +1,4 @@
-// <MotionProvider> — wraps Motion's MotionConfig so every motion component in the tree honours pleate's reduced-motion
+// <MotionProvider>: wraps Motion's MotionConfig so every motion component in the tree honours pleate's reduced-motion
 // rule (system setting or data-motion="off"): transforms are skipped, opacity still fades.
 "use client";
 

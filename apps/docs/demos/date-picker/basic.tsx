@@ -22,7 +22,7 @@ export default function Demo() {
           value={range}
           onValueChange={setRange}
           min={today}
-          placeholder="Check-in – check-out"
+          placeholder="Check-in to check-out"
           presets={[
             { label: "This weekend", value: () => ({ from: saturday, to: addDays(saturday, 1) }) },
             { label: "Next 7 days", value: () => ({ from: today, to: addDays(today, 6) }) },

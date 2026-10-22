@@ -10,7 +10,7 @@ export default function Demo() {
         align="center"
         eyebrow="New"
         title="A dark band on any page."
-        description='tone="dark" pins the theme for this section only — tokens, palette and components follow.'
+        description='tone="dark" pins the theme for this section only: tokens, palette and components follow.'
       >
         <div className="flex justify-center gap-3">
           <Button>Learn more</Button>

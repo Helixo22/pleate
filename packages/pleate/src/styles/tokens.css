@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------------------------------------------------
-   pleate/styles/tokens.css — design tokens as CSS variables (prefix --pl-).
+   pleate/styles/tokens.css, design tokens as CSS variables (prefix --pl-).
    Neutral surfaces follow iOS system colors; all surfaces are solid (no translucency, no blur).
    Light values live on :root and [data-theme="light"], dark ones on [data-theme="dark"], so a subtree can pin its own
    theme. The accent comes from palettes.css; hover/pressed/soft/ring shades are derived below from whatever accent is

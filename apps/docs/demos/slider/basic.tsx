@@ -16,7 +16,7 @@ export default function Demo() {
       <div className="grid gap-2">
         <div className="flex justify-between text-subhead">
           <span>Price per night</span>
-          <span className="pl-tabular text-fg-muted">€{price[0]} – €{price[1]}</span>
+          <span className="pl-tabular text-fg-muted">€{price[0]} to €{price[1]}</span>
         </div>
         <Slider value={price} onValueChange={setPrice} min={0} max={400} step={10} thumbLabels={["Minimum price", "Maximum price"]} />
       </div>

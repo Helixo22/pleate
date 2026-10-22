@@ -1,4 +1,4 @@
-// Slider: iOS track with a white knob, or "bar" — the thick Control Center style where the fill is the handle.
+// Slider: iOS track with a white knob, or "bar", the thick Control Center style where the fill is the handle.
 // One value or a range (pass two values). Keyboard: arrows, Page Up/Down, Home/End (Radix).
 "use client";
 

@@ -1,4 +1,4 @@
-// Alert: an inline message in the page — info, success, warning or danger — with an icon, a title, text, optional
+// Alert: an inline message in the page, info, success, warning or danger, with an icon, a title, text, optional
 // actions and an optional dismiss button. role="alert" for danger/warning (announced at once), "status" otherwise.
 import { cva, type VariantProps } from "class-variance-authority";
 import type { HTMLAttributes, ReactNode, Ref } from "react";

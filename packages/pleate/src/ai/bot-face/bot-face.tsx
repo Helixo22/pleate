@@ -1,11 +1,11 @@
 // BotFace: an expressive assistant avatar. A soft flat body in the palette's accent with two pill eyes painted on an
 // imaginary sphere, so glancing aside slides and foreshortens them towards the rim (evolved from Cronfiga's
 // AgentFace). States show through eyes and body:
-//   idle      — blinks, glances around, follows the pointer (track)
-//   listening — eyes wide and attentive, rings pulse; with `level` (e.g. useAudioLevel) they follow your voice
-//   thinking  — looks up and aside, sways, particles orbit
-//   speaking  — bounces, eyes alternate; with `level` they move with the speech
-//   waiting   — looks down at what needs you and hops now and then
+//   idle: blinks, glances around, follows the pointer (track)
+//   listening: eyes wide and attentive, rings pulse; with `level` (e.g. useAudioLevel) they follow your voice
+//   thinking: looks up and aside, sways, particles orbit
+//   speaking: bounces, eyes alternate; with `level` they move with the speech
+//   waiting: looks down at what needs you and hops now and then
 //   happy · error · offline
 // `seed` picks one of five body shapes; `color` overrides the accent. Reduced motion keeps the poses still.
 "use client";
@@ -90,7 +90,7 @@ const SPREAD = 0.25; // half the angle between the eyes on the sphere
 const random = (min: number, max: number) => min + Math.random() * (max - min);
 
 // Where eye `side` lands for a gaze: an SVG matrix mapping the eye's flat patch onto a sphere stretched to the body,
-// seen from the front — near the rim it slides along the edge and gets foreshortened.
+// seen from the front: near the rim it slides along the edge and gets foreshortened.
 function eyeMatrix(shape: Shape, side: -1 | 1, yaw: number, pitch: number, e: Eye, scale: number) {
   const { rx, ry, cy } = SHAPES[shape];
   const a = side * SPREAD;

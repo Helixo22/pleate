@@ -18,7 +18,7 @@ export default function Home() {
         <p className="mb-4 text-subhead font-semibold text-accent-ink">pleate · v0.1 · 90+ components</p>
         <h1 className="max-w-4xl text-display-xl">Interfaces that feel native.</h1>
         <p className="mt-6 max-w-2xl text-title3 font-normal text-fg-muted">
-          iOS-inspired React components, design tokens and themes for Next.js. Rounded, airy, precise — and yours,
+          iOS-inspired React components, design tokens and themes for Next.js. Rounded, airy, precise, and yours
           down to the last color.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">

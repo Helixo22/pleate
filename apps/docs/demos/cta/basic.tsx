@@ -24,7 +24,7 @@ export default function Demo() {
         tone="dark"
         align="start"
         title="Meet your travel assistant."
-        description="It plans, compares and books — and it listens."
+        description="It plans, compares and books. And it listens."
         actions={<Button size="lg">Try it now</Button>}
         media={
           <div className="grid place-items-center">

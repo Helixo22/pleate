@@ -1,4 +1,4 @@
-// Select: Radix Select with an iOS menu look — a field-styled trigger and a rounded, softly shadowed list that grows
+// Select: Radix Select with an iOS menu look, a field-styled trigger and a rounded, softly shadowed list that grows
 // from it, with a checkmark on the chosen row. Composable like shadcn/ui (Select, SelectTrigger, SelectContent,
 // SelectItem, SelectGroup, SelectLabel, SelectSeparator).
 "use client";

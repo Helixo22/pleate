@@ -1,4 +1,4 @@
-// DatePicker: a field that opens a Calendar — in a popover on desktop, in a bottom sheet on phones. Single date or
+// DatePicker: a field that opens a Calendar, in a popover on desktop, in a bottom sheet on phones. Single date or
 // range (mode="range"), optional presets ("This weekend"), clearable. For forms, `name` adds a hidden input with
 // the ISO date (yyyy-mm-dd) or the ISO interval (yyyy-mm-dd/yyyy-mm-dd), so FormField rules work on it.
 "use client";
@@ -93,7 +93,7 @@ export function DatePicker(props: DatePickerProps) {
     ? r?.from
       ? r.to
         ? fmt.formatRange(r.from, r.to)
-        : `${fmt.format(r.from)} – …`
+        : `${fmt.format(r.from)} …`
       : null
     : d
       ? fmt.format(d)

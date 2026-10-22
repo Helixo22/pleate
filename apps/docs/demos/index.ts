@@ -109,7 +109,7 @@ export const DOCS: Record<string, ComponentDoc> = {
 
   hero: {
     name: "Hero",
-    description: "The opening of a page: announcement pill, display title, description, actions, footnote and a visual — centered or split, on the page, a soft wash or a dark band.",
+    description: "The opening of a page: announcement pill, display title, description, actions, footnote and a visual. Centered or split, on the page, a soft wash or a dark band.",
     importName: "Hero",
     importPath: "pleate/marketing/hero",
     demos: [{ id: "variants", title: "Centered wash and dark split", align: "stretch", Component: HeroVariants }],
@@ -135,7 +135,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   pricing: {
     name: "Pricing",
-    description: "Plans with a monthly/yearly switch — prices roll to the new amount and the saving is shown. Highlight a plan; mark what's included.",
+    description: "Plans with a monthly/yearly switch: prices roll to the new amount and the saving is shown. Highlight a plan; mark what's included.",
     importName: "Pricing",
     importPath: "pleate/marketing/pricing",
     demos: [{ id: "basic", title: "Three plans", align: "stretch", Component: PricingBasic }],
@@ -160,7 +160,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   cta: {
     name: "CTA",
-    description: "The closing call to action — in the accent color, on a surface or dark, with an optional visual — and a newsletter signup.",
+    description: "The closing call to action (accent, surface or dark, with an optional visual) and a newsletter signup.",
     importName: "CTA, Newsletter",
     importPath: "pleate/marketing/cta",
     demos: [{ id: "basic", title: "Accent, dark with media, newsletter", align: "stretch", Component: CtaBasic }],
@@ -206,7 +206,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   reveal: {
     name: "Reveal",
-    description: "Content that enters as it scrolls into view — alone or in sequence — plus a reading progress bar and parallax.",
+    description: "Content that enters as it scrolls into view, alone or in sequence, plus a reading progress bar and parallax.",
     importName: "Reveal, RevealGroup, RevealItem, ScrollProgress, Parallax",
     importPath: "pleate/effects/reveal",
     demos: [
@@ -256,7 +256,7 @@ export const DOCS: Record<string, ComponentDoc> = {
     demos: [
       { id: "states", title: "States", description: "Idle follows your pointer.", Component: BotFaceStates },
       { id: "voice", title: "Driven by your voice", description: "useAudioLevel turns a microphone stream into a level the face reacts to.", Component: BotFaceVoice },
-      { id: "variants", title: "Sizes, shapes, colors", description: "Defaults to the palette accent — switch palette to see it follow.", Component: BotFaceVariants },
+      { id: "variants", title: "Sizes, shapes, colors", description: "Defaults to the palette accent. Switch palette to see it follow.", Component: BotFaceVariants },
     ],
     props: [
       { name: "state", type: '"idle" | "listening" | "thinking" | "speaking" | "waiting" | "happy" | "error" | "offline"', default: '"idle"', description: "Expression." },
@@ -264,20 +264,20 @@ export const DOCS: Record<string, ComponentDoc> = {
       { name: "level", type: "number | MotionValue<number>", description: "0–1 loudness for listening/speaking." },
       { name: "track", type: "boolean", description: "Follow the pointer while idle." },
       { name: "seed / color / eyeColor", type: "string", description: "Body shape; colors (accent and on-accent by default)." },
-      { name: "dot / decorative / labels / animated", type: "—", description: "Status dot, hide from AT, state labels, still mode." },
+      { name: "dot / decorative / labels / animated", type: "", description: "Status dot, hide from AT, state labels, still mode." },
     ],
     a11y: ["role=img with a label per state (customizable).", "With reduced motion every state is a still pose."],
   },
   chat: {
     name: "Chat",
-    description: "A complete AI chat: thread that follows the stream, bubbles or document-style answers, reasoning, sources and message actions — composed from the AI components.",
+    description: "A complete AI chat: thread that follows the stream, bubbles or document-style answers, reasoning, sources and message actions, composed from the AI components.",
     importName: "ChatThread, Message, MessageAction",
     importPath: "pleate/ai/chat",
     demos: [{ id: "full", title: "Trip assistant", description: "Pick a suggestion or type. Try Stop while it streams, and scroll up during a reply.", align: "stretch", Component: ChatFull }],
     props: [
       { name: "ChatThread", type: "threshold, latestLabel, contentClassName", description: "Auto-scroll while at the bottom; a jump button otherwise. role=log." },
       { name: "Message role / variant", type: '"user" | "assistant" | "system" / "bubble" | "document"', description: "Who and how." },
-      { name: "avatar / name / time / status", type: "—", description: "Header and delivery state." },
+      { name: "avatar / name / time / status", type: "", description: "Header and delivery state." },
       { name: "actions / footer / continued", type: "ReactNode / ReactNode / boolean", description: "Hover actions, attachments or sources, grouping." },
     ],
     a11y: ["New messages are announced politely (role=log).", "Actions stay reachable by keyboard (shown on focus)."],
@@ -291,10 +291,10 @@ export const DOCS: Record<string, ComponentDoc> = {
     props: [
       { name: "onSubmit", type: "({ text, files }) => void", description: "Enter or the send button; clears after." },
       { name: "generating / onStop", type: "boolean / () => void", description: "Stop mode." },
-      { name: "accept / maxFiles", type: "string / number", default: "— / 8", description: "Enables attachments." },
+      { name: "accept / maxFiles", type: "string / number", default: "none / 8", description: "Enables attachments." },
       { name: "onVoice / listening", type: "() => void / boolean", description: "Mic button." },
       { name: "toolbar", type: "ReactNode", description: "Model picker, tools." },
-      { name: "value / onValueChange / labels", type: "—", description: "Controlled text and translatable labels." },
+      { name: "value / onValueChange / labels", type: "", description: "Controlled text and translatable labels." },
     ],
     a11y: ["Enter sends, Shift+Enter breaks the line; IME composition is respected."],
   },
@@ -363,7 +363,7 @@ export const DOCS: Record<string, ComponentDoc> = {
 
   "form-field": {
     name: "Form Field",
-    description: "Accessible validation without a form library. Rules run on blur, live once an error shows, and for every field on submit — then focus jumps to the first problem.",
+    description: "Accessible validation without a form library. Rules run on blur, live once an error shows, and for every field on submit. Then focus jumps to the first problem.",
     importName: "Form, FormField, useForm, useFormField",
     demos: [{ id: "booking", title: "Booking request", description: "Submit it empty to see every message; values are read from the form itself.", align: "stretch", Component: FormFieldBooking }],
     props: [
@@ -439,7 +439,7 @@ export const DOCS: Record<string, ComponentDoc> = {
     importName: "Progress, ProgressCircle",
     demos: [{ id: "basic", title: "Bars and rings", align: "stretch", Component: ProgressBasic }],
     props: [
-      { name: "value / max", type: "number | null / number", default: "— / 100", description: "null = indeterminate." },
+      { name: "value / max", type: "number | null / number", default: "none / 100", description: "null = indeterminate." },
       { name: "tone", type: '"accent" | "success" | "warning" | "danger" | "neutral"', default: '"accent"', description: "Fill color." },
       { name: "Progress size / label / valueLabel", type: '"sm" | "md" | "lg" / ReactNode / ReactNode | true', description: "Bar height, caption, value text." },
       { name: "ProgressCircle size / thickness / children", type: "number / number / ReactNode", default: "48 / 4", description: "Ring geometry and center content." },
@@ -459,7 +459,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   table: {
     name: "Table",
-    description: "Rows and columns on a rounded surface: sortable headers, density, stripes, sticky header — and cards on phones.",
+    description: "Rows and columns on a rounded surface: sortable headers, density, stripes, sticky header, and cards on phones.",
     importName: "Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption, TableFooter",
     demos: [{ id: "basic", title: "Sortable, stacks on phones", align: "stretch", Component: TableBasic }],
     props: [
@@ -480,19 +480,19 @@ export const DOCS: Record<string, ComponentDoc> = {
       { name: "ListItem title / subtitle / value", type: "ReactNode", description: "Text content." },
       { name: "icon / iconColor / leading", type: "ReactNode / CSS color / ReactNode", description: "Tile glyph and color, or custom leading content." },
       { name: "trailing / selected / chevron", type: "ReactNode / boolean / boolean", description: "End accessories." },
-      { name: "href / onClick / asChild", type: "—", description: "Makes the row interactive." },
+      { name: "href / onClick / asChild", type: "", description: "Makes the row interactive." },
       { name: "swipeActions", type: "{ label, icon?, tone?, onSelect }[]", description: "Revealed by swiping left or by keyboard focus." },
     ],
     a11y: ["Rows are links or buttons only when interactive.", "Swipe actions are real buttons: Tab reaches them and reveals the row."],
   },
   accordion: {
     name: "Accordion",
-    description: "Sections that expand in place — grouped like an iOS list, as separate cards, or with hairlines only.",
+    description: "Sections that expand in place: grouped like an iOS list, as separate cards, or with hairlines only.",
     importName: "Accordion, AccordionItem, AccordionTrigger, AccordionContent",
     demos: [{ id: "variants", title: "Inset, separated, plain", align: "stretch", Component: AccordionVariants }],
     props: [
       { name: "type", type: '"single" | "multiple"', description: "One or many open (Radix)." },
-      { name: "collapsible / defaultValue / value", type: "—", description: "State (Radix)." },
+      { name: "collapsible / defaultValue / value", type: "", description: "State (Radix)." },
       { name: "variant", type: '"inset" | "separated" | "plain"', default: '"inset"', description: "Look." },
       { name: "AccordionTrigger icon / subtitle", type: "ReactNode", description: "Leading icon and second line." },
     ],
@@ -518,7 +518,7 @@ export const DOCS: Record<string, ComponentDoc> = {
       { name: "label / value / format", type: "ReactNode / number / (v) => string", description: "The metric." },
       { name: "delta / deltaLabel / invertTrend", type: "number / ReactNode / boolean", description: "Change (0.12 = +12%); invert when down is good." },
       { name: "trend", type: "number[]", description: "Sparkline data." },
-      { name: "icon / animated", type: "ReactNode / boolean", default: "— / true", description: "Tile icon; count-up animation." },
+      { name: "icon / animated", type: "ReactNode / boolean", default: "none / true", description: "Tile icon; count-up animation." },
     ],
     a11y: ["Screen readers read the final value, not the animation.", "No count-up with reduced motion."],
   },
@@ -558,7 +558,7 @@ export const DOCS: Record<string, ComponentDoc> = {
     props: [
       { name: "actions", type: "{ label, onSelect?, icon?, destructive?, disabled? }[]", description: "Choices." },
       { name: "title / message", type: "ReactNode", description: "Optional header." },
-      { name: "trigger / open / onOpenChange", type: "—", description: "Uncontrolled with a trigger, or controlled." },
+      { name: "trigger / open / onOpenChange", type: "", description: "Uncontrolled with a trigger, or controlled." },
       { name: "cancelLabel", type: "ReactNode", default: '"Cancel"', description: "Cancel button text." },
     ],
   },
@@ -570,7 +570,7 @@ export const DOCS: Record<string, ComponentDoc> = {
     props: [
       { name: "title / description", type: "ReactNode", description: "Question and context." },
       { name: "actions", type: '{ label, onSelect?, role?: "default" | "cancel" | "destructive" }[]', description: "Buttons, in order." },
-      { name: "trigger / open / onOpenChange", type: "—", description: "Uncontrolled or controlled." },
+      { name: "trigger / open / onOpenChange", type: "", description: "Uncontrolled or controlled." },
       { name: "children", type: "ReactNode", description: "Extra content (e.g. a text field)." },
     ],
     a11y: ["role=alertdialog; it does not close on outside click.", "Focus starts on the cancel action."],
@@ -612,7 +612,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   alert: {
     name: "Alert",
-    description: "Inline messages in the page: info, success, warning, danger — with actions and an optional dismiss.",
+    description: "Inline messages in the page: info, success, warning, danger, with actions and an optional dismiss.",
     importName: "Alert",
     demos: [{ id: "basic", title: "Tones and variants", align: "stretch", Component: AlertBasic }],
     props: [
@@ -685,7 +685,7 @@ export const DOCS: Record<string, ComponentDoc> = {
     props: [
       { name: "MenuItem", type: "icon, shortcut, destructive, inset, disabled, onSelect", description: "One action." },
       { name: "MenuCheckboxItem / MenuRadioItem", type: "checked / value", description: "Toggles and single choice." },
-      { name: "MenuSub, MenuSubTrigger, MenuSubContent", type: "—", description: "Nested menu." },
+      { name: "MenuSub, MenuSubTrigger, MenuSubContent", type: "", description: "Nested menu." },
       { name: "MenuContent", type: "align, side, sideOffset", description: "Placement (Radix)." },
     ],
     a11y: ["menu / menuitem roles, arrow keys, typeahead, Escape.", "Focus returns to the trigger on close."],
@@ -874,7 +874,7 @@ export const DOCS: Record<string, ComponentDoc> = {
     props: [
       { name: "aria-label", type: "string", description: "Required accessible name." },
       { name: "icon", type: "ReactNode", description: "The glyph (or pass it as children)." },
-      { name: "variant / tone / size / shape", type: "—", default: '"gray"', description: "Same as Button; defaults to the gray variant." },
+      { name: "variant / tone / size / shape", type: "", default: '"gray"', description: "Same as Button; defaults to the gray variant." },
     ],
   },
   input: {
@@ -903,7 +903,7 @@ export const DOCS: Record<string, ComponentDoc> = {
       { name: "autoResize", type: "boolean", default: "true", description: "Grow with content (CSS field-sizing, JS fallback)." },
       { name: "minRows / maxRows", type: "number", default: "3 / 12", description: "Height limits in lines." },
       { name: "showCount", type: "boolean", default: "false", description: "Counter, against maxLength when set." },
-      { name: "variant / size / invalid", type: "—", description: "Same as Input." },
+      { name: "variant / size / invalid", type: "", description: "Same as Input." },
     ],
   },
   select: {
@@ -953,7 +953,7 @@ export const DOCS: Record<string, ComponentDoc> = {
       { name: "checked / defaultChecked / onCheckedChange", type: "boolean", description: "State." },
       { name: "tone", type: '"accent" | "success"', default: '"accent"', description: "Accent or iOS green when on." },
       SIZE('"sm" | "md"'),
-      { name: "label / description / labelPlacement", type: "—", description: "As Checkbox; use \"start\" for settings rows." },
+      { name: "label / description / labelPlacement", type: "", description: "As Checkbox; use \"start\" for settings rows." },
     ],
   },
   slider: {
@@ -1003,8 +1003,8 @@ export const DOCS: Record<string, ComponentDoc> = {
     props: [
       { name: "variant", type: '"soft" | "outline" | "surface" | "accent"', default: '"soft"', description: "Look." },
       SIZE('"sm" | "md" | "lg"'),
-      { name: "onClick + selected", type: "—", description: "Turns the tag into a toggle button." },
-      { name: "onRemove / removeLabel", type: "—", description: "Adds a remove button." },
+      { name: "onClick + selected", type: "", description: "Turns the tag into a toggle button." },
+      { name: "onRemove / removeLabel", type: "", description: "Adds a remove button." },
       { name: "icon", type: "ReactNode", description: "Leading icon." },
     ],
   },
