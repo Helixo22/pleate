@@ -1,0 +1,4 @@
+{% load i18n %}{% autoescape off %}{% blocktranslate %}Hi,
+
+your wait is over: you can now start using {{ site_name }}. Open this link to get started:{% endblocktranslate %}
+{{ action_url }}{% endautoescape %}

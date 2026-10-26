@@ -1,0 +1,6 @@
+{% load i18n %}{% blocktranslate %}Hi {{ name }},
+
+confirm your email address by opening this link:{% endblocktranslate %}
+{{ action_url }}
+
+{% translate "If you did not create an account, ignore this email." %}

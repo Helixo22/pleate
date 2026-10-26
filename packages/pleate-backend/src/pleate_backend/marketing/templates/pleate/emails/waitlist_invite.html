@@ -1,0 +1,1 @@
+{% extends "pleate/emails/base.html" %}{% load i18n %}{% block content %}<p>{% translate "Hi," %}</p><p>{% blocktranslate %}Your wait is over: you can now start using {{ site_name }}.{% endblocktranslate %}</p>{% endblock %}{% block footer %}{% blocktranslate %}You received this email because you joined the {{ site_name }} waitlist.{% endblocktranslate %}{% endblock %}

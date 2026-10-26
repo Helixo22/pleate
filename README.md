@@ -100,17 +100,40 @@ Each component lives at its own path, for example `pleate/button` or `pleate/ai/
 | --- | --- |
 | Base | Button, IconButton, Input, Textarea, Select, Checkbox, Radio, Switch, Slider, Badge, Avatar, Tag, Label, Spinner |
 | Layout | Container, Stack, Grid, Card, Divider, Section, Navbar, NavigationBar (iOS large title), Sidebar, Footer, TabBar |
-| Navigation | Tabs, SegmentedControl, Breadcrumb, Pagination, Menu, ContextMenu, Dropdown |
+| Navigation | Tabs, SegmentedControl, Breadcrumb, Pagination (with range summary), Menu, ContextMenu, Dropdown |
 | Overlay | Modal, BottomSheet, ActionSheet, AlertDialog, Popover, Tooltip, Toast, Alert |
-| Feedback | Skeleton, Progress, ProgressCircle, EmptyState |
-| Data | Table, List (iOS Settings style), Accordion, Timeline, StatCard |
-| Forms | Form and FormField with validation, Calendar, DatePicker, SearchBar, FileUpload |
+| Feedback | Skeleton, Progress, ProgressCircle, EmptyState, NotificationBell, NotificationCenter |
+| Data | Table, DataTable, List (iOS Settings style), Accordion, Timeline, StatCard, SessionList, ApiKeyList |
+| Forms | Form and FormField with validation, PasswordInput, OTPInput, Calendar, DatePicker, SearchBar, FileUpload (with upload progress) |
+| Auth (`pleate/auth/*`) | AuthCard, LoginForm, SignupForm, ForgotPasswordForm, ResetPasswordForm, TwoFactorForm, TwoFactorSetup, OAuthButtons |
 | AI (`pleate/ai/*`) | BotFace, ChatThread, Message, Composer, StreamingText, PromptSuggestions, ResultCard, ModelPicker, Reasoning |
 | Effects (`pleate/effects/*`) | BlurText, RotatingText, GradientText, CountUp, ScrollRevealText, Reveal, Parallax, PageTransition, Magnet, Spotlight, Tilt, ClickSpark |
-| Marketing (`pleate/marketing/*`) | Hero, FeatureGrid, Pricing, Testimonials, CTA, Newsletter, LogoMarquee |
+| Marketing (`pleate/marketing/*`) | Hero, FeatureGrid, Pricing, Testimonials, CTA, Newsletter, ContactForm, LogoMarquee |
 
 The documentation app shows every component with live examples, the code behind each one, its props and notes on
 accessibility. There's also a complete example landing page built only with pleate.
+
+## Backend
+
+pleate also ships the other half. [`pleate-backend`](packages/pleate-backend) is a set of reusable
+Django apps on MongoDB (through the official django-mongodb-backend) with a REST API and an OpenAPI
+schema, and [`pleate-client`](packages/pleate-client) is a typed client with React hooks that connect
+each component to its endpoint:
+
+```tsx
+const list = useList<Product>("/catalog/products");
+<DataTable columns={columns} getRowId={(p) => p.id} {...list.tableProps} />
+
+const login = useLogin({ onSuccess: () => router.push("/") });
+login.mfaRequired ? <TwoFactorForm {...login.twoFactorFormProps} /> : <LoginForm {...login.loginFormProps} />
+```
+
+It covers authentication with sessions, password reset and email verification, two factor, OAuth,
+roles and feature flags, API keys, lists with pagination, search, ordering and filters, file uploads,
+live notifications, emails, an activity log, rate limiting, cache, Celery tasks, signed webhooks,
+streaming AI chat, newsletter, contact and waitlist, Stripe billing and a back office API, with
+messages in English, Italian and Spanish. The Backend section of the docs explains each part with
+live examples, and [`apps/backend-demo`](apps/backend-demo) is a complete project to start from.
 
 ## Theming
 
@@ -159,7 +182,10 @@ Then open http://localhost:3000.
 | Path | Contents |
 | --- | --- |
 | `packages/pleate` | The library. `npm run build -w pleate` builds it, `npm run palettes -w pleate` regenerates the palettes. |
+| `packages/pleate-backend` | Django + MongoDB apps. `docker compose up -d` then `uv run pytest` inside it. |
+| `packages/pleate-client` | Typed client, React hooks and the in-memory mock backend. `npm test -w pleate-client`. |
 | `apps/docs` | The documentation, live examples and the example landing page. |
+| `apps/backend-demo` | Example Django project used by the docs and the end to end tests. |
 | `media` | Logo, banners and the intro video. |
 
 ## License

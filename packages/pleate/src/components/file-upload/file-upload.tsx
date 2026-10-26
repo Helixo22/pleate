@@ -1,17 +1,21 @@
 // FileUpload: pick files by dropping them on the zone, clicking it, or with the keyboard (it is a button). Checks
 // type (accept), size and count, lists the files with image previews, sizes, optional upload progress and a remove
 // button. "dropzone" is the large area; "button" a compact trigger with the same list. With `name` the files are
-// part of the form submission (FormData).
+// part of the form submission (FormData). `uploads` drives a per-file state (uploading with progress, done, error
+// with a retry button); look entries up with fileKey(file).
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useId, useMemo, useRef, useState, type DragEvent, type ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";
-import { XIcon } from "../../lib/icons.tsx";
+import { CheckIcon, RetryIcon, XIcon } from "../../lib/icons.tsx";
 import { useReducedMotion } from "../../motion/use-reduced-motion.ts";
 import { Button } from "../button/button.tsx";
 
 export type FileRejection = { file: File; reason: "type" | "size" | "count"; message: string };
+
+/** Upload state of one file: progress 0 to 1 while uploading, done, or an error message. */
+export type FileUploadState = { status: "uploading" | "done" | "error"; progress?: number; error?: string };
 
 export type FileUploadProps = {
   value?: File[];
@@ -24,8 +28,19 @@ export type FileUploadProps = {
   /** Bytes. */
   maxSize?: number;
   maxFiles?: number;
-  /** Upload progress per file name, 0–100. */
+  /** Upload progress per file name, 0 to 100. Superseded by `uploads`. */
   progress?: Record<string, number>;
+  /**
+   * Upload state per file, keyed by fileKey(file) (name, size and last modified time joined by "-"), or by the file
+   * name when names are unique. Shows a progress bar, a done check or the error with a retry button.
+   */
+  uploads?: Record<string, FileUploadState>;
+  /** Shows a retry button on files whose upload failed. */
+  onRetry?: (file: File) => void;
+  /** Called when a file is removed from the list (after onValueChange), e.g. to cancel its upload. */
+  onRemove?: (file: File) => void;
+  /** Text of the retry button; also its accessible name with the file name appended. */
+  retryLabel?: string;
   variant?: "dropzone" | "button";
   title?: ReactNode;
   description?: ReactNode;
@@ -61,16 +76,31 @@ function matches(file: File, accept?: string) {
   });
 }
 
-const key = (f: File) => `${f.name}-${f.size}-${f.lastModified}`;
+/** The key FileUpload uses for a file: name, size and last modified time. Use it to key `uploads`. */
+export const fileKey = (f: File) => `${f.name}-${f.size}-${f.lastModified}`;
+const key = fileKey;
 
-function FileRow({ file, progress, onRemove, removeLabel, disabled }: { file: File; progress?: number; onRemove: () => void; removeLabel: string; disabled?: boolean }) {
+type FileRowProps = {
+  file: File;
+  progress?: number;
+  upload?: FileUploadState;
+  onRemove: () => void;
+  onRetry?: () => void;
+  removeLabel: string;
+  retryLabel: string;
+  disabled?: boolean;
+};
+
+function FileRow({ file, progress: legacy, upload, onRemove, onRetry, removeLabel, retryLabel, disabled }: FileRowProps) {
   const image = file.type.startsWith("image/");
   const url = useMemo(() => (image ? URL.createObjectURL(file) : null), [file, image]);
   useEffect(() => () => (url ? URL.revokeObjectURL(url) : undefined), [url]);
   const ext = file.name.includes(".") ? file.name.split(".").pop()!.slice(0, 4).toUpperCase() : "FILE";
-  const done = progress === undefined || progress >= 100;
+  const status = upload?.status;
+  const progress = upload ? (status === "uploading" ? Math.min(100, Math.max(0, (upload.progress ?? 0) * 100)) : undefined) : legacy;
+  const done = status !== "error" && (progress === undefined || progress >= 100);
   return (
-    <div className="flex items-center gap-3 rounded-xl bg-surface p-2 pe-3 shadow-xs">
+    <div className={cn("flex items-center gap-3 rounded-xl bg-surface p-2 pe-3 shadow-xs", status === "error" && "shadow-[inset_0_0_0_1px_var(--pl-danger-ink)]")}>
       {url ? (
         <img src={url} alt="" className="size-11 shrink-0 rounded-lg object-cover" />
       ) : (
@@ -78,8 +108,15 @@ function FileRow({ file, progress, onRemove, removeLabel, disabled }: { file: Fi
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="truncate text-subhead font-medium">{file.name}</span>
-        {done ? (
-          <span className="text-footnote text-fg-muted">{formatBytes(file.size)}</span>
+        {status === "error" ? (
+          <span role="alert" className="line-clamp-2 text-footnote font-medium text-danger-ink">
+            {upload?.error ?? "Upload failed."}
+          </span>
+        ) : done ? (
+          <span className="flex items-center gap-1.5 text-footnote text-fg-muted">
+            {status === "done" && <CheckIcon className="size-3.5 shrink-0 text-success-ink" strokeWidth={3} />}
+            {formatBytes(file.size)}
+          </span>
         ) : (
           <span className="flex items-center gap-2">
             <span
@@ -96,6 +133,18 @@ function FileRow({ file, progress, onRemove, removeLabel, disabled }: { file: Fi
           </span>
         )}
       </div>
+      {status === "error" && onRetry && (
+        <button
+          type="button"
+          aria-label={`${retryLabel} ${file.name}`}
+          disabled={disabled}
+          onClick={onRetry}
+          className="pl-focus-ring inline-flex h-7 shrink-0 cursor-pointer items-center gap-1 rounded-full bg-fill-2 px-2.5 text-footnote font-semibold text-fg transition-colors hover:bg-fill disabled:opacity-40 [&_svg]:size-3.5"
+        >
+          <RetryIcon strokeWidth={2.5} />
+          <span aria-hidden="true">{retryLabel}</span>
+        </button>
+      )}
       <button
         type="button"
         aria-label={removeLabel}
@@ -119,6 +168,10 @@ export function FileUpload({
   maxSize,
   maxFiles,
   progress,
+  uploads,
+  onRetry,
+  onRemove,
+  retryLabel = "Retry",
   variant = "dropzone",
   title,
   description,
@@ -287,9 +340,15 @@ export function FileUpload({
                 <FileRow
                   file={file}
                   progress={progress?.[file.name]}
+                  upload={uploads?.[key(file)] ?? uploads?.[file.name]}
                   disabled={disabled}
                   removeLabel={removeLabel(file)}
-                  onRemove={() => update(files.filter((f) => f !== file))}
+                  retryLabel={retryLabel}
+                  onRetry={onRetry && (() => onRetry(file))}
+                  onRemove={() => {
+                    update(files.filter((f) => f !== file));
+                    onRemove?.(file);
+                  }}
                 />
               </motion.li>
             ))}

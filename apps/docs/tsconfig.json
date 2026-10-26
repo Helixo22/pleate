@@ -42,6 +42,9 @@
       "pleate/ai/*": [
         "../../packages/pleate/src/ai/*/index.ts"
       ],
+      "pleate/auth/*": [
+        "../../packages/pleate/src/auth/*/index.ts"
+      ],
       "pleate/effects/*": [
         "../../packages/pleate/src/effects/*/index.ts"
       ],
@@ -50,6 +53,15 @@
       ],
       "pleate/*": [
         "../../packages/pleate/src/components/*/index.ts"
+      ],
+      "pleate-client": [
+        "../../packages/pleate-client/src/index.ts"
+      ],
+      "pleate-client/react": [
+        "../../packages/pleate-client/src/react/index.ts"
+      ],
+      "pleate-client/mock/browser": [
+        "../../packages/pleate-client/src/mock/browser.ts"
       ]
     }
   },

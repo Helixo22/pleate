@@ -1,5 +1,22 @@
 // Component pages: description, import path, the examples (each file in demos/<slug>/<id>.tsx) and the main props.
 import type { ComponentType } from "react";
+import ApiKeyListBasic from "./api-key-list/basic";
+import AuthCardBasic from "./auth-card/basic";
+import ContactBasic from "./contact/basic";
+import DataTableBasic from "./data-table/basic";
+import FileUploadUploads from "./file-upload/uploads";
+import ForgotPasswordFormBasic from "./forgot-password-form/basic";
+import LoginFormBasic from "./login-form/basic";
+import NotificationCenterBasic from "./notification-center/basic";
+import OAuthButtonsBasic from "./oauth-buttons/basic";
+import OtpInputBasic from "./otp-input/basic";
+import PaginationRange from "./pagination/range";
+import PasswordInputBasic from "./password-input/basic";
+import ResetPasswordFormBasic from "./reset-password-form/basic";
+import SessionListBasic from "./session-list/basic";
+import SignupFormBasic from "./signup-form/basic";
+import TwoFactorFormBasic from "./two-factor-form/basic";
+import TwoFactorSetupBasic from "./two-factor-setup/basic";
 import CtaBasic from "./cta/basic";
 import FeatureGridVariants from "./feature-grid/variants";
 import HeroVariants from "./hero/variants";
@@ -410,11 +427,16 @@ export const DOCS: Record<string, ComponentDoc> = {
     name: "File Upload",
     description: "Drop files, click, or use the keyboard. Type, size and count checks, image previews, per-file progress and removal.",
     importName: "FileUpload",
-    demos: [{ id: "basic", title: "Dropzone with progress, compact button", align: "stretch", Component: FileUploadBasic }],
+    demos: [
+      { id: "basic", title: "Dropzone with progress, compact button", align: "stretch", Component: FileUploadBasic },
+      { id: "uploads", title: "Upload states", description: "Done, uploading and failed with Retry. Add files: every third one fails once.", align: "stretch", Component: FileUploadUploads },
+    ],
     props: [
       { name: "value / defaultValue / onValueChange", type: "File[]", description: "Selected files." },
       { name: "accept / maxSize / maxFiles / multiple", type: "string / bytes / number / boolean", description: "Checks; rejections are listed and sent to onReject." },
-      { name: "progress", type: "Record<fileName, 0–100>", description: "Upload bars." },
+      { name: "progress", type: "Record<fileName, 0–100>", description: "Upload bars (simple form; see uploads)." },
+      { name: "uploads", type: 'Record<fileKey(file) | fileName, { status: "uploading" | "done" | "error", progress?: 0–1, error? }>', description: "Per file state. Key entries with fileKey(file) (name-size-lastModified), or the file name when names are unique." },
+      { name: "onRetry / onRemove / retryLabel", type: "(file) => void / (file) => void / string", default: 'none / none / "Retry"', description: "Retry button on failed files; removal callback (e.g. cancel the upload)." },
       { name: "variant", type: '"dropzone" | "button"', default: '"dropzone"', description: "Look." },
       { name: "name", type: "string", description: "Include the files in the form submission." },
     ],
@@ -665,13 +687,18 @@ export const DOCS: Record<string, ComponentDoc> = {
     name: "Pagination",
     description: "Move through pages: numbered with ellipses (fewer on phones), compact \"3 of 12\", or the iOS page-control dots.",
     importName: "Pagination",
-    demos: [{ id: "variants", title: "Pages, compact, dots", Component: PaginationVariants }],
+    demos: [
+      { id: "variants", title: "Pages, compact, dots", Component: PaginationVariants },
+      { id: "range", title: "With a range summary", description: "Pass total and pageSize.", align: "stretch", Component: PaginationRange },
+    ],
     props: [
       { name: "page / pageCount", type: "number", description: "Current page (1-based) and total." },
       { name: "onPageChange / getHref", type: "function", description: "Buttons, or links for crawlable pages." },
       { name: "variant", type: '"pages" | "compact" | "dots"', default: '"pages"', description: "Look." },
       { name: "siblings", type: "number", default: "1", description: "Pages on each side of the current one." },
       { name: "size", type: '"sm" | "md"', default: '"md"', description: "Button size." },
+      { name: "total / pageSize", type: "number", description: "Show a \"21–40 of 134\" summary before the controls." },
+      { name: "formatRange", type: "(start, end, total) => ReactNode", description: "Text of the summary." },
     ],
   },
   menu: {
@@ -1028,5 +1055,261 @@ export const DOCS: Record<string, ComponentDoc> = {
       SIZE('"xs" | "sm" | "md" | "lg" | "xl" | number'),
       { name: "label", type: "string | null", default: '"Loading"', description: "Accessible name; null when a parent announces the state." },
     ],
+  },
+  "password-input": {
+    name: "Password Input",
+    description: "A password field with a show/hide toggle and an optional strength meter, fed by the built-in scorePassword() or your own scorer.",
+    importName: "PasswordInput, scorePassword",
+    demos: [{ id: "basic", title: "Toggle, strength meter, scorer", align: "stretch", Component: PasswordInputBasic }],
+    props: [
+      { name: "showStrength", type: "boolean", default: "false", description: "Four bars and a word under the field." },
+      { name: "scorer", type: "(password) => 0 | 1 | 2 | 3 | 4", default: "scorePassword", description: "Swap in zxcvbn or your own rules." },
+      { name: "defaultVisible", type: "boolean", default: "false", description: "Start with the text shown." },
+      { name: "labels", type: "{ show, hide, strength, scores }", description: "Toggle names and strength words." },
+      { name: "...Input props", type: "InputProps", description: "Everything Input takes (size, variant, invalid, adornments)." },
+    ],
+    a11y: [
+      "The toggle is a button with aria-pressed and a name that says what it does; it never submits the form.",
+      "The strength text is linked to the field (aria-describedby) and announced politely as it changes.",
+      "scorePassword is a hint for people, not a security check: validate on the server too.",
+    ],
+  },
+  "otp-input": {
+    name: "OTP Input",
+    description: "One-time codes in separate boxes: auto advance, Backspace to go back, arrows, and paste or SMS autofill of the whole code. onComplete fires when the last box is filled.",
+    importName: "OTPInput",
+    demos: [{ id: "basic", title: "Verify, alphanumeric, disabled", description: "Type or paste 123456.", align: "stretch", Component: OtpInputBasic }],
+    props: [
+      { name: "length", type: "number", default: "6", description: "Number of boxes." },
+      { name: "mode", type: '"numeric" | "alphanumeric"', default: '"numeric"', description: "Allowed characters and the keyboard shown on phones." },
+      { name: "value / defaultValue / onValueChange", type: "string", description: "The code." },
+      { name: "onComplete", type: "(code) => void", description: "All boxes filled." },
+      { name: "groupSize", type: "number", description: "A gap after every N boxes." },
+      { name: "invalid / disabled / autoFocus", type: "boolean", description: "States." },
+      { name: "name", type: "string", description: "Submit the joined code with the form; works inside FormField." },
+      { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', description: "Box size; boxes shrink to fit narrow screens." },
+    ],
+    a11y: [
+      "A labelled group; every box is named (\"Character 2 of 6\").",
+      "The first box has autocomplete=\"one-time-code\" so phones offer the code from SMS.",
+      "Inside FormField, validation runs when focus leaves the whole group, not between boxes.",
+    ],
+  },
+  "auth-card": {
+    name: "Auth Card",
+    description: "The frame of sign in and sign up screens: logo, title, a line of description, the form and a footer. AuthDivider is the \"or\" rule.",
+    importName: "AuthCard, AuthDivider",
+    importPath: "pleate/auth/auth-card",
+    demos: [{ id: "basic", title: "Welcome screen", align: "stretch", Component: AuthCardBasic }],
+    props: [
+      { name: "logo / title / description / footer", type: "ReactNode", description: "Content around the form." },
+      { name: "variant", type: '"card" | "plain"', default: '"card"', description: "Solid surface with a shadow, or none." },
+      { name: "headingLevel", type: "1 | 2 | 3", default: "1", description: "Level of the title." },
+    ],
+    a11y: ["The title is a real heading (h1 by default) so the page has an outline."],
+  },
+  "login-form": {
+    name: "Login Form",
+    description: "Email and password sign in with remember me, a forgot password link, a slot for social buttons and a footer. Client validation, server errors through props.",
+    importName: "LoginForm",
+    importPath: "pleate/auth/login-form",
+    demos: [{ id: "basic", title: "Sign in to Plate", description: "Any email, password plate123.", align: "stretch", Component: LoginFormBasic }],
+    props: [
+      { name: "onSubmit", type: "({ email, password, remember }) => void | Promise", description: "Runs when valid; a thrown Error's message shows as the banner." },
+      { name: "loading / error / fieldErrors", type: "boolean / string / Partial<Record<field, string>>", description: "Busy button, a banner above the fields, and server messages per field (they replace the client ones)." },
+      { name: "forgotPasswordHref / forgotPassword", type: "string / ReactNode", description: "Link target, or your own element (Next Link)." },
+      { name: "showRemember", type: "boolean", default: "true", description: "Remember me checkbox." },
+      { name: "oauth / oauthPosition", type: 'ReactNode / "top" | "bottom"', default: '"top"', description: "Social buttons with an \"or\" rule." },
+      { name: "footer / defaultEmail", type: "ReactNode / string", description: "Links under the form; prefilled email." },
+      { name: "labels", type: "object", description: "Every visible string, for your wording or translation." },
+    ],
+    a11y: ["Labels, descriptions and errors are linked to each field; the first invalid field gets focus on submit.", "autocomplete=\"username\" and \"current-password\" let password managers fill the form.", "The error banner is a role=alert region."],
+  },
+  "signup-form": {
+    name: "Signup Form",
+    description: "Create an account: name, email, a password with a live strength meter, and an optional terms checkbox that becomes required.",
+    importName: "SignupForm",
+    importPath: "pleate/auth/signup-form",
+    demos: [{ id: "basic", title: "Create a Plate account", description: "Use an address ending in @taken.com to see a server field error.", align: "stretch", Component: SignupFormBasic }],
+    props: [
+      { name: "onSubmit", type: "({ name, email, password, acceptTerms }) => void | Promise", description: "Runs when valid." },
+      { name: "loading / error / fieldErrors", type: "boolean / string / Partial<Record<field, string>>", description: "Busy button, a banner above the fields, and server messages per field (they replace the client ones)." },
+      { name: "terms", type: "ReactNode", description: "Checkbox label with your links; shown and required when set." },
+      { name: "minPasswordLength / minStrength", type: "number / 0 to 4", default: "8 / none", description: "Password rules (strength from scorePassword)." },
+      { name: "showName / showStrength", type: "boolean", default: "true / true", description: "Optional parts." },
+      { name: "oauth / footer / defaultValues", type: "ReactNode / ReactNode / { name, email }", description: "Slots and prefill." },
+      { name: "labels", type: "object", description: "Every visible string, for your wording or translation." },
+    ],
+    a11y: ["Labels, descriptions and errors are linked to each field; the first invalid field gets focus on submit.", "autocomplete=\"new-password\" lets browsers suggest a strong password."],
+  },
+  "forgot-password-form": {
+    name: "Forgot Password Form",
+    description: "Ask for the account email, then confirm that a link is on its way without revealing whether the account exists.",
+    importName: "ForgotPasswordForm",
+    importPath: "pleate/auth/forgot-password-form",
+    demos: [{ id: "basic", title: "Request a reset link", align: "stretch", Component: ForgotPasswordFormBasic }],
+    props: [
+      { name: "onSubmit", type: "({ email }) => void | Promise", description: "The confirmation shows when it resolves." },
+      { name: "sent / onSentChange", type: "boolean / (sent) => void", description: "Control the confirmation yourself." },
+      { name: "loading / error / fieldErrors", type: "boolean / string / Partial<Record<field, string>>", description: "Busy button, a banner above the fields, and server messages per field (they replace the client ones)." },
+      { name: "footer / defaultEmail", type: "ReactNode / string", description: "Back link; prefill." },
+      { name: "labels", type: "object", description: "Every visible string, for your wording or translation." },
+    ],
+    a11y: ["The confirmation is a status region, announced when it appears."],
+  },
+  "reset-password-form": {
+    name: "Reset Password Form",
+    description: "Choose a new password with a strength meter and confirm it. Keep the reset token in your own code and send it along.",
+    importName: "ResetPasswordForm",
+    importPath: "pleate/auth/reset-password-form",
+    demos: [{ id: "basic", title: "New password", align: "stretch", Component: ResetPasswordFormBasic }],
+    props: [
+      { name: "onSubmit", type: "({ password, confirmPassword }) => void | Promise", description: "Runs when both match and pass the rules." },
+      { name: "loading / error / fieldErrors", type: "boolean / string / Partial<Record<field, string>>", description: "Busy button, a banner above the fields, and server messages per field (they replace the client ones)." },
+      { name: "minPasswordLength / minStrength / showStrength", type: "number / 0 to 4 / boolean", default: "8 / none / true", description: "Password rules." },
+      { name: "labels", type: "object", description: "Every visible string, for your wording or translation." },
+    ],
+    a11y: ["Labels, descriptions and errors are linked to each field; the first invalid field gets focus on submit."],
+  },
+  "two-factor-form": {
+    name: "Two Factor Form",
+    description: "The second step of sign in: a code that submits itself when complete, a switch to a backup code, and an optional resend with a cooldown.",
+    importName: "TwoFactorForm",
+    importPath: "pleate/auth/two-factor-form",
+    demos: [{ id: "basic", title: "Verify a sign in", description: "Code 123456, or backup code plate-2026.", align: "stretch", Component: TwoFactorFormBasic }],
+    props: [
+      { name: "onSubmit", type: '({ code, method: "otp" | "backup" }) => void | Promise', description: "Throw to show the error and clear the boxes." },
+      { name: "length / autoSubmit", type: "number / boolean", default: "6 / true", description: "Code length; submit on the last box." },
+      { name: "allowBackupCode", type: "boolean", default: "true", description: "Offer the backup code switch." },
+      { name: "onResend / resendCooldown", type: "() => void | Promise / seconds", default: "none / 30", description: "\"Send a new code\" for SMS or email codes." },
+      { name: "loading / error / fieldErrors", type: "boolean / string / Partial<Record<field, string>>", description: "Busy button, a banner above the fields, and server messages per field (they replace the client ones)." },
+      { name: "labels", type: "object", description: "Every visible string, for your wording or translation." },
+    ],
+    a11y: ["The code group is labelled and the first box offers one-time-code autofill.", "The resend countdown is announced politely."],
+  },
+  "two-factor-setup": {
+    name: "Two Factor Setup",
+    description: "Turn on an authenticator app: scan the QR code or copy the key, confirm a code, then save the backup codes (copy or download).",
+    importName: "TwoFactorSetup",
+    importPath: "pleate/auth/two-factor-setup",
+    demos: [{ id: "basic", title: "Three steps", description: "Confirm with 123456.", align: "stretch", Component: TwoFactorSetupBasic }],
+    props: [
+      { name: "qrSvg / qrSrc", type: "string", description: "SVG markup (shown as an image data URL, never injected) or an image URL." },
+      { name: "secret", type: "string", description: "The key for manual entry, shown in groups of four." },
+      { name: "onVerify", type: "(code) => Promise<void | { backupCodes }>", description: "Throw when the code is wrong; return the backup codes or pass backupCodes." },
+      { name: "backupCodes / onDone", type: "string[] / () => void", description: "Last step." },
+      { name: "step / defaultStep / onStepChange", type: '"scan" | "verify" | "backup"', default: '"scan"', description: "Control the step." },
+      { name: "downloadName / downloadHeader", type: "string", default: '"backup-codes.txt"', description: "The downloaded text file." },
+      { name: "error / codeLength", type: "string / number", default: "none / 6", description: "Controlled verify error; code length." },
+      { name: "labels", type: "object", description: "Every visible string, for your wording or translation." },
+    ],
+    a11y: ["The QR image has a text alternative and the key is always offered as text.", "Copy buttons announce \"Copied\"."],
+  },
+  "oauth-buttons": {
+    name: "OAuth Buttons",
+    description: "\"Continue with\" buttons with built-in monochrome marks for Google, GitHub and Apple, a key for anything else, links or callbacks.",
+    importName: "OAuthButtons",
+    importPath: "pleate/auth/oauth-buttons",
+    demos: [{ id: "basic", title: "Stacked, in a row, custom provider", align: "stretch", Component: OAuthButtonsBasic }],
+    props: [
+      { name: "providers", type: "{ id, name, href?, icon? }[]", description: "google, github and apple get a mark; others a key or your icon." },
+      { name: "onSelect", type: "(id) => void", description: "Called on press (also before following an href)." },
+      { name: "loadingId", type: "string | null", description: "Spinner on that provider, others disabled." },
+      { name: "layout", type: '"stack" | "row"', default: '"stack"', description: "Rows, or side by side (icons only on phones with three or more)." },
+      { name: "size / disabled", type: '"md" | "lg" / boolean', default: '"md"', description: "Look and state." },
+      { name: "labels.continueWith", type: "(name) => string", description: "Button text." },
+    ],
+    a11y: ["Icon-only buttons keep their full name (\"Continue with Apple\").", "Marks are decorative and hidden from screen readers."],
+  },
+  "notification-center": {
+    name: "Notification Center",
+    description: "An inbox grouped into Today and Earlier with unread dots, time ago, mark read, mark all read, delete, skeletons, an empty state and load more. NotificationBell opens it from a bell with a count.",
+    importName: "NotificationBell, NotificationCenter",
+    demos: [{ id: "basic", title: "Bell, inline, loading and empty", description: "Open the bell, mark items read, load more.", align: "stretch", Component: NotificationCenterBasic }],
+    props: [
+      { name: "items", type: "{ id, title, body?, createdAt, read, href?, kind?, icon? }[]", description: "Notifications, newest first." },
+      { name: "unreadCount", type: "number", default: "unread items", description: "Badge and header count (e.g. from the server)." },
+      { name: "onMarkRead / onMarkAllRead / onDelete", type: "(id) => void / () => void / (id) => void", description: "Actions; delete shows only when set." },
+      { name: "onLoadMore / hasMore / loading", type: "() => void / boolean / boolean", description: "Paging; loading shows skeletons when empty." },
+      { name: "icons", type: "Record<kind, ReactNode>", description: "Icon per kind." },
+      { name: "onSelect / now / locale", type: "(item) => void / Date / string", description: "Row press, reference time, formatting." },
+      { name: "Bell: open / onOpenChange / align / bellLabel", type: "", description: "Popover control and the bell's accessible name." },
+      { name: "labels", type: "object", description: "Every visible string, for your wording or translation." },
+    ],
+    a11y: [
+      "The bell's name includes the unread count (\"Notifications, 2 unread\").",
+      "Unread rows say so to screen readers; every action button is named after its notification.",
+      "The popover traps focus while open; Escape closes it and returns focus to the bell.",
+    ],
+  },
+  "data-table": {
+    name: "Data Table",
+    description: "Table, SearchBar, Pagination, Skeleton and EmptyState in one server-friendly table: it renders what you pass and reports sorting, searching, paging and selection.",
+    importName: "DataTable",
+    demos: [{ id: "basic", title: "Members, from a pretend API", description: "Sort, search, filter by role, select rows, page through 134 members.", align: "stretch", Component: DataTableBasic }],
+    props: [
+      { name: "columns", type: "{ key, header, cell?, sortable?, align?, width?, nowrap? }[]", description: "Columns; cell defaults to row[key]." },
+      { name: "rows / getRowId", type: "T[] / (row) => string", description: "The current page." },
+      { name: "sort / onSortChange", type: '{ key, direction: "asc" | "desc" } | null', description: "Sortable headers toggle the direction." },
+      { name: "search / onSearchChange / debounceMs", type: "string / (value) => void / number", default: "300", description: "Shows the search field; debounced." },
+      { name: "page / pageCount / total / pageSize / onPageChange", type: "number", description: "Pagination with a \"21–40 of 134\" summary." },
+      { name: "loading", type: "boolean", description: "Skeleton rows." },
+      { name: "empty", type: "{ icon, title, description, actions }", description: "Empty state (a no results text while searching)." },
+      { name: "toolbar / selectionActions", type: "ReactNode", description: "Filters; bulk actions while rows are selected." },
+      { name: "selectedIds / onSelectionChange", type: "string[] / (ids) => void", description: "Checkbox column." },
+      { name: "onRowClick / density / caption", type: '(row) => void / "comfortable" | "compact" / ReactNode', description: "Row press, row height, caption." },
+      { name: "labels", type: "object", description: "Every visible string, for your wording or translation." },
+    ],
+    a11y: [
+      "Sortable headers are buttons with aria-sort; checkboxes are named per row.",
+      "Clickable rows are focusable and open with Enter or Space.",
+      "The table is aria-busy while loading; wide tables scroll inside their card.",
+    ],
+  },
+  "session-list": {
+    name: "Session List",
+    description: "Where the account is signed in: browser and OS, IP, location and last activity per device, with sign out per row and everywhere else after a confirmation.",
+    importName: "SessionList",
+    demos: [{ id: "basic", title: "Active sessions", align: "stretch", Component: SessionListBasic }],
+    props: [
+      { name: "sessions", type: "{ id, browser, os, mobile, ip?, location?, lastSeenAt, current }[]", description: "The current one comes first, marked \"This device\"." },
+      { name: "onRevoke", type: "(id) => void | Promise", description: "Per row; spins while the promise runs." },
+      { name: "onRevokeOthers", type: "() => void | Promise", description: "After an AlertDialog confirmation." },
+      { name: "revokingIds / loading", type: "string[] / boolean", description: "External busy rows; skeleton while empty." },
+      { name: "showTitle / now / locale", type: "boolean / Date / string", description: "Heading and time formatting." },
+      { name: "labels", type: "object", description: "Every visible string, for your wording or translation." },
+    ],
+    a11y: ["Each Sign out button names the session (\"Sign out Chrome on Windows\").", "Signing out everywhere asks first, with focus on Cancel."],
+  },
+  "api-key-list": {
+    name: "API Key List",
+    description: "API keys with masked prefixes, scope badges, created, last used and expiry; a create dialog that reveals the new key once with a copy button; revoke behind a confirmation.",
+    importName: "ApiKeyList",
+    demos: [{ id: "basic", title: "Keys for the Plate API", description: "Create a key to see the reveal-once panel.", align: "stretch", Component: ApiKeyListBasic }],
+    props: [
+      { name: "keys", type: "{ id, name, prefix, scopes, createdAt, lastUsedAt?, expiresAt? }[]", description: "Shown as prefix_••••; expired keys are dimmed." },
+      { name: "scopes / defaultScopes", type: "{ value, label, description? }[] / string[]", description: "Choices in the create dialog." },
+      { name: "expiryOptions / defaultExpiry", type: "{ value, label, days | null }[] / string", default: "30, 90, 365 days, never", description: "Expiry select." },
+      { name: "onCreate", type: "({ name, scopes, expiresInDays }) => Promise<{ key }>", description: "Resolve with the full key; throw to show an error." },
+      { name: "onRevoke", type: "(id) => void | Promise", description: "After confirmation; the row spins meanwhile." },
+      { name: "loading / toolbar / now / locale", type: "boolean / ReactNode / Date / string", description: "Skeleton, header slot, formatting." },
+      { name: "labels", type: "object", description: "Every visible string, for your wording or translation." },
+    ],
+    a11y: ["The secret is shown once, selectable, with a copy button that announces \"Copied\".", "Revoking asks first; rows become labelled cards on phones."],
+  },
+  contact: {
+    name: "Contact Form",
+    description: "Name, email, an optional subject and the message, validated on the client, with a success panel and a hidden honeypot field named website.",
+    importName: "ContactForm",
+    importPath: "pleate/marketing/contact",
+    demos: [{ id: "basic", title: "Talk to the team", align: "stretch", Component: ContactBasic }],
+    props: [
+      { name: "onSubmit", type: "({ name, email, subject?, message, website }) => void | Promise", description: "website is the honeypot: drop submissions where it isn't empty." },
+      { name: "showSubject / minMessageLength / maxMessageLength", type: "boolean / number / number", default: "true / 10 / 2000", description: "Fields and rules." },
+      { name: "loading / error / fieldErrors", type: "boolean / string / object", description: "Server state." },
+      { name: "sent / onSentChange / footnote", type: "boolean / (sent) => void / ReactNode", description: "Success panel control; a note under the button." },
+      { name: "labels", type: "object", description: "Every visible string, for your wording or translation." },
+    ],
+    a11y: ["Labels, descriptions and errors are linked to each field; the first invalid field gets focus on submit.", "The honeypot is out of the tab order and hidden from screen readers.", "The success panel is a status region."],
   },
 };

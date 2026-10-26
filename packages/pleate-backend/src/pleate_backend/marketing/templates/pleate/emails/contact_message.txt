@@ -1,0 +1,8 @@
+{% load i18n %}{% autoescape off %}{% blocktranslate %}New message from the {{ site_name }} contact form.{% endblocktranslate %}
+
+{% translate "From" %}: {{ name }} <{{ email }}>
+{% if subject %}{% translate "Subject" %}: {{ subject }}
+{% endif %}
+{{ message }}
+
+{% translate "Reply to this email to answer the sender." %}{% endautoescape %}

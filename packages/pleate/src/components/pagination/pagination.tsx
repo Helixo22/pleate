@@ -1,5 +1,6 @@
 // Pagination: move through pages. "pages" shows numbers with ellipses (fewer on phones), "compact" a
 // "3 of 12" label between arrows, "dots" the iOS page control. On phones "pages" keeps first, current and last. Pages are buttons (onPageChange) or links (getHref).
+// With `total` and `pageSize` a range summary ("21–40 of 134") sits before the controls.
 "use client";
 
 import type { ReactNode } from "react";
@@ -21,6 +22,12 @@ export type PaginationProps = {
   nextLabel?: string;
   /** Text of the compact variant. */
   formatLabel?: (page: number, pageCount: number) => ReactNode;
+  /** Number of items across all pages; with pageSize, shows the range summary. */
+  total?: number;
+  /** Items per page, for the range summary. */
+  pageSize?: number;
+  /** Text of the range summary (first and last item shown, 1-based, and the total). */
+  formatRange?: (start: number, end: number, total: number) => ReactNode;
   className?: string;
 };
 
@@ -49,8 +56,14 @@ export function Pagination({
   previousLabel = "Previous page",
   nextLabel = "Next page",
   formatLabel = (p, n) => `${p} of ${n}`,
+  total,
+  pageSize,
+  formatRange = (start, end, count) => `${start.toLocaleString()}–${end.toLocaleString()} of ${count.toLocaleString()}`,
   className,
 }: PaginationProps) {
+  const showRange = total !== undefined && pageSize !== undefined && pageSize > 0 && variant !== "dots";
+  const rangeStart = showRange ? Math.min(total, (page - 1) * pageSize + 1) : 0;
+  const rangeEnd = showRange ? Math.min(total, page * pageSize) : 0;
   const box = size === "sm" ? "h-8 min-w-8 text-footnote" : "h-9 min-w-9 text-subhead sm:h-10 sm:min-w-10";
   const cell = (target: number, content: ReactNode, extra: { label?: string; current?: boolean; disabled?: boolean; className?: string } = {}) => {
     const classes = cn(
@@ -108,7 +121,12 @@ export function Pagination({
   }
 
   return (
-    <nav aria-label={label} className={cn("flex items-center", className)}>
+    <nav aria-label={label} className={cn("flex items-center", showRange && "flex-wrap justify-between gap-x-4 gap-y-2", className)}>
+      {showRange && (
+        <p className={cn("font-medium text-fg-muted pl-tabular", size === "sm" ? "text-footnote" : "text-footnote sm:text-subhead")} aria-live="polite">
+          {formatRange(rangeStart, rangeEnd, total)}
+        </p>
+      )}
       <ul className="flex items-center gap-1">
         <li>{arrow(-1)}</li>
         {variant === "compact" ? (

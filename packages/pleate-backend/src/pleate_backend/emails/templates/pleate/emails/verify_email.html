@@ -1,0 +1,1 @@
+{% extends "pleate/emails/base.html" %}{% load i18n %}{% block content %}<p>{% blocktranslate %}Hi {{ name }},{% endblocktranslate %}</p><p>{% translate "Confirm your email address to finish setting up your account." %}</p><p style="color:#6e6e73">{% translate "If you did not create an account, ignore this email." %}</p>{% endblock %}

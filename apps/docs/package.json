@@ -9,10 +9,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.105.0",
     "lucide-react": "^1.61.0",
     "motion": "^14.5.0",
+    "msw": "^3.0.3",
     "next": "^16.4.2",
     "pleate": "*",
+    "pleate-client": "*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

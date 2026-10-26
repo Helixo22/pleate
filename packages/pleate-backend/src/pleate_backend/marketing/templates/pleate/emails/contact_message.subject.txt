@@ -1,0 +1,1 @@
+{% load i18n %}{% autoescape off %}{% if subject %}{% blocktranslate %}Contact form: {{ subject }}{% endblocktranslate %}{% else %}{% blocktranslate %}New message from {{ name }}{% endblocktranslate %}{% endif %}{% endautoescape %}

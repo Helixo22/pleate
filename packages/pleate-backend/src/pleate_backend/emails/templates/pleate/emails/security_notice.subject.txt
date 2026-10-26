@@ -1,0 +1,1 @@
+{% load i18n %}{% blocktranslate %}Security alert for your {{ site_name }} account{% endblocktranslate %}

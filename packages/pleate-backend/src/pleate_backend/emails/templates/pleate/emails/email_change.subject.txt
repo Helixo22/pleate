@@ -1,0 +1,1 @@
+{% load i18n %}{% blocktranslate %}Confirm your new email for {{ site_name }}{% endblocktranslate %}

@@ -1,0 +1,23 @@
+# Development services for pleate-backend: MongoDB (single node replica set, so
+# transactions work), Redis (cache, rate limits, Celery, realtime) and Mailpit
+# (catches every email, UI on http://localhost:8025).
+services:
+  mongo:
+    image: mongo:8
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    ports: ["27027:27017"]
+    volumes: [mongo-data:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "try { rs.status().ok } catch (e) { rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]}).ok }"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    ports: ["6389:6379"]
+  mailpit:
+    image: axllent/mailpit
+    ports: ["8025:8025", "1025:1025"]
+
+volumes:
+  mongo-data:
