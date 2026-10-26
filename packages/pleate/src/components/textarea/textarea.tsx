@@ -65,7 +65,7 @@ export function Textarea({
       <textarea
         ref={setRefs}
         aria-invalid={invalid || props["aria-invalid"] || undefined}
-        className={cn(fieldControl, "resize-none leading-[inherit]", autoResize && "field-sizing-content", textareaClassName)}
+        className={cn(fieldControl, "w-full resize-none leading-[inherit]", autoResize && "field-sizing-content", textareaClassName)}
         style={{
           minHeight: `${minRows}lh`,
           maxHeight: autoResize ? `${maxRows}lh` : undefined,

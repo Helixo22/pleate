@@ -1,0 +1,4 @@
+{% load i18n %}{% blocktranslate %}Hi {{ name }},
+
+open this link to use {{ new_email }} as the email of your account:{% endblocktranslate %}
+{{ action_url }}

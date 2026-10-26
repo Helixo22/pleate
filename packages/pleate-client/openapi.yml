@@ -1,0 +1,6206 @@
+openapi: 3.0.3
+info:
+  title: pleate-backend API
+  version: 0.1.0
+  description: REST API that backs the pleate components.
+paths:
+  /api/activity:
+    get:
+      operationId: activity_list
+      description: 'What the signed in user did: logins, password changes, edits...'
+      summary: My activity, newest first
+      parameters:
+      - in: query
+        name: action
+        schema:
+          type: string
+        description: Exact action, for example auth.login.
+      - in: query
+        name: action__startswith
+        schema:
+          type: string
+        description: Action prefix, for example auth.
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - activity
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedActivityLogList'
+          description: ''
+  /api/activity/all:
+    get:
+      operationId: activity_all_list
+      summary: Every activity entry (staff)
+      parameters:
+      - in: query
+        name: action
+        schema:
+          type: string
+        description: Exact action, for example auth.login.
+      - in: query
+        name: action__startswith
+        schema:
+          type: string
+        description: Action prefix, for example auth.
+      - in: query
+        name: actor
+        schema:
+          type: string
+        description: User id.
+      - in: query
+        name: created_after
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: created_before
+        schema:
+          type: string
+          format: date-time
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: target_id
+        schema:
+          type: string
+      - in: query
+        name: target_type
+        schema:
+          type: string
+      tags:
+      - activity
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedActivityLogList'
+          description: ''
+  /api/activity/all/{id}:
+    get:
+      operationId: activity_all_retrieve
+      summary: One activity entry (staff)
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - activity
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityLog'
+          description: ''
+  /api/ai/conversations:
+    get:
+      operationId: ai_conversations_list
+      parameters:
+      - in: query
+        name: archived
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: pinned
+        schema:
+          type: boolean
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - ai
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedConversationList'
+          description: ''
+    post:
+      operationId: ai_conversations_create
+      tags:
+      - ai
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConversationRequest'
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+          description: ''
+  /api/ai/conversations/{id}:
+    get:
+      operationId: ai_conversations_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - ai
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+          description: ''
+    patch:
+      operationId: ai_conversations_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - ai
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedConversationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedConversationRequest'
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+          description: ''
+    delete:
+      operationId: ai_conversations_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - ai
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/ai/conversations/{id}/messages:
+    get:
+      operationId: ai_conversations_messages_list
+      description: Cursor paginated. The first page has the latest messages, `next_cursor`
+        loads older ones. Messages inside a page are in chronological order.
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - sse
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - ai
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMessageList'
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/PaginatedMessageList'
+          description: ''
+    post:
+      operationId: ai_conversations_messages_create
+      description: Sends a message and streams the answer.
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - sse
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - ai
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            text/event-stream:
+              schema:
+                type: string
+              examples:
+                Stream:
+                  value: |+
+                    event: user_message
+                    data: {"message": {...}}
+
+                    event: start
+                    data: {"message": {"status": "streaming", ...}}
+
+                    event: delta
+                    data: {"text": "Hello"}
+
+                    event: done
+                    data: {"message": {"status": "complete", ...}}
+
+          description: 'Server-Sent Events stream (default). Events, in order: `user_message`
+            {message} (send only), `start` {message}, then any number of `delta` {text},
+            `reasoning` {text}, `sources` {sources}, then `error` {code, message,
+            message_id} when the provider failed, and always `done` {message} last.
+            Send `Accept: application/json` to get a single JSON response after completion
+            instead.'
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendResponse'
+          description: ''
+  /api/ai/messages/{id}/regenerate:
+    post:
+      operationId: ai_messages_regenerate_create
+      description: Answers again the last assistant message. The previous answer is
+        kept in ``variants``.
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - sse
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - ai
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegenerateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RegenerateRequest'
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            text/event-stream:
+              schema:
+                type: string
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegenerateResponse'
+          description: 'Server-Sent Events stream (default). Events, in order: `user_message`
+            {message} (send only), `start` {message}, then any number of `delta` {text},
+            `reasoning` {text}, `sources` {sources}, then `error` {code, message,
+            message_id} when the provider failed, and always `done` {message} last.
+            Send `Accept: application/json` to get a single JSON response after completion
+            instead.'
+  /api/ai/messages/{id}/stop:
+    post:
+      operationId: ai_messages_stop_create
+      description: Asks the running generation to stop. The stream then ends with
+        ``done`` and status ``stopped``.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - ai
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+  /api/ai/models:
+    get:
+      operationId: ai_models_retrieve
+      tags:
+      - ai
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelsResponse'
+          description: ''
+  /api/ai/suggestions:
+    get:
+      operationId: ai_suggestions_list
+      tags:
+      - ai
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Suggestion'
+          description: ''
+  /api/ai/usage:
+    get:
+      operationId: ai_usage_retrieve
+      tags:
+      - ai
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usage'
+          description: ''
+  /api/api-keys:
+    get:
+      operationId: api_keys_list
+      summary: List my API keys
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - api-keys
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAPIKeyList'
+          description: ''
+    post:
+      operationId: api_keys_create
+      description: The response carries the full `key`. It is never shown again.
+      summary: Create an API key
+      tags:
+      - api-keys
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/APIKeyCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/APIKeyCreateRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIKeyCreated'
+          description: ''
+  /api/api-keys/{id}:
+    get:
+      operationId: api_keys_retrieve
+      summary: Get an API key
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api-keys
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIKey'
+          description: ''
+    patch:
+      operationId: api_keys_partial_update
+      summary: Rename an API key
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api-keys
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAPIKeyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAPIKeyRequest'
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIKey'
+          description: ''
+    delete:
+      operationId: api_keys_destroy
+      summary: Revoke an API key
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - api-keys
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/auth/avatars/{user_id}:
+    get:
+      operationId: auth_avatars_retrieve
+      description: Serves an avatar. Signed in users only, avatars are not public.
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - account
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          description: Avatar image
+  /api/auth/email/change:
+    post:
+      operationId: auth_email_change_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailChangeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmailChangeRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '202':
+          description: No response body
+  /api/auth/email/change/confirm:
+    post:
+      operationId: auth_email_change_confirm_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+          description: ''
+  /api/auth/email/verify:
+    post:
+      operationId: auth_email_verify_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+          description: ''
+  /api/auth/email/verify/resend:
+    post:
+      operationId: auth_email_verify_resend_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - auth
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '202':
+          description: No response body
+  /api/auth/login:
+    post:
+      operationId: auth_login_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          description: ''
+  /api/auth/logout:
+    post:
+      operationId: auth_logout_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - auth
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/auth/me:
+    get:
+      operationId: auth_me_retrieve
+      tags:
+      - account
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+          description: ''
+    patch:
+      operationId: auth_me_partial_update
+      tags:
+      - account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMeRequest'
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+          description: ''
+    delete:
+      operationId: auth_me_destroy
+      description: Deletes the account and, through cascades and signals, every piece
+        of its data.
+      tags:
+      - account
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/auth/me/avatar:
+    put:
+      operationId: auth_me_avatar_update
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - account
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AvatarUploadRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+          description: ''
+    delete:
+      operationId: auth_me_avatar_destroy
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - account
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/auth/me/export:
+    get:
+      operationId: auth_me_export_retrieve
+      tags:
+      - account
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          description: JSON file with every piece of the user's data
+  /api/auth/mfa:
+    get:
+      operationId: auth_mfa_retrieve
+      tags:
+      - mfa
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaStatus'
+          description: ''
+  /api/auth/mfa/backup-codes:
+    post:
+      operationId: auth_mfa_backup_codes_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - mfa
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaCodeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MfaCodeRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaBackupCodes'
+          description: ''
+  /api/auth/mfa/confirm:
+    post:
+      operationId: auth_mfa_confirm_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - mfa
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaCodeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MfaCodeRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaBackupCodes'
+          description: ''
+  /api/auth/mfa/disable:
+    post:
+      operationId: auth_mfa_disable_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - mfa
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaDisableRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MfaDisableRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/auth/mfa/setup:
+    post:
+      operationId: auth_mfa_setup_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - mfa
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaSetupResponse'
+          description: ''
+  /api/auth/mfa/verify:
+    post:
+      operationId: auth_mfa_verify_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - mfa
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaVerifyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MfaVerifyRequest'
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaVerifyResponse'
+          description: ''
+  /api/auth/oauth/{provider}/callback:
+    get:
+      operationId: auth_oauth_callback_retrieve
+      description: |-
+        Where the provider sends the browser back. GET for most providers, POST for
+        Apple (``form_post``). The POST is turned into a GET with a 303 redirect: the
+        session cookie is SameSite=Lax, so a cross site POST does not carry it, while
+        the top level GET that follows does. CSRF does not apply, the state does.
+      parameters:
+      - in: query
+        name: code
+        schema:
+          type: string
+      - in: query
+        name: error
+        schema:
+          type: string
+      - in: path
+        name: provider
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: state
+        schema:
+          type: string
+      tags:
+      - oauth
+      security:
+      - {}
+      responses:
+        '302':
+          description: Redirect to the frontend OAUTH_DONE page
+    post:
+      operationId: auth_oauth_callback_create
+      description: |-
+        Where the provider sends the browser back. GET for most providers, POST for
+        Apple (``form_post``). The POST is turned into a GET with a 303 redirect: the
+        session cookie is SameSite=Lax, so a cross site POST does not carry it, while
+        the top level GET that follows does. CSRF does not apply, the state does.
+      parameters:
+      - in: path
+        name: provider
+        schema:
+          type: string
+        required: true
+      tags:
+      - oauth
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - {}
+      responses:
+        '303':
+          description: Redirect to the same callback with GET
+  /api/auth/oauth/{provider}/start:
+    get:
+      operationId: auth_oauth_start_retrieve
+      description: 'Browser navigation: redirects to the provider.'
+      parameters:
+      - in: query
+        name: mode
+        schema:
+          type: string
+          enum:
+          - link
+          - login
+        description: link attaches to the signed in user.
+      - in: query
+        name: next
+        schema:
+          type: string
+        description: Frontend path to go back to, must start with /.
+      - in: path
+        name: provider
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: remember
+        schema:
+          type: boolean
+        description: Long lived session after login.
+      tags:
+      - oauth
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '302':
+          description: Redirect to the provider
+  /api/auth/oauth/accounts:
+    get:
+      operationId: auth_oauth_accounts_list
+      tags:
+      - oauth
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SocialAccount'
+          description: ''
+  /api/auth/oauth/accounts/{id}:
+    delete:
+      operationId: auth_oauth_accounts_destroy
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - oauth
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/auth/oauth/providers:
+    get:
+      operationId: auth_oauth_providers_list
+      tags:
+      - oauth
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OAuthProvider'
+          description: ''
+  /api/auth/password/change:
+    post:
+      operationId: auth_password_change_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/auth/password/reset:
+    post:
+      operationId: auth_password_reset_create
+      description: Always answers 202, so it does not reveal which emails have an
+        account.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '202':
+          description: No response body
+  /api/auth/password/reset/confirm:
+    post:
+      operationId: auth_password_reset_confirm_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/auth/password/reset/validate:
+    post:
+      operationId: auth_password_reset_validate_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidResponse'
+          description: ''
+  /api/auth/sessions:
+    get:
+      operationId: auth_sessions_list
+      tags:
+      - account
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Session'
+          description: ''
+  /api/auth/sessions/{session_id}:
+    delete:
+      operationId: auth_sessions_destroy
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - account
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/auth/sessions/revoke-others:
+    post:
+      operationId: auth_sessions_revoke_others_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - account
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Count'
+          description: ''
+  /api/auth/signup:
+    post:
+      operationId: auth_signup_create
+      description: |-
+        Enforces CSRF even for anonymous requests (DRF only does it for signed in
+        users). Used by login, signup and the other cookie setting endpoints so a
+        third party site cannot log a victim into an attacker account.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignupResponse'
+          description: ''
+  /api/billing/checkout:
+    post:
+      operationId: billing_checkout_create
+      description: Starts a Stripe Checkout session. Redirect the browser to ``url``.
+      tags:
+      - billing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CheckoutRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Redirect'
+          description: ''
+  /api/billing/plans:
+    get:
+      operationId: billing_plans_retrieve
+      tags:
+      - billing
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plans'
+          description: ''
+  /api/billing/portal:
+    post:
+      operationId: billing_portal_create
+      description: Opens the Stripe billing portal (change plan, payment method, invoices,
+        cancel).
+      tags:
+      - billing
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Redirect'
+          description: ''
+  /api/billing/subscription:
+    get:
+      operationId: billing_subscription_retrieve
+      tags:
+      - billing
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentSubscription'
+          description: ''
+  /api/billing/webhook:
+    post:
+      operationId: billing_webhook_create
+      description: Stripe calls this. Signed with STRIPE_WEBHOOK_SECRET, never with
+        a session.
+      parameters:
+      - in: header
+        name: Stripe-Signature
+        schema:
+          type: string
+        required: true
+      tags:
+      - billing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+          description: ''
+  /api/csrf:
+    get:
+      operationId: csrf_retrieve
+      description: Sets the ``csrftoken`` cookie. Call once before the first unsafe
+        request.
+      tags:
+      - csrf
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Csrf'
+          description: ''
+  /api/files:
+    get:
+      operationId: files_list
+      description: The ``upload`` scope applies to POST only, browsing stays on the
+        default rates.
+      summary: List my files
+      parameters:
+      - in: query
+        name: content_type
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: purpose
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - files
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFileList'
+          description: ''
+    post:
+      operationId: files_create
+      description: The ``upload`` scope applies to POST only, browsing stays on the
+        default rates.
+      summary: Upload a file
+      tags:
+      - files
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: ''
+  /api/files/{id}:
+    get:
+      operationId: files_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - files
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: ''
+    patch:
+      operationId: files_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFileUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFileUpdateRequest'
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: ''
+    delete:
+      operationId: files_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - files
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/files/{id}/complete:
+    post:
+      operationId: files_complete_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - files
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: ''
+  /api/files/{id}/download:
+    get:
+      operationId: files_download_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: inline
+        schema:
+          type: boolean
+        description: Display in the browser. Images and PDF only.
+      tags:
+      - files
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          description: File content
+  /api/files/presign:
+    post:
+      operationId: files_presign_create
+      description: The ``upload`` scope applies to POST only, browsing stays on the
+        default rates.
+      tags:
+      - files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresignRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PresignRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PresignResponse'
+          description: ''
+  /api/files/usage:
+    get:
+      operationId: files_usage_retrieve
+      tags:
+      - files
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileUsage'
+          description: ''
+  /api/health:
+    get:
+      operationId: health_retrieve
+      description: Liveness and readiness. Checks MongoDB and, when configured, Redis.
+      tags:
+      - health
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+          description: ''
+  /api/marketing/contact:
+    post:
+      operationId: marketing_contact_create
+      description: 'Anonymous form endpoint: CSRF enforced, rate limited with the
+        ``contact`` scope.'
+      tags:
+      - marketing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ContactRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactResponse'
+          description: ''
+  /api/marketing/contact-messages:
+    get:
+      operationId: marketing_contact_messages_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - archived
+          - new
+          - read
+          - spam
+        description: |-
+          * `new` - New
+          * `read` - Read
+          * `archived` - Archived
+          * `spam` - Spam
+      tags:
+      - marketing
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedContactMessageList'
+          description: ''
+  /api/marketing/contact-messages/{id}:
+    patch:
+      operationId: marketing_contact_messages_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - marketing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedContactStatusRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedContactStatusRequest'
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactMessage'
+          description: ''
+  /api/marketing/newsletter/confirm:
+    post:
+      operationId: marketing_newsletter_confirm_create
+      description: 'Anonymous form endpoint: CSRF enforced, rate limited with the
+        ``contact`` scope.'
+      tags:
+      - marketing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewsletterTokenRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NewsletterTokenRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsletterStatus'
+          description: ''
+  /api/marketing/newsletter/subscribe:
+    post:
+      operationId: marketing_newsletter_subscribe_create
+      description: |-
+        Always answers 202 with the same body, whether the email is new, pending,
+        subscribed or unsubscribed, so it does not reveal who is on the list.
+      tags:
+      - marketing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscribeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubscribeRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscribeResponse'
+          description: ''
+  /api/marketing/newsletter/unsubscribe:
+    post:
+      operationId: marketing_newsletter_unsubscribe_create
+      description: 'Anonymous form endpoint: CSRF enforced, rate limited with the
+        ``contact`` scope.'
+      tags:
+      - marketing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewsletterTokenRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NewsletterTokenRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsletterStatus'
+          description: ''
+  /api/marketing/subscribers:
+    get:
+      operationId: marketing_subscribers_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: source
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - pending
+          - subscribed
+          - unsubscribed
+        description: |-
+          * `pending` - Pending
+          * `subscribed` - Subscribed
+          * `unsubscribed` - Unsubscribed
+      tags:
+      - marketing
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubscriberList'
+          description: ''
+  /api/marketing/subscribers/export:
+    get:
+      operationId: marketing_subscribers_export_retrieve
+      tags:
+      - marketing
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            text/csv:
+              schema:
+                type: string
+          description: CSV of subscribed emails
+  /api/marketing/waitlist:
+    get:
+      operationId: marketing_waitlist_list
+      description: POST joins (anyone), GET lists the entries (staff).
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - marketing
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedWaitlistEntryList'
+          description: ''
+    post:
+      operationId: marketing_waitlist_create
+      description: 'Idempotent: an email already on the list gets its current status
+        back.'
+      tags:
+      - marketing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WaitlistJoinRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/WaitlistJoinRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WaitlistStatus'
+          description: ''
+  /api/marketing/waitlist/{id}/invite:
+    post:
+      operationId: marketing_waitlist_invite_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - marketing
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WaitlistEntry'
+          description: ''
+  /api/marketing/waitlist/{referral_code}:
+    get:
+      operationId: marketing_waitlist_retrieve
+      parameters:
+      - in: path
+        name: referral_code
+        schema:
+          type: string
+        required: true
+      tags:
+      - marketing
+      security:
+      - apiKey: []
+      - session: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WaitlistPublicStatus'
+          description: ''
+  /api/notifications:
+    get:
+      operationId: notifications_list
+      summary: List my notifications, newest first
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: The pagination cursor value.
+        schema:
+          type: string
+      - in: query
+        name: kind
+        schema:
+          type: string
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: unread
+        schema:
+          type: boolean
+        description: 'true: only unread, false: only read'
+      tags:
+      - notifications
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNotificationList'
+          description: ''
+    delete:
+      operationId: notifications_clear_read
+      summary: Delete every read notification
+      tags:
+      - notifications
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/notifications/{id}:
+    delete:
+      operationId: notifications_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - notifications
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/notifications/{id}/read:
+    post:
+      operationId: notifications_read_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - notifications
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/notifications/{id}/unread:
+    post:
+      operationId: notifications_unread_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - notifications
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/notifications/preferences:
+    get:
+      operationId: notifications_preferences_retrieve
+      tags:
+      - notifications
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preferences'
+          description: ''
+    put:
+      operationId: notifications_preferences_update
+      tags:
+      - notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreferencesRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PreferencesRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preferences'
+          description: ''
+  /api/notifications/push/public-key:
+    get:
+      operationId: notifications_push_public_key_retrieve
+      tags:
+      - notifications
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicKey'
+          description: ''
+  /api/notifications/push/subscriptions:
+    post:
+      operationId: notifications_push_subscriptions_create
+      tags:
+      - notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushSubscriptionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PushSubscriptionRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PushSubscriptionOut'
+          description: ''
+    delete:
+      operationId: notifications_push_subscriptions_destroy
+      tags:
+      - notifications
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/notifications/read-all:
+    post:
+      operationId: notifications_read_all_create
+      tags:
+      - notifications
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationCount'
+          description: ''
+  /api/notifications/stream:
+    get:
+      operationId: notifications_stream_retrieve
+      summary: 'Server-Sent Events: notification and unread_count events'
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - sse
+      tags:
+      - notifications
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            text/event-stream:
+              schema:
+                type: string
+          description: Events `unread_count` ({count}) first, then `notification`
+            (a Notification) and `unread_count` as they happen.
+  /api/notifications/unread-count:
+    get:
+      operationId: notifications_unread_count_retrieve
+      tags:
+      - notifications
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationCount'
+          description: ''
+  /api/rbac/features:
+    get:
+      operationId: rbac_features_list
+      summary: List feature flags
+      parameters:
+      - in: query
+        name: enabled
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - rbac
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFeatureList'
+          description: ''
+    post:
+      operationId: rbac_features_create
+      summary: Create a feature flag
+      tags:
+      - rbac
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeatureRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FeatureRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feature'
+          description: ''
+  /api/rbac/features/{id}:
+    get:
+      operationId: rbac_features_retrieve
+      summary: Get a feature flag
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - rbac
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feature'
+          description: ''
+    patch:
+      operationId: rbac_features_partial_update
+      summary: Update a feature flag
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - rbac
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFeatureRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFeatureRequest'
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feature'
+          description: ''
+    delete:
+      operationId: rbac_features_destroy
+      summary: Delete a feature flag
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - rbac
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/rbac/features/me:
+    get:
+      operationId: rbac_features_me_retrieve
+      description: Feature flags that are on for the signed in user.
+      summary: My feature flags
+      tags:
+      - rbac
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureKeys'
+          description: ''
+  /api/rbac/permissions:
+    get:
+      operationId: rbac_permissions_list
+      summary: List every available permission
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - rbac
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPermissionList'
+          description: ''
+  /api/rbac/roles:
+    get:
+      operationId: rbac_roles_list
+      summary: List roles
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - rbac
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRoleList'
+          description: ''
+    post:
+      operationId: rbac_roles_create
+      summary: Create a role
+      tags:
+      - rbac
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoleRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: ''
+  /api/rbac/roles/{id}:
+    get:
+      operationId: rbac_roles_retrieve
+      summary: Get a role
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - rbac
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: ''
+    patch:
+      operationId: rbac_roles_partial_update
+      summary: Update a role
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - rbac
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRoleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRoleRequest'
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+          description: ''
+    delete:
+      operationId: rbac_roles_destroy
+      summary: Delete a role
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - rbac
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/rbac/users/{user_id}/roles:
+    post:
+      operationId: rbac_users_roles_create
+      description: Give or take a role from a user.
+      summary: Add a role to a user
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - rbac
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleAssignRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RoleAssignRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRoles'
+          description: ''
+    delete:
+      operationId: rbac_users_roles_destroy
+      description: Give or take a role from a user.
+      summary: Remove a role from a user
+      parameters:
+      - in: query
+        name: role
+        schema:
+          type: string
+        description: Role name, when not sent in the body.
+      - in: path
+        name: user_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - rbac
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/staff/bans:
+    get:
+      operationId: staff_bans_list
+      summary: List IP bans
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - staff
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBanList'
+          description: ''
+    post:
+      operationId: staff_bans_create
+      summary: Ban an IP address or network
+      tags:
+      - staff
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BanRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BanRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ban'
+          description: ''
+  /api/staff/bans/{id}:
+    get:
+      operationId: staff_bans_retrieve
+      summary: Get an IP ban
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - staff
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ban'
+          description: ''
+    patch:
+      operationId: staff_bans_partial_update
+      summary: Update an IP ban
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - staff
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBanRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBanRequest'
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ban'
+          description: ''
+    delete:
+      operationId: staff_bans_destroy
+      summary: Lift an IP ban
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - staff
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/staff/stats:
+    get:
+      operationId: staff_stats_retrieve
+      summary: User and session numbers
+      tags:
+      - staff
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Stats'
+          description: ''
+  /api/staff/users:
+    get:
+      operationId: staff_users_list
+      summary: List users
+      parameters:
+      - in: query
+        name: email_verified
+        schema:
+          type: boolean
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: is_staff
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: role
+        schema:
+          type: string
+        description: Role name
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - staff
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStaffUserList'
+          description: ''
+  /api/staff/users/{id}:
+    get:
+      operationId: staff_users_retrieve
+      summary: Get a user
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - staff
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffUserDetail'
+          description: ''
+    patch:
+      operationId: staff_users_partial_update
+      description: Deactivating a user signs it out everywhere.
+      summary: Update a user
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - staff
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStaffUserUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStaffUserUpdateRequest'
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffUserDetail'
+          description: ''
+    delete:
+      operationId: staff_users_destroy
+      summary: Delete a user
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - staff
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/staff/users/{id}/password-reset:
+    post:
+      operationId: staff_users_password_reset_create
+      summary: Send a password reset email to a user
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - staff
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '202':
+          description: No response body
+  /api/staff/users/{id}/revoke-sessions:
+    post:
+      operationId: staff_users_revoke_sessions_create
+      summary: Sign a user out everywhere
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - staff
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Count'
+          description: ''
+  /api/webhooks/deliveries/{id}:
+    get:
+      operationId: webhooks_deliveries_retrieve
+      summary: One delivery with its payload
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - webhooks
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryDetail'
+          description: ''
+  /api/webhooks/deliveries/{id}/redeliver:
+    post:
+      operationId: webhooks_deliveries_redeliver_create
+      summary: Send again
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - webhooks
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryDetail'
+          description: ''
+  /api/webhooks/endpoints:
+    get:
+      operationId: webhooks_endpoints_list
+      summary: My webhook endpoints
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - webhooks
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEndpointList'
+          description: ''
+    post:
+      operationId: webhooks_endpoints_create
+      summary: Add an endpoint
+      tags:
+      - webhooks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EndpointRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EndpointRequest'
+        required: true
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EndpointCreated'
+          description: ''
+  /api/webhooks/endpoints/{id}:
+    get:
+      operationId: webhooks_endpoints_retrieve
+      summary: One endpoint
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - webhooks
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Endpoint'
+          description: ''
+    patch:
+      operationId: webhooks_endpoints_partial_update
+      summary: Change an endpoint
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - webhooks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEndpointRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEndpointRequest'
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Endpoint'
+          description: ''
+    delete:
+      operationId: webhooks_endpoints_destroy
+      summary: Remove an endpoint
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - webhooks
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '204':
+          description: No response body
+  /api/webhooks/endpoints/{id}/deliveries:
+    get:
+      operationId: webhooks_endpoints_deliveries_list
+      summary: Deliveries of an endpoint
+      parameters:
+      - in: query
+        name: event
+        schema:
+          type: string
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - failed
+          - pending
+          - success
+        description: |-
+          * `pending` - Pending
+          * `success` - Success
+          * `failed` - Failed
+      tags:
+      - webhooks
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDeliveryList'
+          description: ''
+  /api/webhooks/endpoints/{id}/rotate-secret:
+    post:
+      operationId: webhooks_endpoints_rotate_secret_create
+      summary: New signing secret
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - webhooks
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Secret'
+          description: ''
+  /api/webhooks/endpoints/{id}/test:
+    post:
+      operationId: webhooks_endpoints_test_create
+      summary: Send a ping now
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - webhooks
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestResult'
+          description: ''
+  /api/webhooks/events:
+    get:
+      operationId: webhooks_events_list
+      summary: Events to subscribe to
+      tags:
+      - webhooks
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+          description: ''
+components:
+  schemas:
+    APIKey:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        prefix:
+          type: string
+          readOnly: true
+        display:
+          type: string
+          readOnly: true
+          description: Masked key, for example pl_AbCd1234_...
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScopesEnum'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/APIKeyStatus'
+          readOnly: true
+        expires_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        last_used_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        last_used_ip:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        revoked_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - display
+      - expires_at
+      - id
+      - last_used_at
+      - last_used_ip
+      - name
+      - prefix
+      - revoked_at
+      - scopes
+      - status
+    APIKeyCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScopesEnum'
+        expires_in_days:
+          type: integer
+          maximum: 3650
+          minimum: 1
+          nullable: true
+      required:
+      - name
+    APIKeyCreated:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        prefix:
+          type: string
+          readOnly: true
+        display:
+          type: string
+          readOnly: true
+          description: Masked key, for example pl_AbCd1234_...
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScopesEnum'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/APIKeyStatus'
+          readOnly: true
+        expires_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        last_used_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        last_used_ip:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        revoked_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        key:
+          type: string
+          readOnly: true
+          description: The full key. Shown only once.
+      required:
+      - created_at
+      - display
+      - expires_at
+      - id
+      - key
+      - last_used_at
+      - last_used_ip
+      - name
+      - prefix
+      - revoked_at
+      - scopes
+      - status
+    APIKeyStatus:
+      type: string
+      enum:
+      - active
+      - expired
+      - revoked
+    ActivityLog:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        actor:
+          type: string
+          nullable: true
+          readOnly: true
+        actor_email:
+          type: string
+          readOnly: true
+        action:
+          type: string
+          readOnly: true
+        target_type:
+          type: string
+          readOnly: true
+        target_id:
+          type: string
+          readOnly: true
+        target_repr:
+          type: string
+          readOnly: true
+        changes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              nullable: true
+          readOnly: true
+          description: Field name to [before, after].
+        metadata:
+          type: object
+          additionalProperties:
+            nullable: true
+          readOnly: true
+        ip:
+          type: string
+          readOnly: true
+        user_agent:
+          type: string
+          readOnly: true
+        request_id:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor
+      - actor_email
+      - changes
+      - created_at
+      - id
+      - ip
+      - metadata
+      - request_id
+      - target_id
+      - target_repr
+      - target_type
+      - user_agent
+    Amounts:
+      type: object
+      properties:
+        month:
+          type: integer
+          nullable: true
+          description: Minor units charged each month.
+        year:
+          type: integer
+          nullable: true
+          description: Minor units charged each year.
+      required:
+      - month
+      - year
+    Attachment:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        content_type:
+          type: string
+        size:
+          type: integer
+      required:
+      - content_type
+      - id
+      - name
+      - size
+    AvatarUploadRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+      required:
+      - file
+    Ban:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        network:
+          type: string
+          description: IP address or CIDR network
+          maxLength: 49
+        reason:
+          type: string
+          maxLength: 500
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        is_active:
+          type: boolean
+          readOnly: true
+        created_by:
+          type: string
+          format: email
+          nullable: true
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - created_by
+      - id
+      - is_active
+      - network
+    BanRequest:
+      type: object
+      properties:
+        network:
+          type: string
+          minLength: 1
+          description: IP address or CIDR network
+          maxLength: 49
+        reason:
+          type: string
+          maxLength: 500
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - network
+    BillingIntervalEnum:
+      enum:
+      - month
+      - year
+      type: string
+      description: |-
+        * `month` - month
+        * `year` - year
+    BlankEnum:
+      enum:
+      - ''
+    CheckoutRequest:
+      type: object
+      properties:
+        plan:
+          type: string
+          minLength: 1
+          maxLength: 100
+        interval:
+          allOf:
+          - $ref: '#/components/schemas/BillingIntervalEnum'
+          default: month
+      required:
+      - plan
+    ContactMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        subject:
+          type: string
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        user_id:
+          type: string
+          readOnly: true
+          nullable: true
+        ip:
+          type: string
+          readOnly: true
+        user_agent:
+          type: string
+          readOnly: true
+        locale:
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/ContactMessageStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - email
+      - id
+      - ip
+      - locale
+      - message
+      - name
+      - subject
+      - user_agent
+      - user_id
+    ContactMessageStatusEnum:
+      enum:
+      - new
+      - read
+      - archived
+      - spam
+      type: string
+      description: |-
+        * `new` - New
+        * `read` - Read
+        * `archived` - Archived
+        * `spam` - Spam
+    ContactRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        subject:
+          type: string
+          default: ''
+          maxLength: 200
+        message:
+          type: string
+          minLength: 10
+          maxLength: 5000
+        website:
+          type: string
+          default: ''
+          description: Honeypot. Render it hidden and leave it empty.
+      required:
+      - email
+      - message
+      - name
+    ContactResponse:
+      type: object
+      properties:
+        received:
+          type: boolean
+      required:
+      - received
+    Conversation:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        model:
+          type: string
+          maxLength: 100
+        system_prompt:
+          type: string
+          maxLength: 8000
+        pinned:
+          type: boolean
+        archived:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        last_message_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - last_message_at
+      - updated_at
+    ConversationRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        model:
+          type: string
+          maxLength: 100
+        system_prompt:
+          type: string
+          maxLength: 8000
+        pinned:
+          type: boolean
+        archived:
+          type: boolean
+    Count:
+      type: object
+      properties:
+        count:
+          type: integer
+      required:
+      - count
+    Csrf:
+      type: object
+      properties:
+        csrf_token:
+          type: string
+      required:
+      - csrf_token
+    CurrentSubscription:
+      type: object
+      properties:
+        subscription:
+          allOf:
+          - $ref: '#/components/schemas/Subscription'
+          nullable: true
+      required:
+      - subscription
+    DayCount:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        count:
+          type: integer
+      required:
+      - count
+      - date
+    Delivery:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        endpoint:
+          type: string
+          readOnly: true
+        event_id:
+          type: string
+          readOnly: true
+        event:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/WebhookDeliveryStatusEnum'
+          readOnly: true
+        attempts:
+          type: integer
+          readOnly: true
+        next_attempt_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        last_status_code:
+          type: integer
+          readOnly: true
+          nullable: true
+        last_error:
+          type: string
+          readOnly: true
+        duration_ms:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        delivered_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - attempts
+      - created_at
+      - delivered_at
+      - duration_ms
+      - endpoint
+      - event
+      - event_id
+      - id
+      - last_error
+      - last_status_code
+      - next_attempt_at
+      - status
+    DeliveryDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        endpoint:
+          type: string
+          readOnly: true
+        event_id:
+          type: string
+          readOnly: true
+        event:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/WebhookDeliveryStatusEnum'
+          readOnly: true
+        attempts:
+          type: integer
+          readOnly: true
+        next_attempt_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        last_status_code:
+          type: integer
+          readOnly: true
+          nullable: true
+        last_error:
+          type: string
+          readOnly: true
+        duration_ms:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        delivered_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        payload:
+          type: object
+          additionalProperties:
+            nullable: true
+          readOnly: true
+        response_excerpt:
+          type: string
+          readOnly: true
+      required:
+      - attempts
+      - created_at
+      - delivered_at
+      - duration_ms
+      - endpoint
+      - event
+      - event_id
+      - id
+      - last_error
+      - last_status_code
+      - next_attempt_at
+      - payload
+      - response_excerpt
+      - status
+    EmailChangeRequest:
+      type: object
+      properties:
+        new_email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+      required:
+      - new_email
+    EmailRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+      - email
+    Endpoint:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          maxLength: 2000
+        description:
+          type: string
+          maxLength: 200
+        events:
+          type: array
+          items:
+            type: string
+            maxLength: 100
+          description: Event names, or ["*"] for every event.
+        active:
+          type: boolean
+        secret:
+          type: string
+          readOnly: true
+          description: Masked after creation.
+        consecutive_failures:
+          type: integer
+          readOnly: true
+        disabled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - consecutive_failures
+      - created_at
+      - disabled_at
+      - id
+      - secret
+      - url
+    EndpointCreated:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          maxLength: 2000
+        description:
+          type: string
+          maxLength: 200
+        events:
+          type: array
+          items:
+            type: string
+            maxLength: 100
+          description: Event names, or ["*"] for every event.
+        active:
+          type: boolean
+        secret:
+          type: string
+          readOnly: true
+          description: Shown in full only now. Store it safely.
+        consecutive_failures:
+          type: integer
+          readOnly: true
+        disabled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - consecutive_failures
+      - created_at
+      - disabled_at
+      - id
+      - secret
+      - url
+    EndpointRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          minLength: 1
+          maxLength: 2000
+        description:
+          type: string
+          maxLength: 200
+        events:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 100
+          description: Event names, or ["*"] for every event.
+        active:
+          type: boolean
+      required:
+      - url
+    Event:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+      required:
+      - description
+      - name
+    Feature:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        key:
+          type: string
+          maxLength: 100
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+          maxLength: 500
+        enabled:
+          type: boolean
+          title: Enabled for everyone
+        rollout_percent:
+          type: integer
+          maximum: 100
+          minimum: 0
+        users:
+          type: array
+          items:
+            type: string
+          description: Ids of the users that always get the flag.
+        groups:
+          type: array
+          items:
+            type: string
+          description: Names of the roles that always get the flag.
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - key
+      - updated_at
+    FeatureKeys:
+      type: object
+      properties:
+        features:
+          type: array
+          items:
+            type: string
+      required:
+      - features
+    FeatureRequest:
+      type: object
+      properties:
+        key:
+          type: string
+          minLength: 1
+          maxLength: 100
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+          maxLength: 500
+        enabled:
+          type: boolean
+          title: Enabled for everyone
+        rollout_percent:
+          type: integer
+          maximum: 100
+          minimum: 0
+        users:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          description: Ids of the users that always get the flag.
+        groups:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          description: Names of the roles that always get the flag.
+      required:
+      - key
+    File:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        size:
+          type: integer
+          readOnly: true
+        content_type:
+          type: string
+          readOnly: true
+        checksum:
+          type: string
+          readOnly: true
+        width:
+          type: integer
+          readOnly: true
+          nullable: true
+        height:
+          type: integer
+          readOnly: true
+          nullable: true
+        purpose:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/FileStatusEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        download_url:
+          type: string
+          readOnly: true
+      required:
+      - checksum
+      - content_type
+      - created_at
+      - download_url
+      - height
+      - id
+      - name
+      - purpose
+      - size
+      - status
+      - width
+    FileStatusEnum:
+      type: string
+      enum:
+      - ready
+      - pending
+    FileUsage:
+      type: object
+      properties:
+        used:
+          type: integer
+        quota:
+          type: integer
+          nullable: true
+        count:
+          type: integer
+      required:
+      - count
+      - quota
+      - used
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+        checks:
+          type: object
+          additionalProperties: {}
+      required:
+      - checks
+      - status
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        remember:
+          type: boolean
+          default: false
+      required:
+      - email
+      - password
+    LoginResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/Me'
+        mfa_required:
+          type: boolean
+          default: false
+        methods:
+          type: array
+          items:
+            type: string
+    Me:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        display_name:
+          type: string
+          readOnly: true
+        email_verified:
+          type: boolean
+          readOnly: true
+        locale:
+          oneOf:
+          - $ref: '#/components/schemas/MeLocaleEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        timezone:
+          type: string
+          maxLength: 64
+        preferences: {}
+        avatar_url:
+          type: string
+          nullable: true
+          readOnly: true
+        has_password:
+          type: boolean
+          readOnly: true
+        is_staff:
+          type: boolean
+          readOnly: true
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+        extra:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+          description: 'Fields contributed by other apps: roles, permissions, mfa_enabled,
+            subscription...'
+      required:
+      - avatar_url
+      - date_joined
+      - display_name
+      - email
+      - email_verified
+      - extra
+      - has_password
+      - id
+      - is_staff
+    MeLocaleEnum:
+      enum:
+      - en
+      - it
+      - es
+      type: string
+      description: "* `` - \n* `en` - English\n* `it` - Italiano\n* `es` - Español"
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        conversation:
+          type: string
+          readOnly: true
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          readOnly: true
+        content:
+          type: string
+          readOnly: true
+        reasoning:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/MessageStatusEnum'
+          readOnly: true
+        error_code:
+          type: string
+          readOnly: true
+        model:
+          type: string
+          readOnly: true
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Source'
+          readOnly: true
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attachment'
+          readOnly: true
+        variants:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        input_tokens:
+          type: integer
+          readOnly: true
+        output_tokens:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - attachments
+      - content
+      - conversation
+      - created_at
+      - error_code
+      - id
+      - input_tokens
+      - model
+      - output_tokens
+      - reasoning
+      - role
+      - sources
+      - status
+      - variants
+    MessageStatusEnum:
+      enum:
+      - complete
+      - streaming
+      - stopped
+      - error
+      type: string
+      description: |-
+        * `complete` - Complete
+        * `streaming` - Streaming
+        * `stopped` - Stopped
+        * `error` - Error
+    MfaBackupCodes:
+      type: object
+      properties:
+        backup_codes:
+          type: array
+          items:
+            type: string
+      required:
+      - backup_codes
+    MfaCodeRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          description: A TOTP code or, where accepted, a backup code.
+          maxLength: 32
+      required:
+      - code
+    MfaDisableRequest:
+      type: object
+      properties:
+        password:
+          type: string
+        code:
+          type: string
+          minLength: 1
+          maxLength: 32
+      required:
+      - code
+    MfaSetupResponse:
+      type: object
+      properties:
+        secret:
+          type: string
+          description: Base32 secret, for manual entry in the app.
+        otpauth_url:
+          type: string
+        qr_svg:
+          type: string
+          description: Inline SVG of the otpauth URL.
+      required:
+      - otpauth_url
+      - qr_svg
+      - secret
+    MfaStatus:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+        backup_codes_remaining:
+          type: integer
+      required:
+      - backup_codes_remaining
+      - confirmed_at
+      - enabled
+    MfaVerifyRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 32
+        backup_code:
+          type: string
+          maxLength: 32
+    MfaVerifyResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/Me'
+        mfa_required:
+          type: boolean
+      required:
+      - mfa_required
+      - user
+    ModelOption:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+      required:
+      - description
+      - id
+      - name
+    ModelsResponse:
+      type: object
+      properties:
+        models:
+          type: array
+          items:
+            $ref: '#/components/schemas/ModelOption'
+        default:
+          type: string
+      required:
+      - default
+      - models
+    NewsletterStatus:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        status:
+          $ref: '#/components/schemas/NewsletterStatusEnum'
+      required:
+      - email
+      - status
+    NewsletterStatusEnum:
+      enum:
+      - pending
+      - subscribed
+      - unsubscribed
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `subscribed` - Subscribed
+        * `unsubscribed` - Unsubscribed
+    NewsletterTokenRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 1
+          maxLength: 1000
+      required:
+      - token
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        body:
+          type: string
+          readOnly: true
+        url:
+          type: string
+          readOnly: true
+          title: Link
+        data:
+          readOnly: true
+        read:
+          type: boolean
+          readOnly: true
+        read_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - body
+      - created_at
+      - data
+      - id
+      - kind
+      - read
+      - read_at
+      - title
+      - url
+    NotificationCount:
+      type: object
+      properties:
+        count:
+          type: integer
+      required:
+      - count
+    OAuthProvider:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+    PaginatedAPIKeyList:
+      type: object
+      required:
+      - results
+      - count
+      - page
+      - page_size
+      - page_count
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/APIKey'
+        count:
+          type: integer
+          example: 134
+        page:
+          type: integer
+          example: 2
+        page_size:
+          type: integer
+          example: 20
+        page_count:
+          type: integer
+          example: 7
+    PaginatedActivityLogList:
+      type: object
+      required:
+      - results
+      - next_cursor
+      - previous_cursor
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityLog'
+        next_cursor:
+          type: string
+          nullable: true
+        previous_cursor:
+          type: string
+          nullable: true
+    PaginatedBanList:
+      type: object
+      required:
+      - results
+      - count
+      - page
+      - page_size
+      - page_count
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ban'
+        count:
+          type: integer
+          example: 134
+        page:
+          type: integer
+          example: 2
+        page_size:
+          type: integer
+          example: 20
+        page_count:
+          type: integer
+          example: 7
+    PaginatedContactMessageList:
+      type: object
+      required:
+      - results
+      - count
+      - page
+      - page_size
+      - page_count
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactMessage'
+        count:
+          type: integer
+          example: 134
+        page:
+          type: integer
+          example: 2
+        page_size:
+          type: integer
+          example: 20
+        page_count:
+          type: integer
+          example: 7
+    PaginatedConversationList:
+      type: object
+      required:
+      - results
+      - count
+      - page
+      - page_size
+      - page_count
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Conversation'
+        count:
+          type: integer
+          example: 134
+        page:
+          type: integer
+          example: 2
+        page_size:
+          type: integer
+          example: 20
+        page_count:
+          type: integer
+          example: 7
+    PaginatedDeliveryList:
+      type: object
+      required:
+      - results
+      - count
+      - page
+      - page_size
+      - page_count
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Delivery'
+        count:
+          type: integer
+          example: 134
+        page:
+          type: integer
+          example: 2
+        page_size:
+          type: integer
+          example: 20
+        page_count:
+          type: integer
+          example: 7
+    PaginatedEndpointList:
+      type: object
+      required:
+      - results
+      - count
+      - page
+      - page_size
+      - page_count
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Endpoint'
+        count:
+          type: integer
+          example: 134
+        page:
+          type: integer
+          example: 2
+        page_size:
+          type: integer
+          example: 20
+        page_count:
+          type: integer
+          example: 7
+    PaginatedFeatureList:
+      type: object
+      required:
+      - results
+      - count
+      - page
+      - page_size
+      - page_count
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feature'
+        count:
+          type: integer
+          example: 134
+        page:
+          type: integer
+          example: 2
+        page_size:
+          type: integer
+          example: 20
+        page_count:
+          type: integer
+          example: 7
+    PaginatedFileList:
+      type: object
+      required:
+      - results
+      - count
+      - page
+      - page_size
+      - page_count
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/File'
+        count:
+          type: integer
+          example: 134
+        page:
+          type: integer
+          example: 2
+        page_size:
+          type: integer
+          example: 20
+        page_count:
+          type: integer
+          example: 7
+    PaginatedMessageList:
+      type: object
+      required:
+      - results
+      - next_cursor
+      - previous_cursor
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+        next_cursor:
+          type: string
+          nullable: true
+        previous_cursor:
+          type: string
+          nullable: true
+    PaginatedNotificationList:
+      type: object
+      required:
+      - results
+      - next_cursor
+      - previous_cursor
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+        next_cursor:
+          type: string
+          nullable: true
+        previous_cursor:
+          type: string
+          nullable: true
+    PaginatedPermissionList:
+      type: object
+      required:
+      - results
+      - count
+      - page
+      - page_size
+      - page_count
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+        count:
+          type: integer
+          example: 134
+        page:
+          type: integer
+          example: 2
+        page_size:
+          type: integer
+          example: 20
+        page_count:
+          type: integer
+          example: 7
+    PaginatedRoleList:
+      type: object
+      required:
+      - results
+      - count
+      - page
+      - page_size
+      - page_count
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+        count:
+          type: integer
+          example: 134
+        page:
+          type: integer
+          example: 2
+        page_size:
+          type: integer
+          example: 20
+        page_count:
+          type: integer
+          example: 7
+    PaginatedStaffUserList:
+      type: object
+      required:
+      - results
+      - count
+      - page
+      - page_size
+      - page_count
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StaffUser'
+        count:
+          type: integer
+          example: 134
+        page:
+          type: integer
+          example: 2
+        page_size:
+          type: integer
+          example: 20
+        page_count:
+          type: integer
+          example: 7
+    PaginatedSubscriberList:
+      type: object
+      required:
+      - results
+      - count
+      - page
+      - page_size
+      - page_count
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subscriber'
+        count:
+          type: integer
+          example: 134
+        page:
+          type: integer
+          example: 2
+        page_size:
+          type: integer
+          example: 20
+        page_count:
+          type: integer
+          example: 7
+    PaginatedWaitlistEntryList:
+      type: object
+      required:
+      - results
+      - count
+      - page
+      - page_size
+      - page_count
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/WaitlistEntry'
+        count:
+          type: integer
+          example: 134
+        page:
+          type: integer
+          example: 2
+        page_size:
+          type: integer
+          example: 20
+        page_count:
+          type: integer
+          example: 7
+    PasswordChangeRequest:
+      type: object
+      properties:
+        current_password:
+          type: string
+        new_password:
+          type: string
+          minLength: 1
+      required:
+      - new_password
+    PasswordResetConfirmRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 1
+        new_password:
+          type: string
+          minLength: 1
+      required:
+      - new_password
+      - token
+    PatchedAPIKeyRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+    PatchedBanRequest:
+      type: object
+      properties:
+        network:
+          type: string
+          minLength: 1
+          description: IP address or CIDR network
+          maxLength: 49
+        reason:
+          type: string
+          maxLength: 500
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+    PatchedContactStatusRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/ContactMessageStatusEnum'
+    PatchedConversationRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        model:
+          type: string
+          maxLength: 100
+        system_prompt:
+          type: string
+          maxLength: 8000
+        pinned:
+          type: boolean
+        archived:
+          type: boolean
+    PatchedEndpointRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          minLength: 1
+          maxLength: 2000
+        description:
+          type: string
+          maxLength: 200
+        events:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 100
+          description: Event names, or ["*"] for every event.
+        active:
+          type: boolean
+    PatchedFeatureRequest:
+      type: object
+      properties:
+        key:
+          type: string
+          minLength: 1
+          maxLength: 100
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+          maxLength: 500
+        enabled:
+          type: boolean
+          title: Enabled for everyone
+        rollout_percent:
+          type: integer
+          maximum: 100
+          minimum: 0
+        users:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          description: Ids of the users that always get the flag.
+        groups:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          description: Names of the roles that always get the flag.
+    PatchedFileUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+    PatchedMeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        locale:
+          oneOf:
+          - $ref: '#/components/schemas/MeLocaleEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        timezone:
+          type: string
+          maxLength: 64
+        preferences: {}
+    PatchedRoleRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        description:
+          type: string
+          maxLength: 500
+        is_default:
+          type: boolean
+        permissions:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          description: Global permissions, "app_label.codename".
+    PatchedStaffUserUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        is_active:
+          type: boolean
+        is_staff:
+          type: boolean
+        email_verified:
+          type: boolean
+        roles:
+          type: array
+          items:
+            type: string
+            minLength: 1
+    Permission:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        codename:
+          type: string
+          readOnly: true
+          description: '"app_label.codename"'
+        name:
+          type: string
+          maxLength: 255
+        app_label:
+          type: string
+          readOnly: true
+        model:
+          type: string
+          readOnly: true
+      required:
+      - app_label
+      - codename
+      - id
+      - model
+      - name
+    Plan:
+      type: object
+      description: Maps 1:1 onto the ``PricingPlan`` type of the pleate Pricing component.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        features:
+          type: array
+          items:
+            oneOf:
+            - type: string
+            - type: object
+              required:
+              - label
+              - included
+              properties:
+                label:
+                  type: string
+                included:
+                  type: boolean
+                hint:
+                  type: string
+        highlighted:
+          type: boolean
+        badge:
+          type: string
+          nullable: true
+        cta:
+          type: string
+          nullable: true
+        price:
+          allOf:
+          - $ref: '#/components/schemas/PricingPrice'
+          nullable: true
+          description: null for custom priced plans.
+        custom_price:
+          type: string
+          nullable: true
+        amounts:
+          $ref: '#/components/schemas/Amounts'
+        intervals:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingIntervalEnum'
+          description: Intervals that can be bought.
+        current:
+          type: boolean
+      required:
+      - amounts
+      - badge
+      - cta
+      - current
+      - custom_price
+      - description
+      - features
+      - highlighted
+      - id
+      - intervals
+      - name
+      - price
+    Plans:
+      type: object
+      properties:
+        currency:
+          type: string
+          description: ISO 4217, upper case.
+        trial_days:
+          type: integer
+        current_plan:
+          type: string
+          nullable: true
+        plans:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plan'
+      required:
+      - currency
+      - current_plan
+      - plans
+      - trial_days
+    Preferences:
+      type: object
+      properties:
+        channels:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+              maxLength: 32
+          description: Channels per kind, "*" is the fallback for every other kind.
+        available_channels:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - available_channels
+      - channels
+    PreferencesRequest:
+      type: object
+      properties:
+        channels:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+              minLength: 1
+              maxLength: 32
+          description: Channels per kind, "*" is the fallback for every other kind.
+      required:
+      - channels
+    PresignRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        size:
+          type: integer
+          minimum: 1
+        content_type:
+          type: string
+          minLength: 1
+          maxLength: 127
+        purpose:
+          type: string
+          default: ''
+          maxLength: 32
+      required:
+      - content_type
+      - name
+      - size
+    PresignResponse:
+      type: object
+      properties:
+        file_id:
+          type: string
+        upload_url:
+          type: string
+          format: uri
+        fields:
+          type: object
+          additionalProperties:
+            type: string
+        expires_in:
+          type: integer
+      required:
+      - expires_in
+      - fields
+      - file_id
+      - upload_url
+    PricingPrice:
+      type: object
+      properties:
+        monthly:
+          type: number
+          format: double
+          description: Per month, in major units.
+        yearly:
+          type: number
+          format: double
+          description: Per month when billed yearly, in major units.
+      required:
+      - monthly
+      - yearly
+    PublicKey:
+      type: object
+      properties:
+        key:
+          type: string
+          nullable: true
+      required:
+      - key
+    PushKeysRequest:
+      type: object
+      properties:
+        p256dh:
+          type: string
+          minLength: 1
+          maxLength: 200
+        auth:
+          type: string
+          minLength: 1
+          maxLength: 100
+      required:
+      - auth
+      - p256dh
+    PushSubscriptionOut:
+      type: object
+      properties:
+        endpoint:
+          type: string
+          format: uri
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - endpoint
+    PushSubscriptionRequest:
+      type: object
+      properties:
+        endpoint:
+          type: string
+          format: uri
+          minLength: 1
+          maxLength: 1000
+        keys:
+          $ref: '#/components/schemas/PushKeysRequest'
+      required:
+      - endpoint
+      - keys
+    Redirect:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+      required:
+      - url
+    RegenerateRequest:
+      type: object
+      properties:
+        model:
+          type: string
+          maxLength: 100
+    RegenerateResponse:
+      type: object
+      properties:
+        assistant_message:
+          $ref: '#/components/schemas/Message'
+      required:
+      - assistant_message
+    Role:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+          maxLength: 500
+        is_default:
+          type: boolean
+        permissions:
+          type: array
+          items:
+            type: string
+          description: Global permissions, "app_label.codename".
+      required:
+      - id
+      - name
+    RoleAssignRequest:
+      type: object
+      properties:
+        role:
+          type: string
+          minLength: 1
+      required:
+      - role
+    RoleEnum:
+      enum:
+      - user
+      - assistant
+      - system
+      type: string
+      description: |-
+        * `user` - User
+        * `assistant` - Assistant
+        * `system` - System
+    RoleRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        description:
+          type: string
+          maxLength: 500
+        is_default:
+          type: boolean
+        permissions:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          description: Global permissions, "app_label.codename".
+      required:
+      - name
+    ScopesEnum:
+      enum:
+      - read
+      - write
+      type: string
+      description: |-
+        * `read` - Read
+        * `write` - Write
+    Secret:
+      type: object
+      properties:
+        secret:
+          type: string
+      required:
+      - secret
+    SendMessageRequest:
+      type: object
+      properties:
+        content:
+          type: string
+          default: ''
+        attachments:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 64
+        model:
+          type: string
+          maxLength: 100
+    SendResponse:
+      type: object
+      properties:
+        user_message:
+          $ref: '#/components/schemas/Message'
+        assistant_message:
+          $ref: '#/components/schemas/Message'
+      required:
+      - assistant_message
+      - user_message
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+        current:
+          type: boolean
+        ip:
+          type: string
+        user_agent:
+          type: string
+        browser:
+          type: string
+        os:
+          type: string
+        mobile:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        last_seen_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+      required:
+      - browser
+      - created_at
+      - current
+      - expires_at
+      - id
+      - ip
+      - last_seen_at
+      - mobile
+      - os
+      - user_agent
+    SignupLocaleEnum:
+      enum:
+      - en
+      - it
+      - es
+      type: string
+      description: |-
+        * `en` - en
+        * `it` - it
+        * `es` - es
+    SignupRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        name:
+          type: string
+          maxLength: 150
+        locale:
+          $ref: '#/components/schemas/SignupLocaleEnum'
+      required:
+      - email
+      - password
+    SignupResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/Me'
+        verification_required:
+          type: boolean
+      required:
+      - user
+      - verification_required
+    SocialAccount:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        provider:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        last_login_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - email
+      - id
+      - last_login_at
+      - provider
+    Source:
+      type: object
+      properties:
+        title:
+          type: string
+        url:
+          type: string
+        snippet:
+          type: string
+      required:
+      - snippet
+      - title
+      - url
+    StaffUser:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        display_name:
+          type: string
+          readOnly: true
+        avatar_url:
+          type: string
+          nullable: true
+          readOnly: true
+        email_verified:
+          type: boolean
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+        is_staff:
+          type: boolean
+          readOnly: true
+        is_superuser:
+          type: boolean
+          readOnly: true
+          title: Superuser status
+          description: Designates that this user has all permissions without explicitly
+            assigning them.
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        roles:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - avatar_url
+      - date_joined
+      - display_name
+      - email
+      - email_verified
+      - id
+      - is_active
+      - is_staff
+      - is_superuser
+      - last_login
+      - name
+      - roles
+    StaffUserDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        display_name:
+          type: string
+          readOnly: true
+        avatar_url:
+          type: string
+          nullable: true
+          readOnly: true
+        email_verified:
+          type: boolean
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+        is_staff:
+          type: boolean
+          readOnly: true
+        is_superuser:
+          type: boolean
+          readOnly: true
+          title: Superuser status
+          description: Designates that this user has all permissions without explicitly
+            assigning them.
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        roles:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        has_password:
+          type: boolean
+          readOnly: true
+        locale:
+          type: string
+          readOnly: true
+        timezone:
+          type: string
+          readOnly: true
+        sessions_count:
+          type: integer
+          readOnly: true
+        mfa_enabled:
+          type: boolean
+          nullable: true
+          readOnly: true
+          description: null when the mfa app is not installed
+      required:
+      - avatar_url
+      - date_joined
+      - display_name
+      - email
+      - email_verified
+      - has_password
+      - id
+      - is_active
+      - is_staff
+      - is_superuser
+      - last_login
+      - locale
+      - mfa_enabled
+      - name
+      - roles
+      - sessions_count
+      - timezone
+    Stats:
+      type: object
+      properties:
+        users_total:
+          type: integer
+        users_active:
+          type: integer
+        users_new_7d:
+          type: integer
+        users_new_30d:
+          type: integer
+        sessions_active:
+          type: integer
+        signups_by_day:
+          type: array
+          items:
+            $ref: '#/components/schemas/DayCount'
+      required:
+      - sessions_active
+      - signups_by_day
+      - users_active
+      - users_new_30d
+      - users_new_7d
+      - users_total
+    SubscribeRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        source:
+          type: string
+          default: ''
+          maxLength: 100
+      required:
+      - email
+    SubscribeResponse:
+      type: object
+      properties:
+        confirmation_required:
+          type: boolean
+          description: True when a confirmation email was (or would have been) sent.
+      required:
+      - confirmation_required
+    Subscriber:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/NewsletterStatusEnum'
+          readOnly: true
+        locale:
+          type: string
+          readOnly: true
+        source:
+          type: string
+          readOnly: true
+        user_id:
+          type: string
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        confirmed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        unsubscribed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - confirmed_at
+      - created_at
+      - email
+      - id
+      - locale
+      - source
+      - status
+      - unsubscribed_at
+      - user_id
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        plan_id:
+          type: string
+          readOnly: true
+        price_id:
+          type: string
+          readOnly: true
+        interval:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SubscriptionStatusEnum'
+          readOnly: true
+        active:
+          type: boolean
+          readOnly: true
+        current_period_end:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        cancel_at_period_end:
+          type: boolean
+          readOnly: true
+        trial_end:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - active
+      - cancel_at_period_end
+      - created_at
+      - current_period_end
+      - id
+      - interval
+      - plan_id
+      - price_id
+      - status
+      - trial_end
+      - updated_at
+    SubscriptionStatusEnum:
+      enum:
+      - incomplete
+      - incomplete_expired
+      - trialing
+      - active
+      - past_due
+      - canceled
+      - unpaid
+      - paused
+      type: string
+      description: |-
+        * `incomplete` - Incomplete
+        * `incomplete_expired` - Incomplete expired
+        * `trialing` - Trialing
+        * `active` - Active
+        * `past_due` - Past due
+        * `canceled` - Canceled
+        * `unpaid` - Unpaid
+        * `paused` - Paused
+    Suggestion:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        prompt:
+          type: string
+      required:
+      - prompt
+      - title
+    TestResult:
+      type: object
+      properties:
+        delivery:
+          type: string
+        status:
+          $ref: '#/components/schemas/WebhookDeliveryStatusEnum'
+        status_code:
+          type: integer
+          nullable: true
+        duration_ms:
+          type: integer
+          nullable: true
+        error:
+          type: string
+      required:
+      - delivery
+      - duration_ms
+      - error
+      - status
+      - status_code
+    TokenRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 1
+      required:
+      - token
+    UploadRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+        purpose:
+          type: string
+          default: ''
+          maxLength: 32
+      required:
+      - file
+    Usage:
+      type: object
+      properties:
+        today:
+          $ref: '#/components/schemas/UsageDay'
+      required:
+      - today
+    UsageDay:
+      type: object
+      properties:
+        input_tokens:
+          type: integer
+        output_tokens:
+          type: integer
+        limit:
+          type: integer
+          nullable: true
+      required:
+      - input_tokens
+      - limit
+      - output_tokens
+    UserRoles:
+      type: object
+      properties:
+        roles:
+          type: array
+          items:
+            type: string
+      required:
+      - roles
+    ValidResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
+      required:
+      - valid
+    WaitlistEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        referral_code:
+          type: string
+          readOnly: true
+        referred_by_id:
+          type: string
+          readOnly: true
+          nullable: true
+        referrals:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        invited_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - email
+      - id
+      - invited_at
+      - referral_code
+      - referrals
+      - referred_by_id
+    WaitlistJoinRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        ref:
+          type: string
+          default: ''
+          description: Referral code of the inviter.
+          maxLength: 32
+      required:
+      - email
+    WaitlistPublicStatus:
+      type: object
+      properties:
+        position:
+          type: integer
+        referrals:
+          type: integer
+      required:
+      - position
+      - referrals
+    WaitlistStatus:
+      type: object
+      properties:
+        position:
+          type: integer
+          description: 1 is next in line, 0 once invited.
+        referral_code:
+          type: string
+        referrals:
+          type: integer
+        invited:
+          type: boolean
+      required:
+      - invited
+      - position
+      - referral_code
+      - referrals
+    WebhookDeliveryStatusEnum:
+      enum:
+      - pending
+      - success
+      - failed
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `success` - Success
+        * `failed` - Failed
+    WebhookResponse:
+      type: object
+      properties:
+        received:
+          type: boolean
+        duplicate:
+          type: boolean
+      required:
+      - duplicate
+      - received
+  securitySchemes:
+    apiKey:
+      type: http
+      scheme: bearer
+      description: 'Personal API key, `Authorization: Bearer pl_...`'
+    session:
+      type: apiKey
+      in: cookie
+      name: sessionid

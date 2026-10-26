@@ -1,0 +1,16 @@
+[project]
+name = "pleate-backend-demo"
+version = "0.1.0"
+description = "Example Django project wired with pleate-backend. Used by the docs and the end to end tests."
+requires-python = ">=3.12"
+dependencies = [
+  "pleate-backend[all]",
+  "gunicorn>=23",
+  "uvicorn>=0.35",
+]
+
+[tool.uv.sources]
+pleate-backend = { path = "../../packages/pleate-backend", editable = true }
+
+[tool.uv]
+package = false

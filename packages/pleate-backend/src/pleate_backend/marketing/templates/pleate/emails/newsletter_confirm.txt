@@ -1,0 +1,6 @@
+{% load i18n %}{% autoescape off %}{% blocktranslate %}Hi,
+
+confirm your subscription to the {{ site_name }} newsletter by opening this link:{% endblocktranslate %}
+{{ action_url }}
+
+{% translate "If you did not ask to subscribe, ignore this email and you will not hear from us." %}{% endautoescape %}

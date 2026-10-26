@@ -1,1 +1,1 @@
-export { FileUpload, formatBytes, type FileRejection, type FileUploadProps } from "./file-upload.tsx";
+export { FileUpload, fileKey, formatBytes, type FileRejection, type FileUploadProps, type FileUploadState } from "./file-upload.tsx";

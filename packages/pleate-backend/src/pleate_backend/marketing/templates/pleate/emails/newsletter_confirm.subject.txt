@@ -1,0 +1,1 @@
+{% load i18n %}{% autoescape off %}{% blocktranslate %}Confirm your subscription to {{ site_name }}{% endblocktranslate %}{% endautoescape %}

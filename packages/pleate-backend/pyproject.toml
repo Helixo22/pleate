@@ -1,0 +1,62 @@
+[project]
+name = "pleate-backend"
+version = "0.1.0"
+description = "Reusable Django + MongoDB apps that give every pleate component a ready backend."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+  "django>=6.1,<6.2",
+  "django-mongodb-backend>=6.1,<6.2",
+  "djangorestframework>=3.18",
+  "drf-spectacular>=0.30",
+  "django-filter>=26.2",
+  "argon2-cffi>=25.1",
+  "cryptography>=45",
+  "pyotp>=2.9",
+  "segno>=1.6",
+  "pyjwt[crypto]>=2.10",
+  "httpx>=0.28",
+  "filetype>=1.2",
+  "pillow>=11",
+  "celery[redis]>=5.5",
+  "redis>=6",
+]
+
+[project.optional-dependencies]
+s3 = ["django-storages[s3]>=1.14"]
+stripe = ["stripe>=12"]
+openai = ["openai>=2"]
+anthropic = ["anthropic>=0.60"]
+push = ["pywebpush>=2"]
+anymail = ["django-anymail>=13"]
+all = ["pleate-backend[s3,stripe,openai,anthropic,push,anymail]"]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.4",
+  "pytest-django>=4.11",
+  "respx>=0.22",
+  "ruff>=0.13",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pleate_backend"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+pythonpath = [".", "src"]
+testpaths = ["tests"]
+addopts = "-q --reuse-db"
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+extend-exclude = ["**/migrations/**"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "DJ"]

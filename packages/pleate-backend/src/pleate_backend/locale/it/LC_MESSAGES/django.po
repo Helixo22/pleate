@@ -1,0 +1,965 @@
+# Italian translations for pleate-backend.
+# This file is distributed under the same license as the pleate-backend package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: pleate-backend\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-26 18:48+0000\n"
+"PO-Revision-Date: 2026-10-26 00:00+0000\n"
+"Last-Translator: pleate\n"
+"Language-Team: it\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: accounts/models.py:35
+msgid "email"
+msgstr "email"
+
+#: accounts/models.py:36 apikeys/models.py:16 files/models.py:24
+msgid "name"
+msgstr "nome"
+
+#: accounts/serializers.py:75
+msgid "Preferences must be a small object."
+msgstr "Le preferenze devono essere un oggetto piccolo."
+
+#: accounts/serializers.py:103 accounts/serializers.py:179
+#: accounts/views.py:341
+msgid "An account with this email already exists."
+msgstr "Esiste già un account con questa email."
+
+#: accounts/serializers.py:143
+msgid "The current password is wrong."
+msgstr "La password attuale è sbagliata."
+
+#: accounts/serializers.py:187 accounts/views.py:172 mfa/views.py:103
+msgid "The password is wrong."
+msgstr "La password è sbagliata."
+
+#: accounts/views.py:51
+msgid "Confirm email"
+msgstr "Conferma email"
+
+#: accounts/views.py:79
+msgid "Sign up is closed."
+msgstr "Le registrazioni sono chiuse."
+
+#: accounts/views.py:113 mfa/views.py:152
+msgid "Too many attempts. Try again later."
+msgstr "Troppi tentativi. Riprova più tardi."
+
+#: accounts/views.py:122
+msgid "Email or password is wrong."
+msgstr "Email o password sbagliate."
+
+#: accounts/views.py:126
+msgid "Confirm your email before signing in."
+msgstr "Conferma la tua email prima di accedere."
+
+#: accounts/views.py:174
+msgid "Type your email to confirm."
+msgstr "Scrivi la tua email per confermare."
+
+#: accounts/views.py:220
+msgid "The password of your account was changed."
+msgstr "La password del tuo account è stata cambiata."
+
+#: accounts/views.py:240 staff/views.py:160
+msgid "Choose a new password"
+msgstr "Scegli una nuova password"
+
+#: accounts/views.py:263 accounts/views.py:287 accounts/views.py:339
+msgid "This link is not valid anymore. Ask for a new one."
+msgstr "Questo link non è più valido. Richiedine uno nuovo."
+
+#: accounts/views.py:275
+msgid "The password of your account was reset."
+msgstr "La password del tuo account è stata reimpostata."
+
+#: accounts/views.py:324
+msgid "Confirm new email"
+msgstr "Conferma la nuova email"
+
+#: accounts/views.py:348
+#, python-format
+msgid "The email of your account was changed to %(email)s."
+msgstr "L'email del tuo account è stata cambiata in %(email)s."
+
+#: accounts/views.py:413
+msgid "Choose an image."
+msgstr "Scegli un'immagine."
+
+#: accounts/views.py:416
+msgid "The image is too large."
+msgstr "L'immagine è troppo grande."
+
+#: accounts/views.py:425 files/services.py:213
+msgid "This file is not a valid image."
+msgstr "Questo file non è un'immagine valida."
+
+#: ai_chat/models.py:9 notifications/models.py:11
+msgid "title"
+msgstr "titolo"
+
+#: ai_chat/models.py:10
+msgid "model"
+msgstr "modello"
+
+#: ai_chat/models.py:11
+msgid "system prompt"
+msgstr "prompt di sistema"
+
+#: ai_chat/models.py:29
+msgid "User"
+msgstr "Utente"
+
+#: ai_chat/models.py:30
+msgid "Assistant"
+msgstr "Assistente"
+
+#: ai_chat/models.py:31
+msgid "System"
+msgstr "Sistema"
+
+#: ai_chat/models.py:34
+msgid "Complete"
+msgstr "Completato"
+
+#: ai_chat/models.py:35
+msgid "Streaming"
+msgstr "In streaming"
+
+#: ai_chat/models.py:36
+msgid "Stopped"
+msgstr "Interrotto"
+
+#: ai_chat/models.py:37
+msgid "Error"
+msgstr "Errore"
+
+#: ai_chat/providers.py:32
+msgid "The assistant could not answer. Try again."
+msgstr "L'assistente non è riuscito a rispondere. Riprova."
+
+#: ai_chat/providers.py:202 ai_chat/providers.py:324
+msgid "The model is busy. Try again in a moment."
+msgstr "Il modello è occupato. Riprova tra un attimo."
+
+#: ai_chat/providers.py:205 ai_chat/providers.py:327
+msgid "The model is not reachable. Try again."
+msgstr "Il modello non è raggiungibile. Riprova."
+
+#: ai_chat/serializers.py:115
+#, python-format
+msgid "Messages can have at most %(limit)s characters."
+msgstr "I messaggi possono avere al massimo %(limit)s caratteri."
+
+#: ai_chat/serializers.py:124
+#, python-format
+msgid "Attach at most %(limit)s files."
+msgstr "Allega al massimo %(limit)s file."
+
+#: ai_chat/services.py:55
+msgid "This model is not available."
+msgstr "Questo modello non è disponibile."
+
+#: ai_chat/services.py:80
+msgid "You reached the daily limit. Try again tomorrow."
+msgstr "Hai raggiunto il limite giornaliero. Riprova domani."
+
+#: ai_chat/services.py:109
+msgid "One of the attached files does not exist."
+msgstr "Uno dei file allegati non esiste."
+
+#: ai_chat/views.py:241
+msgid "Write a message or attach a file."
+msgstr "Scrivi un messaggio o allega un file."
+
+#: ai_chat/views.py:302
+msgid "Only the last answer can be regenerated."
+msgstr "Puoi rigenerare solo l'ultima risposta."
+
+#: ai_chat/views.py:304
+msgid "This answer is still being written."
+msgstr "Questa risposta è ancora in scrittura."
+
+#: apikeys/authentication.py:39
+msgid "This API key is not valid."
+msgstr "Questa chiave API non è valida."
+
+#: apikeys/authentication.py:41
+msgid "This API key has expired."
+msgstr "Questa chiave API è scaduta."
+
+#: apikeys/authentication.py:43
+msgid "This API key can only read."
+msgstr "Questa chiave API può solo leggere."
+
+#: apikeys/models.py:6 marketing/models.py:33
+msgid "Read"
+msgstr "Lettura"
+
+#: apikeys/models.py:6
+msgid "Write"
+msgstr "Scrittura"
+
+#: apikeys/models.py:27
+msgid "API key"
+msgstr "chiave API"
+
+#: apikeys/models.py:28
+msgid "API keys"
+msgstr "chiavi API"
+
+#: apikeys/permissions.py:10
+msgid "This action needs a signed in session, not an API key."
+msgstr "Questa azione richiede una sessione con accesso, non una chiave API."
+
+#: apikeys/serializers.py:51
+msgid "The full key. Shown only once."
+msgstr "La chiave completa. Viene mostrata una sola volta."
+
+#: apikeys/views.py:45
+#, python-format
+msgid "You can have up to %(max)d active API keys. Revoke one first."
+msgstr "Puoi avere al massimo %(max)d chiavi API attive. Prima revocane una."
+
+#: audit/models.py:18
+msgid "actor email"
+msgstr "email dell'autore"
+
+#: audit/models.py:19
+msgid "action"
+msgstr "azione"
+
+#: audit/models.py:32
+msgid "activity log entry"
+msgstr "voce del registro attività"
+
+#: audit/models.py:33
+msgid "activity log"
+msgstr "registro attività"
+
+#: billing/models.py:19
+msgid "Incomplete"
+msgstr "Incompleto"
+
+#: billing/models.py:20
+msgid "Incomplete expired"
+msgstr "Incompleto scaduto"
+
+#: billing/models.py:21
+msgid "Trialing"
+msgstr "In prova"
+
+#: billing/models.py:22
+msgid "Active"
+msgstr "Attivo"
+
+#: billing/models.py:23
+msgid "Past due"
+msgstr "Pagamento scaduto"
+
+#: billing/models.py:24
+msgid "Canceled"
+msgstr "Annullato"
+
+#: billing/models.py:25
+msgid "Unpaid"
+msgstr "Non pagato"
+
+#: billing/models.py:26
+msgid "Paused"
+msgstr "In pausa"
+
+#: billing/models.py:29
+msgid "Monthly"
+msgstr "Mensile"
+
+#: billing/models.py:30
+msgid "Yearly"
+msgstr "Annuale"
+
+#: billing/permissions.py:18
+msgid "This feature needs a subscription."
+msgstr "Questa funzione richiede un abbonamento."
+
+#: billing/services.py:47 billing/views.py:77
+msgid "Payments are not available right now."
+msgstr "I pagamenti non sono disponibili al momento."
+
+#: billing/services.py:53
+msgid "The payment provider is not responding. Try again later."
+msgstr "Il fornitore dei pagamenti non risponde. Riprova più tardi."
+
+#: billing/services.py:234
+msgid "This plan is not available."
+msgstr "Questo piano non è disponibile."
+
+#: billing/services.py:239
+msgid "You already have a subscription. Manage it from the billing portal."
+msgstr "Hai già un abbonamento. Gestiscilo dal portale di fatturazione."
+
+#: billing/services.py:277
+msgid "There is no billing account yet. Choose a plan first."
+msgstr "Non c'è ancora un account di fatturazione. Prima scegli un piano."
+
+#: billing/services.py:451
+msgid "Your payment failed"
+msgstr "Il tuo pagamento non è andato a buon fine"
+
+#: billing/services.py:452
+msgid ""
+"We could not charge your payment method. Update it to keep your subscription."
+msgstr "Non siamo riusciti ad addebitare il tuo metodo di pagamento. Aggiornalo per mantenere l'abbonamento."
+
+#: billing/views.py:83
+msgid "The webhook signature is not valid."
+msgstr "La firma del webhook non è valida."
+
+#: core/exceptions.py:23
+msgid "Something went wrong."
+msgstr "Qualcosa è andato storto."
+
+#: core/exceptions.py:76
+msgid "Some fields are not valid."
+msgstr "Alcuni campi non sono validi."
+
+#: core/filters.py:29
+#, python-format
+msgid "Ordering by '%(ordering)s' is not allowed."
+msgstr "L'ordinamento per '%(ordering)s' non è consentito."
+
+#: emails/templates/pleate/emails/base.html:14
+msgid "If the button does not work, open this link:"
+msgstr "Se il pulsante non funziona, apri questo link:"
+
+#: emails/templates/pleate/emails/base.html:17
+#, python-format
+msgid "You received this email because of your account on %(site_name)s."
+msgstr "Hai ricevuto questa email perché hai un account su %(site_name)s."
+
+#: emails/templates/pleate/emails/email_change.html:1
+#: emails/templates/pleate/emails/password_reset.html:1
+#: emails/templates/pleate/emails/security_notice.html:1
+#: emails/templates/pleate/emails/security_notice.txt:1
+#: emails/templates/pleate/emails/verify_email.html:1
+#, python-format
+msgid "Hi %(name)s,"
+msgstr "Ciao %(name)s,"
+
+#: emails/templates/pleate/emails/email_change.html:1
+#, python-format
+msgid ""
+"Confirm that you want to use %(new_email)s as the email of your account."
+msgstr "Conferma che vuoi usare %(new_email)s come email del tuo account."
+
+#: emails/templates/pleate/emails/email_change.subject.txt:1
+#, python-format
+msgid "Confirm your new email for %(site_name)s"
+msgstr "Conferma la tua nuova email per %(site_name)s"
+
+#: emails/templates/pleate/emails/email_change.txt:1
+#, python-format
+msgid ""
+"Hi %(name)s,\n"
+"\n"
+"open this link to use %(new_email)s as the email of your account:"
+msgstr ""
+"Ciao %(name)s,\n"
+"\n"
+"apri questo link per usare %(new_email)s come email del tuo account:"
+
+#: emails/templates/pleate/emails/password_reset.html:1
+msgid "Someone asked to reset the password of your account."
+msgstr "Qualcuno ha chiesto di reimpostare la password del tuo account."
+
+#: emails/templates/pleate/emails/password_reset.html:1
+#: emails/templates/pleate/emails/password_reset.txt:6
+#, python-format
+msgid ""
+"The link expires in %(minutes)s minutes. If it was not you, ignore this "
+"email: your password stays the same."
+msgstr "Il link scade tra %(minutes)s minuti. Se non sei stato tu, ignora questa email: la tua password resta la stessa."
+
+#: emails/templates/pleate/emails/password_reset.subject.txt:1
+#, python-format
+msgid "Reset your %(site_name)s password"
+msgstr "Reimposta la tua password di %(site_name)s"
+
+#: emails/templates/pleate/emails/password_reset.txt:1
+#, python-format
+msgid ""
+"Hi %(name)s,\n"
+"\n"
+"someone asked to reset the password of your account. Open this link to "
+"choose a new one:"
+msgstr ""
+"Ciao %(name)s,\n"
+"\n"
+"qualcuno ha chiesto di reimpostare la password del tuo account. Apri questo link per sceglierne una nuova:"
+
+#: emails/templates/pleate/emails/security_notice.html:1
+#: emails/templates/pleate/emails/security_notice.txt:5
+msgid "If it was not you, reset your password right away and contact us."
+msgstr "Se non sei stato tu, reimposta subito la password e contattaci."
+
+#: emails/templates/pleate/emails/security_notice.subject.txt:1
+#, python-format
+msgid "Security alert for your %(site_name)s account"
+msgstr "Avviso di sicurezza per il tuo account %(site_name)s"
+
+#: emails/templates/pleate/emails/verify_email.html:1
+msgid "Confirm your email address to finish setting up your account."
+msgstr "Conferma il tuo indirizzo email per completare la configurazione dell'account."
+
+#: emails/templates/pleate/emails/verify_email.html:1
+#: emails/templates/pleate/emails/verify_email.txt:6
+msgid "If you did not create an account, ignore this email."
+msgstr "Se non hai creato un account, ignora questa email."
+
+#: emails/templates/pleate/emails/verify_email.subject.txt:1
+#, python-format
+msgid "Confirm your email for %(site_name)s"
+msgstr "Conferma la tua email per %(site_name)s"
+
+#: emails/templates/pleate/emails/verify_email.txt:1
+#, python-format
+msgid ""
+"Hi %(name)s,\n"
+"\n"
+"confirm your email address by opening this link:"
+msgstr ""
+"Ciao %(name)s,\n"
+"\n"
+"conferma il tuo indirizzo email aprendo questo link:"
+
+#: files/models.py:19
+msgid "Ready"
+msgstr "Pronto"
+
+#: files/models.py:20 marketing/models.py:8 webhooks/models.py:43
+msgid "Pending"
+msgstr "In attesa"
+
+#: files/serializers.py:49
+msgid "Choose a file."
+msgstr "Scegli un file."
+
+#: files/services.py:126
+msgid "The file is too large."
+msgstr "Il file è troppo grande."
+
+#: files/services.py:131
+msgid "This type of file is not allowed."
+msgstr "Questo tipo di file non è consentito."
+
+#: files/services.py:149
+msgid "You are out of storage space."
+msgstr "Hai esaurito lo spazio di archiviazione."
+
+#: files/services.py:319 files/services.py:353
+msgid "Direct uploads are not available."
+msgstr "I caricamenti diretti non sono disponibili."
+
+#: files/services.py:359
+msgid "The upload did not reach the storage."
+msgstr "Il caricamento non è arrivato all'archivio."
+
+#: files/services.py:365
+msgid "The file is larger than announced."
+msgstr "Il file è più grande di quanto dichiarato."
+
+#: marketing/models.py:9
+msgid "Subscribed"
+msgstr "Iscritto"
+
+#: marketing/models.py:10
+msgid "Unsubscribed"
+msgstr "Disiscritto"
+
+#: marketing/models.py:32
+msgid "New"
+msgstr "Nuovo"
+
+#: marketing/models.py:34
+msgid "Archived"
+msgstr "Archiviato"
+
+#: marketing/models.py:35
+msgid "Spam"
+msgstr "Spam"
+
+#: marketing/serializers.py:68
+#, python-brace-format
+msgid "Write at least {min_length} characters."
+msgstr "Scrivi almeno {min_length} caratteri."
+
+#: marketing/serializers.py:69
+#, python-brace-format
+msgid "Keep it under {max_length} characters."
+msgstr "Non superare i {max_length} caratteri."
+
+#: marketing/services.py:72
+msgid "Confirm subscription"
+msgstr "Conferma iscrizione"
+
+#: marketing/templates/pleate/emails/contact_message.html:1
+#: marketing/templates/pleate/emails/contact_message.txt:1
+#, python-format
+msgid "New message from the %(site_name)s contact form."
+msgstr "Nuovo messaggio dal modulo di contatto di %(site_name)s."
+
+#: marketing/templates/pleate/emails/contact_message.html:1
+#: marketing/templates/pleate/emails/contact_message.txt:3
+msgid "From"
+msgstr "Da"
+
+#: marketing/templates/pleate/emails/contact_message.html:1
+#: marketing/templates/pleate/emails/contact_message.txt:4
+msgid "Subject"
+msgstr "Oggetto"
+
+#: marketing/templates/pleate/emails/contact_message.html:1
+#: marketing/templates/pleate/emails/contact_message.txt:8
+msgid "Reply to this email to answer the sender."
+msgstr "Rispondi a questa email per scrivere al mittente."
+
+#: marketing/templates/pleate/emails/contact_message.html:1
+#, python-format
+msgid ""
+"You received this email because you are a contact recipient on %(site_name)s."
+msgstr "Hai ricevuto questa email perché ricevi i messaggi di contatto di %(site_name)s."
+
+#: marketing/templates/pleate/emails/contact_message.subject.txt:1
+#, python-format
+msgid "Contact form: %(subject)s"
+msgstr "Modulo di contatto: %(subject)s"
+
+#: marketing/templates/pleate/emails/contact_message.subject.txt:1
+#, python-format
+msgid "New message from %(name)s"
+msgstr "Nuovo messaggio da %(name)s"
+
+#: marketing/templates/pleate/emails/newsletter_confirm.html:1
+#: marketing/templates/pleate/emails/waitlist_invite.html:1
+msgid "Hi,"
+msgstr "Ciao,"
+
+#: marketing/templates/pleate/emails/newsletter_confirm.html:1
+#, python-format
+msgid "Confirm your subscription to the %(site_name)s newsletter."
+msgstr "Conferma la tua iscrizione alla newsletter di %(site_name)s."
+
+#: marketing/templates/pleate/emails/newsletter_confirm.html:1
+#: marketing/templates/pleate/emails/newsletter_confirm.txt:6
+msgid ""
+"If you did not ask to subscribe, ignore this email and you will not hear "
+"from us."
+msgstr "Se non hai chiesto di iscriverti, ignora questa email e non ti scriveremo più."
+
+#: marketing/templates/pleate/emails/newsletter_confirm.html:1
+#, python-format
+msgid ""
+"You received this email because someone asked to subscribe this address to "
+"%(site_name)s."
+msgstr "Hai ricevuto questa email perché qualcuno ha chiesto di iscrivere questo indirizzo a %(site_name)s."
+
+#: marketing/templates/pleate/emails/newsletter_confirm.subject.txt:1
+#, python-format
+msgid "Confirm your subscription to %(site_name)s"
+msgstr "Conferma la tua iscrizione a %(site_name)s"
+
+#: marketing/templates/pleate/emails/newsletter_confirm.txt:1
+#, python-format
+msgid ""
+"Hi,\n"
+"\n"
+"confirm your subscription to the %(site_name)s newsletter by opening this "
+"link:"
+msgstr ""
+"Ciao,\n"
+"\n"
+"conferma la tua iscrizione alla newsletter di %(site_name)s aprendo questo link:"
+
+#: marketing/templates/pleate/emails/waitlist_invite.html:1
+#, python-format
+msgid "Your wait is over: you can now start using %(site_name)s."
+msgstr "L'attesa è finita: ora puoi iniziare a usare %(site_name)s."
+
+#: marketing/templates/pleate/emails/waitlist_invite.html:1
+#, python-format
+msgid "You received this email because you joined the %(site_name)s waitlist."
+msgstr "Hai ricevuto questa email perché ti sei iscritto alla lista d'attesa di %(site_name)s."
+
+#: marketing/templates/pleate/emails/waitlist_invite.subject.txt:1
+#, python-format
+msgid "Your invite to %(site_name)s is here"
+msgstr "Il tuo invito a %(site_name)s è arrivato"
+
+#: marketing/templates/pleate/emails/waitlist_invite.txt:1
+#, python-format
+msgid ""
+"Hi,\n"
+"\n"
+"your wait is over: you can now start using %(site_name)s. Open this link to "
+"get started:"
+msgstr ""
+"Ciao,\n"
+"\n"
+"l'attesa è finita: ora puoi iniziare a usare %(site_name)s. Apri questo link per cominciare:"
+
+#: marketing/views.py:36
+msgid "This link is not valid anymore."
+msgstr "Questo link non è più valido."
+
+#: marketing/views.py:325
+msgid "Get started"
+msgstr "Inizia"
+
+#: mfa/models.py:20
+msgid "TOTP device"
+msgstr "dispositivo TOTP"
+
+#: mfa/models.py:21
+msgid "TOTP devices"
+msgstr "dispositivi TOTP"
+
+#: mfa/models.py:48
+msgid "backup code"
+msgstr "codice di backup"
+
+#: mfa/models.py:49
+msgid "backup codes"
+msgstr "codici di backup"
+
+#: mfa/views.py:30
+msgid "The code is not valid."
+msgstr "Il codice non è valido."
+
+#: mfa/views.py:36
+msgid "Two factor authentication is not enabled."
+msgstr "L'autenticazione a due fattori non è attiva."
+
+#: mfa/views.py:63 mfa/views.py:84
+msgid "Two factor authentication is already enabled."
+msgstr "L'autenticazione a due fattori è già attiva."
+
+#: mfa/views.py:82
+msgid "Start the setup first."
+msgstr "Prima avvia la configurazione."
+
+#: mfa/views.py:91
+msgid "Two factor authentication was turned on for your account."
+msgstr "L'autenticazione a due fattori è stata attivata sul tuo account."
+
+#: mfa/views.py:109
+msgid "Two factor authentication was turned off for your account."
+msgstr "L'autenticazione a due fattori è stata disattivata sul tuo account."
+
+#: mfa/views.py:135
+msgid "Type the code from your app or a backup code."
+msgstr "Scrivi il codice della tua app o un codice di backup."
+
+#: mfa/views.py:137
+msgid "The sign in expired. Sign in again."
+msgstr "L'accesso è scaduto. Accedi di nuovo."
+
+#: notifications/models.py:10
+msgid "kind"
+msgstr "tipo"
+
+#: notifications/models.py:12
+msgid "body"
+msgstr "testo"
+
+#: notifications/models.py:13
+msgid "link"
+msgstr "link"
+
+#: notifications/serializers.py:37
+msgid "This kind is not valid."
+msgstr "Questo tipo non è valido."
+
+#: notifications/serializers.py:41
+#, python-format
+msgid "Unknown channel: %(channel)s."
+msgstr "Canale sconosciuto: %(channel)s."
+
+#: notifications/serializers.py:58
+msgid "The endpoint must use HTTPS."
+msgstr "L'endpoint deve usare HTTPS."
+
+#: notifications/services.py:90
+msgid "Open"
+msgstr "Apri"
+
+#: oauth/models.py:19
+msgid "social account"
+msgstr "account social"
+
+#: oauth/models.py:20
+msgid "social accounts"
+msgstr "account social"
+
+#: oauth/views.py:77
+msgid "This sign in method is not available."
+msgstr "Questo metodo di accesso non è disponibile."
+
+#: oauth/views.py:112
+msgid "Unknown mode."
+msgstr "Modalità sconosciuta."
+
+#: oauth/views.py:114
+msgid "Sign in first."
+msgstr "Prima accedi."
+
+#: oauth/views.py:245
+#, python-format
+msgid "A %(provider)s account was linked to your account."
+msgstr "Un account %(provider)s è stato collegato al tuo account."
+
+#: oauth/views.py:330
+msgid "Set a password or link another account before removing this one."
+msgstr "Imposta una password o collega un altro account prima di rimuovere questo."
+
+#: oauth/views.py:340
+#, python-format
+msgid "A %(provider)s account was unlinked from your account."
+msgstr "Un account %(provider)s è stato scollegato dal tuo account."
+
+#: rbac/models.py:14 rbac/models.py:67 webhooks/models.py:12
+msgid "description"
+msgstr "descrizione"
+
+#: rbac/models.py:16
+msgid "default"
+msgstr "predefinito"
+
+#: rbac/models.py:19 rbac/models.py:20
+msgid "role info"
+msgstr "info ruolo"
+
+#: rbac/models.py:39
+msgid "permission"
+msgstr "permesso"
+
+#: rbac/models.py:41
+msgid "object id"
+msgstr "id oggetto"
+
+#: rbac/models.py:45
+msgid "object permission"
+msgstr "permesso sull'oggetto"
+
+#: rbac/models.py:46
+msgid "object permissions"
+msgstr "permessi sugli oggetti"
+
+#: rbac/models.py:56
+msgid "Set either a user or a group."
+msgstr "Imposta un utente o un gruppo."
+
+#: rbac/models.py:66
+msgid "key"
+msgstr "chiave"
+
+#: rbac/models.py:68
+msgid "enabled for everyone"
+msgstr "attivo per tutti"
+
+#: rbac/models.py:70
+msgid "rollout percent"
+msgstr "percentuale di rilascio"
+
+#: rbac/models.py:78
+msgid "feature flag"
+msgstr "feature flag"
+
+#: rbac/models.py:79
+msgid "feature flags"
+msgstr "feature flag"
+
+#: rbac/permissions.py:15
+msgid "You do not have permission to do this."
+msgstr "Non hai il permesso di farlo."
+
+#: rbac/permissions.py:79
+msgid "This feature is not available."
+msgstr "Questa funzione non è disponibile."
+
+#: rbac/serializers.py:29
+#, python-format
+msgid "Unknown permissions: %(names)s."
+msgstr "Permessi sconosciuti: %(names)s."
+
+#: rbac/serializers.py:83
+msgid "Give the role a name."
+msgstr "Dai un nome al ruolo."
+
+#: rbac/serializers.py:88
+msgid "A role with this name already exists."
+msgstr "Esiste già un ruolo con questo nome."
+
+#: rbac/serializers.py:139
+msgid "This role does not exist."
+msgstr "Questo ruolo non esiste."
+
+#: rbac/serializers.py:198
+msgid "A flag with this key already exists."
+msgstr "Esiste già un flag con questa chiave."
+
+#: rbac/serializers.py:208
+msgid "Some users do not exist."
+msgstr "Alcuni utenti non esistono."
+
+#: rbac/serializers.py:215 staff/serializers.py:98
+msgid "Some roles do not exist."
+msgstr "Alcuni ruoli non esistono."
+
+#: staff/middleware.py:36
+msgid "Access from your network has been blocked."
+msgstr "L'accesso dalla tua rete è stato bloccato."
+
+#: staff/models.py:23
+msgid "network"
+msgstr "rete"
+
+#: staff/models.py:24
+msgid "reason"
+msgstr "motivo"
+
+#: staff/models.py:25
+msgid "expires at"
+msgstr "scade il"
+
+#: staff/models.py:34
+msgid "IP ban"
+msgstr "blocco IP"
+
+#: staff/models.py:35
+msgid "IP bans"
+msgstr "blocchi IP"
+
+#: staff/models.py:53 staff/serializers.py:122
+msgid "Enter an IP address or a CIDR network."
+msgstr "Inserisci un indirizzo IP o una rete CIDR."
+
+#: staff/views.py:51
+msgid "Only a superuser can change a superuser."
+msgstr "Solo un superutente può modificare un superutente."
+
+#: staff/views.py:93
+msgid "You cannot deactivate or demote your own account."
+msgstr "Non puoi disattivare o declassare il tuo account."
+
+#: staff/views.py:95
+msgid "Only staff can change staff access."
+msgstr "Solo lo staff può modificare l'accesso dello staff."
+
+#: staff/views.py:97
+msgid "You cannot change roles."
+msgstr "Non puoi modificare i ruoli."
+
+#: staff/views.py:118
+msgid "You cannot delete your own account from here."
+msgstr "Non puoi eliminare il tuo account da qui."
+
+#: staff/views.py:153
+msgid "This account is deactivated."
+msgstr "Questo account è disattivato."
+
+#: staff/views.py:211
+msgid "This ban would block your own address."
+msgstr "Questo blocco bloccherebbe il tuo stesso indirizzo."
+
+#: webhooks/models.py:11
+msgid "URL"
+msgstr "URL"
+
+#: webhooks/models.py:24
+msgid "webhook endpoint"
+msgstr "endpoint webhook"
+
+#: webhooks/models.py:25
+msgid "webhook endpoints"
+msgstr "endpoint webhook"
+
+#: webhooks/models.py:43
+msgid "Success"
+msgstr "Riuscito"
+
+#: webhooks/models.py:43
+msgid "Failed"
+msgstr "Fallito"
+
+#: webhooks/models.py:63
+msgid "webhook delivery"
+msgstr "consegna webhook"
+
+#: webhooks/models.py:64
+msgid "webhook deliveries"
+msgstr "consegne webhook"
+
+#: webhooks/registry.py:37
+msgid "Sent by the test button to check an endpoint."
+msgstr "Inviato dal pulsante di test per verificare un endpoint."
+
+#: webhooks/registry.py:38
+msgid "A user signed up."
+msgstr "Un utente si è registrato."
+
+#: webhooks/registry.py:39
+msgid "A user deleted their account."
+msgstr "Un utente ha eliminato il suo account."
+
+#: webhooks/security.py:67 webhooks/security.py:73
+msgid "This URL is not valid."
+msgstr "Questo URL non è valido."
+
+#: webhooks/security.py:70
+msgid "Use an https URL."
+msgstr "Usa un URL https."
+
+#: webhooks/security.py:75
+msgid "Credentials in the URL are not allowed."
+msgstr "Le credenziali nell'URL non sono consentite."
+
+#: webhooks/security.py:81 webhooks/security.py:83 webhooks/security.py:89
+msgid "The host of this URL could not be resolved."
+msgstr "Non è stato possibile risolvere l'host di questo URL."
+
+#: webhooks/security.py:91
+msgid "This URL points to a private or reserved address."
+msgstr "Questo URL punta a un indirizzo privato o riservato."
+
+#: webhooks/serializers.py:44
+msgid "Pick at least one event."
+msgstr "Scegli almeno un evento."
+
+#: webhooks/serializers.py:51
+#, python-format
+msgid "Unknown events: %(names)s."
+msgstr "Eventi sconosciuti: %(names)s."
+
+#: webhooks/services.py:244
+msgid "A webhook endpoint was disabled"
+msgstr "Un endpoint webhook è stato disattivato"
+
+#: webhooks/services.py:245
+#, python-format
+msgid "%(url)s failed too many times in a row. Fix it, then turn it back on."
+msgstr "%(url)s ha fallito troppe volte di fila. Correggilo, poi riattivalo."
+
+#: webhooks/views.py:63
+#, python-format
+msgid "You can have at most %(count)s endpoints."
+msgstr "Puoi avere al massimo %(count)s endpoint."
+
+#: webhooks/views.py:153
+msgid "Turn the endpoint on before sending again."
+msgstr "Attiva l'endpoint prima di inviare di nuovo."

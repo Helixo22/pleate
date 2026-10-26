@@ -4,27 +4,68 @@
 import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Badge, cn, IconButton, spring } from "pleate";
+import { usePathname, useRouter } from "next/navigation";
+import { Badge, cn, IconButton, SegmentedControl, spring } from "pleate";
 import { useEffect, useState, type ReactNode } from "react";
-import { NAV } from "@/lib/nav";
+import { type Area, AREA_HOME, areaOf, BACKEND_NAV, NAV } from "@/lib/nav";
 import { PalettePicker, ThemeSwitch } from "./theme-controls";
 
-function Wordmark() {
+function Wordmark({ area }: { area: Area }) {
   return (
-    <Link href="/" className="pl-focus-ring flex items-center gap-2 rounded-md text-headline font-bold tracking-tight">
+    <Link
+      href={AREA_HOME[area]}
+      className="pl-focus-ring flex items-center gap-2 rounded-md text-headline font-bold tracking-tight"
+    >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/logo.svg" alt="" className="size-7" />
       pleate
+      {area === "backend" && (
+        <Badge size="sm" tone="accent">
+          Backend
+        </Badge>
+      )}
     </Link>
   );
 }
 
-function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
-  const pathname = usePathname();
+const LAST_PAGE_KEY = "pleate-docs-last-page";
+
+function readLastPages(): Partial<Record<Area, string>> {
+  try {
+    return JSON.parse(sessionStorage.getItem(LAST_PAGE_KEY) ?? "{}");
+  } catch {
+    return {};
+  }
+}
+
+/** Frontend / Backend switch. Each side remembers the last page visited in this tab. */
+function AreaToggle({ area, onSwitch, fullWidth }: { area: Area; onSwitch?: () => void; fullWidth?: boolean }) {
+  const router = useRouter();
   return (
-    <nav aria-label="Documentation" className="flex flex-col gap-6 pb-10">
-      {NAV.map((section) => (
+    <SegmentedControl<Area>
+      aria-label="Documentation area"
+      size="sm"
+      fullWidth={fullWidth}
+      value={area}
+      onValueChange={(next) => {
+        if (next === area) return;
+        onSwitch?.();
+        router.push(readLastPages()[next] ?? AREA_HOME[next]);
+      }}
+      options={[
+        { value: "frontend", label: "Frontend" },
+        { value: "backend", label: "Backend" },
+      ]}
+    />
+  );
+}
+
+function SidebarNav({ area, onNavigate }: { area: Area; onNavigate?: () => void }) {
+  const pathname = usePathname();
+  const sections = area === "backend" ? BACKEND_NAV : NAV;
+  return (
+    <nav aria-label={area === "backend" ? "Backend documentation" : "Documentation"} className="flex flex-col gap-6 pb-10">
+      {sections.map((section) => (
         <div key={section.title}>
           <p className="px-3 pb-1.5 text-footnote font-semibold text-fg-muted">{section.title}</p>
           <ul className="flex flex-col gap-px">
@@ -65,9 +106,17 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 export function Shell({ children }: { children: ReactNode }) {
   const [menu, setMenu] = useState(false);
   const pathname = usePathname();
+  const area = areaOf(pathname);
   // Example pages are full-bleed sites of their own: no docs chrome.
   const bare = pathname.startsWith("/examples/");
   useEffect(() => setMenu(false), [pathname]);
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(LAST_PAGE_KEY, JSON.stringify({ ...readLastPages(), [area]: pathname }));
+    } catch {
+      // storage unavailable: the toggle falls back to each area's home
+    }
+  }, [area, pathname]);
   useEffect(() => {
     document.body.style.overflow = menu ? "hidden" : "";
   }, [menu]);
@@ -87,7 +136,10 @@ export function Shell({ children }: { children: ReactNode }) {
             onClick={() => setMenu(true)}
             icon={<Menu />}
           />
-          <Wordmark />
+          <Wordmark area={area} />
+          <div className="ms-6 hidden sm:block">
+            <AreaToggle area={area} />
+          </div>
           <div className="ms-auto flex items-center gap-2">
             <PalettePicker />
             <ThemeSwitch />
@@ -97,7 +149,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
       <div className="mx-auto flex max-w-[90rem]">
         <aside className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-64 shrink-0 overflow-y-auto px-3 pt-6 lg:block">
-          <SidebarNav />
+          <SidebarNav area={area} />
         </aside>
         <main className="min-w-0 flex-1 px-4 pt-8 pb-24 md:px-10 md:pt-12">{children}</main>
       </div>
@@ -123,11 +175,14 @@ export function Shell({ children }: { children: ReactNode }) {
               transition={spring.sheet}
             >
               <div className="flex h-14 shrink-0 items-center justify-between px-4 pt-(--pl-safe-top)">
-                <Wordmark />
+                <Wordmark area={area} />
                 <IconButton aria-label="Close menu" size="sm" variant="gray" tone="neutral" onClick={() => setMenu(false)} icon={<X />} />
               </div>
+              <div className="px-4 pt-1 pb-3">
+                <AreaToggle area={area} fullWidth onSwitch={() => setMenu(false)} />
+              </div>
               <div className="overflow-y-auto px-2 pt-2">
-                <SidebarNav onNavigate={() => setMenu(false)} />
+                <SidebarNav area={area} onNavigate={() => setMenu(false)} />
               </div>
             </motion.div>
           </div>
