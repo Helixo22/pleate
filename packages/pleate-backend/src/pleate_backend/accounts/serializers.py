@@ -1,9 +1,13 @@
+import re
+
 from django.conf import settings
 from django.contrib.auth import get_user_model, password_validation
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
+
+from pleate_backend.core.conf import pleate_settings
 
 from .me import extra_fields
 
@@ -57,7 +61,7 @@ class MeSerializer(serializers.ModelSerializer):
 
     def validate_preferences(self, value):
         current = (self.instance.preferences if self.instance else None) or {}
-        if not isinstance(value, dict) or len(str({**current, **value})) > 4000:
+        if not isinstance(value, dict) or len(str({**current, **value})) > PREFERENCES_MAX_CHARS:
             raise serializers.ValidationError(_("Preferences must be a small object."), code="invalid")
         return value
 
@@ -66,6 +70,47 @@ class MeSerializer(serializers.ModelSerializer):
         if prefs is not None:
             instance.preferences = {**(instance.preferences or {}), **prefs}
         return super().update(instance, validated_data)
+
+
+PREFERENCES_MAX_CHARS = 4000
+HEX_COLOR = re.compile(r"^#[0-9a-fA-F]{6}$")
+
+
+class UiPreferencesSerializer(serializers.Serializer):
+    """The UI preferences kept in ``User.preferences``. PATCH merges what is sent."""
+
+    theme = serializers.ChoiceField(choices=["light", "dark", "system"], required=False)
+    palette = serializers.CharField(
+        max_length=32, required=False, allow_null=True, help_text='A palette name or "#rrggbb".'
+    )
+    motion = serializers.ChoiceField(choices=["system", "off"], required=False)
+    bottom_bar = serializers.ListField(
+        child=serializers.RegexField(r"^[a-z0-9_/-]{1,64}$", max_length=64),
+        max_length=4,
+        required=False,
+        help_text="Ordered nav ids, up to 4.",
+    )
+
+    def to_internal_value(self, data):
+        if isinstance(data, dict):
+            unknown = sorted(set(data) - set(self.fields))
+            if unknown:
+                raise serializers.ValidationError(
+                    {name: [_("Unknown preference.")] for name in unknown}, code="unknown_field"
+                )
+        return super().to_internal_value(data)
+
+    def validate_palette(self, value):
+        if value is None or value in pleate_settings.PREFERENCES["PALETTES"]:
+            return value
+        if HEX_COLOR.match(value):
+            return value.lower()
+        raise serializers.ValidationError(_("Pick a palette or a #rrggbb color."), code="invalid_palette")
+
+    def validate_bottom_bar(self, value):
+        if len(set(value)) != len(value):
+            raise serializers.ValidationError(_("Each item can appear once."), code="duplicate_item")
+        return value
 
 
 def _validate_new_password(password, user=None):

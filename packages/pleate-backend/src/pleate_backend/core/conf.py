@@ -28,6 +28,9 @@ DEFAULTS: dict = {
         "BILLING_PORTAL_RETURN": "/settings/billing",
         "WAITLIST_INVITE": "/signup?invite={code}&email={email}",
         "NOTIFICATIONS": "/notifications",
+        # Links of /api/search results.
+        "FILE": "/files/{id}",
+        "CONVERSATION": "/chat/{id}",
     },
     # Proxies whose X-Forwarded-For header is trusted. CIDR notation.
     "TRUSTED_PROXIES": ["127.0.0.1/32", "::1/128"],
@@ -35,12 +38,33 @@ DEFAULTS: dict = {
     "AUTH": {
         "SIGNUP_ENABLED": True,
         "REQUIRE_EMAIL_VERIFICATION": False,
+        # Failed logins per account and IP in LOGIN_LOCKOUT_SECONDS.
         "LOGIN_MAX_ATTEMPTS": 5,
         "LOGIN_LOCKOUT_SECONDS": 15 * 60,
+        # Failed logins per account from any IP, against guesses spread over many addresses.
+        "LOGIN_ACCOUNT_MAX_ATTEMPTS": 50,
+        "LOGIN_ACCOUNT_WINDOW_SECONDS": 60 * 60,
         "LOGIN_IP_MAX_ATTEMPTS": 30,
         "REMEMBER_ME_AGE": 60 * 60 * 24 * 365,
         "EMAIL_TOKEN_MAX_AGE": 60 * 60 * 24 * 3,
         "DELETE_ACCOUNT_REQUIRES_PASSWORD": True,
+    },
+    # UI preferences of /auth/me/preferences.
+    "PREFERENCES": {
+        # Named palettes a user may pick (the pleate presets); "#rrggbb" is always accepted too.
+        "PALETTES": [
+            "cobalt",
+            "blue",
+            "violet",
+            "indigo",
+            "ocean",
+            "teal",
+            "green",
+            "amber",
+            "orange",
+            "rose",
+            "graphite",
+        ],
     },
     "MFA": {
         "ISSUER": None,

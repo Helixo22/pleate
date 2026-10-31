@@ -309,3 +309,74 @@ def test_delete_account(session_api, user):
     assert res.status_code == 204
     assert not User.objects.filter(pk=user.pk).exists()
     assert not UserSession.objects.filter(user_id=user.pk).exists()
+
+
+# UI preferences
+
+
+def test_preferences_defaults(auth_api):
+    res = auth_api.get("/api/auth/me/preferences")
+    assert res.status_code == 200
+    assert res.json() == {"theme": "system", "palette": None, "motion": "system", "bottom_bar": []}
+
+
+def test_preferences_partial_updates_merge(auth_api, user):
+    res = auth_api.patch("/api/auth/me/preferences", {"theme": "dark", "palette": "teal"}, format="json")
+    assert res.status_code == 200
+    res = auth_api.patch(
+        "/api/auth/me/preferences", {"motion": "off", "bottom_bar": ["home", "files/recent"]}, format="json"
+    )
+    assert res.json() == {
+        "theme": "dark",
+        "palette": "teal",
+        "motion": "off",
+        "bottom_bar": ["home", "files/recent"],
+    }
+    user.refresh_from_db()
+    assert user.preferences["theme"] == "dark"
+    res = auth_api.patch("/api/auth/me/preferences", {"palette": "#1A2b3C"}, format="json")
+    assert res.json()["palette"] == "#1a2b3c"
+
+
+@pytest.mark.parametrize(
+    "payload,field",
+    [
+        ({"theme": "neon"}, "theme"),
+        ({"motion": "fast"}, "motion"),
+        ({"palette": "hotpink"}, "palette"),
+        ({"palette": "#12345"}, "palette"),
+        ({"palette": "url(javascript:x)"}, "palette"),
+        ({"bottom_bar": ["a", "b", "c", "d", "e"]}, "bottom_bar"),
+        ({"bottom_bar": ["home", "home"]}, "bottom_bar"),
+        ({"bottom_bar": ["Home"]}, "bottom_bar"),
+        ({"bottom_bar": ["x" * 65]}, "bottom_bar"),
+        ({"bottom_bar": "home"}, "bottom_bar"),
+        ({"extra": 1}, "extra"),
+    ],
+)
+def test_preferences_are_validated(auth_api, user, payload, field):
+    res = auth_api.patch("/api/auth/me/preferences", payload, format="json")
+    assert res.status_code == 400
+    assert any(name.split(".")[0] == field for name in res.json()["error"]["fields"])
+    user.refresh_from_db()
+    assert user.preferences == {}
+
+
+def test_preferences_must_be_an_object(auth_api):
+    res = auth_api.patch("/api/auth/me/preferences", ["dark"], format="json")
+    assert res.status_code == 400
+
+
+def test_preferences_read_with_api_key_but_not_write(api, user):
+    from pleate_backend.apikeys.services import create_key
+
+    _key, raw = create_key(user, "ci", scopes=["read", "write"])
+    header = {"HTTP_AUTHORIZATION": f"Bearer {raw}"}
+    assert api.get("/api/auth/me/preferences", **header).status_code == 200
+    res = api.patch("/api/auth/me/preferences", {"theme": "dark"}, format="json", **header)
+    assert res.status_code == 403
+    assert res.json()["error"]["code"] == "api_key_not_allowed"
+
+
+def test_preferences_need_a_user(api):
+    assert api.get("/api/auth/me/preferences").status_code in (401, 403)

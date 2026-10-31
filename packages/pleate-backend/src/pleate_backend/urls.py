@@ -33,6 +33,8 @@ PREFIXES = {
     "pleate_backend.marketing": "marketing/",
     "pleate_backend.billing": "billing/",
     "pleate_backend.staff": "staff/",
+    "pleate_backend.usage": "usage/",
+    "pleate_backend.search": "search/",
 }
 
 

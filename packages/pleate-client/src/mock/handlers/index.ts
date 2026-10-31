@@ -8,6 +8,7 @@ import { authRoutes } from "./auth.ts";
 import { commerceRoutes } from "./commerce.ts";
 import { keyAndFileRoutes } from "./keys-files.ts";
 import { notificationRoutes } from "./notifications.ts";
+import { usageAndSearchRoutes } from "./usage-search.ts";
 
 /**
  * msw handlers that answer every pleate-backend endpoint from an in memory
@@ -31,5 +32,6 @@ export function createMockHandlers(options: MockHandlerOptions = {}): HttpHandle
   aiRoutes(router);
   commerceRoutes(router);
   adminRoutes(router);
+  usageAndSearchRoutes(router);
   return toHandlers(router, db, resolved);
 }

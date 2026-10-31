@@ -375,3 +375,14 @@ def test_admin_pages_render(staff):
         "/admin/auth/group/add/",
     ):
         assert client.get(url).status_code == 200, url
+
+
+def test_non_superuser_staff_cannot_grant_staff(api, make_user):
+    peer = make_user()
+    peer.is_staff = True
+    peer.save(update_fields=["is_staff"])
+    target = make_user()
+    api.force_authenticate(User.objects.get(pk=peer.pk))
+    res = api.patch(f"/api/staff/users/{target.pk}", {"is_staff": True}, format="json")
+    assert res.status_code == 403
+    assert not User.objects.get(pk=target.pk).is_staff

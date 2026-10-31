@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
-import type { Me } from "../api.ts";
+import type { Me, Schema, UiPreferences } from "../api.ts";
 import { ApiError } from "../errors.ts";
 import { errorProps, mapFields } from "./forms.ts";
 import { keys, usePleateClient } from "./provider.tsx";
@@ -41,6 +41,33 @@ export function useUpdateMe() {
     mutationFn: client.auth.updateMe,
     onSuccess: (me) => qc.setQueryData(keys.me, me),
   });
+}
+
+/**
+ * UI preferences stored on the account (theme, palette, motion, bottom bar).
+ * `update` is optimistic and rolls back when the server refuses the change.
+ *
+ *     const { preferences, update } = usePreferences();
+ *     update.mutate({ theme: "dark" });
+ */
+export function usePreferences() {
+  const client = usePleateClient();
+  const qc = useQueryClient();
+  const query = useQuery({ queryKey: keys.preferences, queryFn: client.auth.preferences });
+  const update = useMutation({
+    mutationFn: (patch: Schema<"PatchedUiPreferencesRequest">) => client.auth.updatePreferences(patch),
+    onMutate: async (patch) => {
+      await qc.cancelQueries({ queryKey: keys.preferences });
+      const previous = qc.getQueryData<UiPreferences>(keys.preferences);
+      if (previous) qc.setQueryData<UiPreferences>(keys.preferences, { ...previous, ...patch } as UiPreferences);
+      return { previous };
+    },
+    onError: (_error, _patch, context) => {
+      if (context?.previous) qc.setQueryData(keys.preferences, context.previous);
+    },
+    onSuccess: (data) => qc.setQueryData(keys.preferences, data),
+  });
+  return { ...query, preferences: query.data, update };
 }
 
 type LoginValues = { email: string; password: string; remember: boolean };

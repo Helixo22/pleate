@@ -69,5 +69,8 @@ export const keys = {
   plans: ["pleate", "billing", "plans"] as const,
   subscription: ["pleate", "billing", "subscription"] as const,
   webhooks: ["pleate", "webhooks"] as const,
+  preferences: ["pleate", "me", "preferences"] as const,
+  usage: ["pleate", "usage"] as const,
+  search: (q: string, types?: string[], limit?: number) => ["pleate", "search", q, types ?? [], limit ?? null] as const,
   list: (path: string) => ["pleate", "list", path] as const,
 };

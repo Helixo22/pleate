@@ -37,6 +37,12 @@ export type ActivityLog = Schema<"ActivityLog">;
 export type WebhookEndpoint = Schema<"Endpoint">;
 export type WebhookDelivery = Schema<"Delivery">;
 export type StaffUser = Schema<"StaffUser">;
+/** UI preferences of `/auth/me/preferences`; the GET always returns every key. */
+export type UiPreferences = Required<Schema<"UiPreferences">>;
+export type UsageSummary = Schema<"UsageSummary">;
+export type UsageItem = Schema<"UsageItem">;
+export type SearchResult = Schema<"SearchResult">;
+export type SearchType = SearchResult["type"];
 
 /** Events of the chat stream, in order: user_message?, start, (reasoning|sources|delta)*, error?, done. */
 export type ChatEvent =
@@ -82,6 +88,10 @@ export function createPleateClient(options: HttpOptions = {}) {
     },
     removeAvatar: () => http.delete<Me>("/auth/me/avatar"),
     exportData: () => http.get<Record<string, unknown>>("/auth/me/export"),
+    preferences: () => http.get<UiPreferences>("/auth/me/preferences"),
+    /** Partial: only the keys sent change. */
+    updatePreferences: (body: Schema<"PatchedUiPreferencesRequest">) =>
+      http.patch<UiPreferences>("/auth/me/preferences", body),
     deleteAccount: (body: { password?: string; confirm_email?: string }) => http.delete<void>("/auth/me", body),
   };
 
@@ -259,6 +269,15 @@ export function createPleateClient(options: HttpOptions = {}) {
     deleteBan: (id: string) => http.delete<void>(`/staff/bans/${enc(id)}`),
   };
 
+  const usage = {
+    /** Plan and every limit with its current use, for UsageMeter. */
+    summary: () => http.get<UsageSummary>("/usage"),
+  };
+
+  /** The signed in user's own files, conversations and notifications. `q` is 2 to 100 characters. */
+  const search = (q: string, opts: { types?: SearchType[]; limit?: number; signal?: AbortSignal } = {}) =>
+    http.get<SearchResult[]>("/search", { q, types: opts.types?.join(","), limit: opts.limit }, { signal: opts.signal });
+
   return {
     http,
     auth,
@@ -275,6 +294,8 @@ export function createPleateClient(options: HttpOptions = {}) {
     webhooks,
     rbac,
     staff,
+    usage,
+    search,
     /** Any list endpoint of your own project that follows the conventions. */
     list: <T>(path: string, params?: ListParams) => http.get<Page<T>>(path, params),
   };

@@ -18,11 +18,14 @@ import Marketing from "./marketing";
 import Notifications from "./notifications";
 import OAuth from "./oauth";
 import Overview from "./overview";
+import Preferences from "./preferences";
 import RateLimitingAndCache from "./rate-limiting-and-cache";
 import RolesAndPermissions from "./roles-and-permissions";
+import Search from "./search";
 import Staff from "./staff";
 import Testing from "./testing";
 import TwoFactor from "./two-factor";
+import Usage from "./usage";
 import Webhooks from "./webhooks";
 
 export const BACKEND_CONTENT: Record<string, ComponentType> = {
@@ -46,6 +49,9 @@ export const BACKEND_CONTENT: Record<string, ComponentType> = {
   marketing: Marketing,
   billing: Billing,
   staff: Staff,
+  preferences: Preferences,
+  usage: Usage,
+  search: Search,
   internationalization: Internationalization,
   "client-and-hooks": ClientAndHooks,
   testing: Testing,

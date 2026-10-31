@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from pleate_backend.core.conf import frontend_url, pleate_settings
+from pleate_backend.core.exceptions import ApiError
 from pleate_backend.core.utils import client_ip, user_agent
 
 # Callables ``(request, user, remember) -> dict | None``. A non None result
@@ -125,3 +126,27 @@ def describe_user_agent(ua: str) -> dict:
     )
     mobile = any(k in ua_l for k in ("iphone", "android", "mobile"))
     return {"browser": browser, "os": os_name, "mobile": mobile}
+
+
+# UI preferences (/auth/me/preferences), kept in User.preferences next to any free form keys.
+
+
+def ui_preferences(user) -> dict:
+    stored = user.preferences or {}
+    return {
+        "theme": stored.get("theme", "system"),
+        "palette": stored.get("palette"),
+        "motion": stored.get("motion", "system"),
+        "bottom_bar": list(stored.get("bottom_bar") or []),
+    }
+
+
+def update_ui_preferences(user, changes: dict) -> dict:
+    from .serializers import PREFERENCES_MAX_CHARS
+
+    merged = {**(user.preferences or {}), **changes}
+    if len(str(merged)) > PREFERENCES_MAX_CHARS:
+        raise ApiError("preferences_too_large", _("Preferences must be a small object."), 400)
+    user.preferences = merged
+    user.save(update_fields=["preferences"])
+    return ui_preferences(user)
