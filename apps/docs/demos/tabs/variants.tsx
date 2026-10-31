@@ -9,7 +9,7 @@ const TABS = [
 
 export default function Demo() {
   return (
-    <div className="grid w-full gap-10">
+    <div className="grid w-full grid-cols-[minmax(0,1fr)] gap-10">
       {(["underline", "pill", "soft"] as const).map((variant) => (
         <Tabs key={variant} defaultValue="overview" variant={variant}>
           <TabsList aria-label={`${variant} tabs`}>

@@ -89,11 +89,11 @@ function FileRow({ file, progress: legacy, upload, onRemove, onRetry, removeLabe
   const progress = upload ? (status === "uploading" ? Math.min(100, Math.max(0, (upload.progress ?? 0) * 100)) : undefined) : legacy;
   const done = status !== "error" && (progress === undefined || progress >= 100);
   return (
-    <div className={cn("flex items-center gap-3 rounded-xl bg-surface p-2 pe-3 shadow-xs", status === "error" && "shadow-[inset_0_0_0_1px_var(--pl-danger-ink)]")}>
+    <div className={cn("pl-field flex items-center gap-3 rounded-lg bg-surface p-2 pe-3 [--pl-field-border:var(--pl-separator)]", status === "error" && "[--pl-field-border:var(--pl-danger-ink)]")}>
       {url ? (
-        <img src={url} alt="" className="size-11 shrink-0 rounded-lg object-cover" />
+        <img src={url} alt="" className="size-10 shrink-0 rounded-sm object-cover" />
       ) : (
-        <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-accent-soft text-caption2 font-bold text-accent-ink">{ext}</span>
+        <span className="grid size-10 shrink-0 place-items-center rounded-sm bg-surface-2 font-mono text-caption2 text-fg-muted shadow-[inset_0_0_0_1px_var(--pl-separator)]">{ext}</span>
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="truncate text-subhead font-medium">{file.name}</span>
@@ -103,7 +103,12 @@ function FileRow({ file, progress: legacy, upload, onRemove, onRetry, removeLabe
           </span>
         ) : done ? (
           <span className="flex items-center gap-1.5 text-footnote text-fg-muted">
-            {status === "done" && <CheckIcon className="size-3.5 shrink-0 text-success-ink" strokeWidth={3} />}
+            {status === "done" && (
+              <CheckIcon
+                className="size-3.5 shrink-0 text-success-ink [&_path]:[stroke-dasharray:24] motion-safe:[&_path]:animate-[pl-check_var(--pl-duration-slow)_var(--pl-ease-out)_both]"
+                strokeWidth={2.5}
+              />
+            )}
             {formatBytes(file.size)}
           </span>
         ) : (
@@ -128,7 +133,7 @@ function FileRow({ file, progress: legacy, upload, onRemove, onRetry, removeLabe
           aria-label={`${retryLabel} ${file.name}`}
           disabled={disabled}
           onClick={onRetry}
-          className="pl-focus-ring inline-flex h-7 shrink-0 cursor-pointer items-center gap-1 rounded-full bg-fill-2 px-2.5 text-footnote font-semibold text-fg transition-colors hover:bg-fill disabled:opacity-40 [&_svg]:size-3.5"
+          className="pl-focus-ring pl-hit relative inline-flex h-7 shrink-0 cursor-pointer items-center gap-1 rounded-sm bg-fill-2 px-2.5 text-footnote font-medium text-fg transition-colors hover:bg-fill disabled:opacity-40 [&_svg]:size-3.5"
         >
           <RetryIcon strokeWidth={2.5} />
           <span aria-hidden="true">{retryLabel}</span>
@@ -139,7 +144,7 @@ function FileRow({ file, progress: legacy, upload, onRemove, onRetry, removeLabe
         aria-label={removeLabel}
         disabled={disabled}
         onClick={onRemove}
-        className="pl-focus-ring grid size-7 shrink-0 cursor-pointer place-items-center rounded-full text-fg-muted transition-colors hover:bg-fill-2 hover:text-fg disabled:opacity-40 [&_svg]:size-4"
+        className="pl-focus-ring pl-hit relative grid size-7 shrink-0 cursor-pointer place-items-center rounded-sm text-fg-muted transition-colors hover:bg-fill-2 hover:text-fg disabled:opacity-40 [&_svg]:size-4"
       >
         <XIcon strokeWidth={2.5} />
       </button>
@@ -264,14 +269,14 @@ export function FileUpload({
           }}
           onDrop={onDrop}
           className={cn(
-            "pl-focus-ring pl-touch flex w-full cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed px-6 py-8 text-center",
+            "pl-focus-ring pl-touch flex w-full cursor-pointer flex-col items-center gap-2 rounded-xl border border-dashed px-6 py-8 text-center",
             "transition-[background-color,border-color,scale] duration-(--pl-duration-base) ease-ios disabled:cursor-not-allowed disabled:opacity-50",
-            over ? "border-accent-ink bg-accent-soft motion-safe:scale-[1.01]" : "border-border bg-fill-3 hover:bg-fill-2",
+            over ? "border-accent-ink bg-accent-soft motion-safe:scale-[1.01]" : "border-border-strong bg-surface-2 hover:bg-fill-3",
             aria["aria-invalid"] && "border-danger-ink",
           )}
         >
-          <span className={cn("grid size-12 place-items-center rounded-full transition-colors", over ? "bg-accent text-on-accent" : "bg-accent-soft text-accent-ink")}>
-            <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <span className={cn("pl-field grid size-10 place-items-center rounded-md transition-colors", over ? "bg-accent text-on-accent pl-lift" : "bg-surface text-fg-muted")}>
+            <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M5 15v2.5A2.5 2.5 0 0 0 7.5 20h9a2.5 2.5 0 0 0 2.5-2.5V15" />
             </svg>
           </span>

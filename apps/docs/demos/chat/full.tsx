@@ -96,7 +96,7 @@ export default function Demo() {
   };
 
   return (
-    <div className="flex h-[40rem] w-full flex-col overflow-hidden rounded-3xl bg-bg shadow-[inset_0_0_0_1px_var(--pl-separator)]">
+    <div className="flex h-[40rem] w-full flex-col overflow-hidden rounded-xl bg-bg shadow-[inset_0_0_0_1px_var(--pl-separator)]">
       <div className="flex h-14 shrink-0 items-center gap-3 border-b border-separator px-4">
         <BotFace state={bot} size={32} decorative />
         <div className="min-w-0 flex-1">

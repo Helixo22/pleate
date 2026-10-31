@@ -14,7 +14,7 @@ export default function Demo() {
         <SearchBar placeholder="Search cities" onValueChange={setQuery} debounce={120} cancelable shortcut="/" />
         <ul className="flex flex-wrap gap-2" aria-live="polite">
           {results.map((c) => (
-            <li key={c} className="rounded-full bg-fill-2 px-3 py-1 text-subhead">{c}</li>
+            <li key={c} className="rounded-md bg-fill-2 px-3 py-1 text-subhead">{c}</li>
           ))}
           {results.length === 0 && <li className="text-subhead text-fg-muted">No cities match “{query}”.</li>}
         </ul>

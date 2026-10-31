@@ -7,7 +7,7 @@ export const fieldVariants = cva(
   [
     "pl-field relative flex w-full items-center text-fg",
     "transition-[background-color,box-shadow] duration-(--pl-duration-fast) ease-out",
-    "hover:[--pl-field-border:color-mix(in_oklab,var(--pl-border)_60%,var(--pl-fg-subtle))]",
+    "hover:[--pl-field-border:var(--pl-fg-muted)]",
     "has-[:focus-visible]:[--pl-field-border:var(--pl-accent-ink)] has-[:focus-visible]:shadow-[inset_0_0_0_1px_var(--pl-field-border),0_0_0_3px_var(--pl-accent-soft)]",
     "has-[[aria-invalid=true]]:[--pl-field-border:var(--pl-danger-ink)] has-[[aria-invalid=true]:focus-visible]:shadow-[inset_0_0_0_1px_var(--pl-field-border),0_0_0_3px_var(--pl-danger-soft)]",
     "has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50",
@@ -16,7 +16,7 @@ export const fieldVariants = cva(
     variants: {
       variant: {
         filled: "bg-fill-2 [--pl-field-border:transparent] hover:bg-fill",
-        outline: "bg-surface",
+        outline: "bg-surface [--pl-field-border:var(--pl-border-strong)]",
         surface: "bg-surface [--pl-field-border:var(--pl-separator)]",
       },
       size: {

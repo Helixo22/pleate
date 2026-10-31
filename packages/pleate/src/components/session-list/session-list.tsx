@@ -148,7 +148,7 @@ export function SessionList({
               </span>
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                  <span className="min-w-0 text-subhead font-semibold break-words text-fg">
+                  <span className="min-w-0 text-subhead font-medium break-words text-fg">
                     {s.browser} <span className="font-normal text-fg-muted">{l.on}</span> {s.os}
                   </span>
                   {s.current && (
@@ -176,8 +176,8 @@ export function SessionList({
 
   return (
     <section className={cn("flex w-full min-w-0 flex-col gap-2", className)} aria-label={showTitle ? undefined : l.title}>
-      {showTitle && <h3 className="px-4 text-footnote font-semibold text-fg-muted">{l.title}</h3>}
-      <div className="overflow-hidden rounded-2xl bg-surface shadow-xs">{body}</div>
+      {showTitle && <h3 className="px-4 text-footnote font-medium text-fg-muted">{l.title}</h3>}
+      <div className="overflow-hidden pl-field [--pl-field-border:var(--pl-separator)] rounded-2xl bg-surface">{body}</div>
       {onRevokeOthers && others > 0 && (
         <div className="flex justify-end pt-1">
           <AlertDialog

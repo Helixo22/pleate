@@ -1,6 +1,6 @@
-// List: the iOS Settings list. ListSection groups rows on a rounded card ("inset") or edge to edge ("plain"), with a
+// List: grouped rows. ListSection groups rows on a rounded card ("inset") or edge to edge ("plain"), with a
 // header and a footer note. ListItem has a colored icon tile, title, subtitle, a trailing value, any control (Switch,
-// Badge…) and a chevron when it navigates. Separators start after the icon, like iOS. swipeActions reveal buttons
+// Badge…) and a chevron when it navigates. Separators start after the icon. swipeActions reveal buttons
 // when the row is dragged left (or when one of them gets keyboard focus).
 "use client";
 
@@ -29,7 +29,7 @@ export function ListSection({ header, footer, variant = "inset", className, chil
     <SectionContext.Provider value={{ variant }}>
       <section className={cn("flex flex-col", className)} {...props}>
         {header && <h3 className={cn("pb-1.5 text-footnote text-fg-muted", variant === "inset" ? "px-4" : "px-4 md:px-5")}>{header}</h3>}
-        <ul role="list" className={cn("overflow-hidden bg-surface", variant === "inset" ? "rounded-xl" : "border-y border-separator")}>
+        <ul role="list" className={cn("overflow-hidden bg-surface", variant === "inset" ? "rounded-lg shadow-[inset_0_0_0_1px_var(--pl-separator)]" : "border-y border-separator")}>
           {children}
         </ul>
         {footer && <p className="px-4 pt-1.5 text-footnote text-fg-muted">{footer}</p>}
@@ -57,9 +57,9 @@ export type ListItemProps = Omit<HTMLAttributes<HTMLElement>, "title" | "onClick
   ref?: Ref<HTMLElement>;
   title: ReactNode;
   subtitle?: ReactNode;
-  /** Glyph shown white on a colored tile. */
+  /** Glyph in a small bordered tile. */
   icon?: ReactNode;
-  /** Tile color (any CSS color, e.g. "var(--pl-info)"). */
+  /** Glyph color (any CSS color, e.g. "var(--pl-info)"); muted when unset. */
   iconColor?: string;
   /** Shows the leading content as-is (an Avatar, a larger image…) instead of a tile. */
   leading?: ReactNode;
@@ -85,7 +85,7 @@ export function ListItem({
   title,
   subtitle,
   icon,
-  iconColor = "var(--pl-accent)",
+  iconColor,
   leading,
   value,
   trailing,
@@ -108,8 +108,8 @@ export function ListItem({
     leading ??
     (icon && (
       <span
-        className="grid size-[1.8125rem] shrink-0 place-items-center rounded-[0.4375rem] text-on-status [&_svg]:size-[1.0625rem]"
-        style={{ background: iconColor }}
+        className="grid size-7 shrink-0 place-items-center rounded-sm bg-fill-3 text-fg-muted shadow-[inset_0_0_0_1px_var(--pl-separator)] [&_svg]:size-4"
+        style={iconColor ? { color: iconColor } : undefined}
         aria-hidden="true"
       >
         {icon}
@@ -119,15 +119,15 @@ export function ListItem({
   const content = (
     <>
       {lead}
-      <span className="flex min-h-11 min-w-0 flex-1 items-center gap-3 py-2.5 pe-4 shadow-[inset_0_-1px_0_var(--pl-separator)] group-last/item:shadow-none">
+      <span className="flex min-h-11 min-w-0 flex-1 items-center gap-3 py-2 pe-4 shadow-[inset_0_-1px_0_var(--pl-separator)] group-last/item:shadow-none">
         <span className="flex min-w-0 flex-1 flex-col">
-          <span className={cn("truncate text-body", tone === "danger" && "text-danger-ink", tone === "accent" && "text-accent-ink")}>{title}</span>
+          <span className={cn("truncate text-subhead", tone === "danger" && "text-danger-ink", tone === "accent" && "text-accent-ink")}>{title}</span>
           {subtitle && <span className="line-clamp-2 text-footnote text-fg-muted">{subtitle}</span>}
         </span>
         {value && <span className="max-w-[45%] shrink-0 truncate text-body text-fg-muted">{value}</span>}
         {trailing && <span className="flex shrink-0 items-center">{trailing}</span>}
-        {selected && <CheckIcon className="size-5 shrink-0 text-accent-ink" strokeWidth={2.5} />}
-        {showChevron && <ChevronRightIcon className="-me-1 size-[1.125rem] shrink-0 text-fg-subtle rtl:rotate-180" strokeWidth={2.5} />}
+        {selected && <CheckIcon className="size-4 shrink-0 text-accent-ink" strokeWidth={2.25} />}
+        {showChevron && <ChevronRightIcon className="-me-1 size-4 shrink-0 text-fg-subtle rtl:rotate-180" strokeWidth={2} />}
       </span>
       {children}
     </>

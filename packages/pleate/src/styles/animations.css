@@ -23,11 +23,14 @@
 @keyframes pl-blink { 50% { opacity: 0; } }
 @keyframes pl-gradient { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
 @keyframes pl-marquee { to { transform: translateX(-100%); } }
+@keyframes pl-marquee-y { to { transform: translateY(-50%); } }
 @keyframes pl-spin { to { transform: rotate(360deg); } }
 @keyframes pl-spoke { from { opacity: 1; } to { opacity: 0.18; } }
 @keyframes pl-shimmer { from { background-position: 150% 0; } to { background-position: -50% 0; } }
 @keyframes pl-pulse { 50% { opacity: 0.55; } }
 @keyframes pl-check { from { stroke-dashoffset: var(--pl-check-length, 24); } to { stroke-dashoffset: 0; } }
+@keyframes pl-wave { 0%, 100% { transform: scaleY(var(--pl-wave-lo, 0.25)); } 50% { transform: scaleY(1); } }
+@keyframes pl-flow { from { stroke-dashoffset: var(--pl-flow-from); } to { stroke-dashoffset: var(--pl-flow-to); } }
 
 /* Popover-like surfaces (Select, Dropdown, Popover, Menu): grow from their trigger. */
 @utility pl-pop {

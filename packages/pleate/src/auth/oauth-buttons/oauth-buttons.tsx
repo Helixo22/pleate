@@ -89,7 +89,7 @@ export function OAuthButtons({
           tone: "neutral" as const,
           size,
           fullWidth: true,
-          className: "min-w-0 font-semibold",
+          className: "min-w-0 font-medium",
           "aria-label": layout === "row" ? label : undefined,
         };
         if (provider.href && !off && !busy) {

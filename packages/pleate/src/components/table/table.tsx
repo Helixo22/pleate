@@ -36,7 +36,7 @@ export function Table({
       <div
         className={cn(
           "relative w-full overflow-auto",
-          surface && "rounded-2xl bg-surface shadow-xs",
+          surface && "pl-field [--pl-field-border:var(--pl-separator)] rounded-2xl bg-surface",
           stackOnMobile && surface && "max-md:rounded-none max-md:bg-transparent max-md:shadow-none",
           wrapperClassName,
         )}
@@ -75,7 +75,7 @@ export function TableBody({ className, ...props }: HTMLAttributes<HTMLTableSecti
 }
 
 export function TableFooter({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
-  return <tfoot className={cn("font-semibold [&_td]:border-t [&_td]:border-separator", className)} {...props} />;
+  return <tfoot className={cn("font-medium [&_td]:border-t [&_td]:border-separator", className)} {...props} />;
 }
 
 export function TableRow({ className, ...props }: HTMLAttributes<HTMLTableRowElement>) {
@@ -88,7 +88,7 @@ export function TableRow({ className, ...props }: HTMLAttributes<HTMLTableRowEle
         hoverable && "[tbody_&]:hover:bg-fill-3",
         "data-[state=selected]:bg-accent-soft",
         "[tbody_&:last-child_td]:border-b-0",
-        stackOnMobile && "max-md:flex max-md:flex-col max-md:rounded-2xl max-md:bg-surface max-md:p-1 max-md:shadow-xs",
+        stackOnMobile && "max-md:flex max-md:flex-col max-md:rounded-2xl max-md:bg-surface max-md:p-1 max-md:pl-field max-md:[--pl-field-border:var(--pl-separator)]",
         className,
       )}
       {...props}
@@ -113,7 +113,7 @@ export function TableHead({ className, sort, onSort, align = "start", children, 
       scope="col"
       aria-sort={sort === "asc" ? "ascending" : sort === "desc" ? "descending" : sortable ? "none" : undefined}
       className={cn(
-        "group/head border-b border-separator text-footnote font-semibold whitespace-nowrap text-fg-muted",
+        "group/head border-b border-separator text-footnote font-medium whitespace-nowrap text-fg-muted",
         density === "compact" ? "h-9 px-3" : "h-11 px-4",
         ALIGN[align],
         className,
@@ -125,7 +125,7 @@ export function TableHead({ className, sort, onSort, align = "start", children, 
           type="button"
           onClick={onSort}
           className={cn(
-            "pl-focus-ring -mx-1.5 inline-flex cursor-pointer items-center gap-1 rounded-md px-1.5 py-0.5 hover:text-fg",
+            "pl-focus-ring pl-hit relative -mx-1.5 inline-flex cursor-pointer items-center gap-1 rounded-md px-1.5 py-0.5 hover:text-fg",
             sort && "text-fg",
           )}
         >

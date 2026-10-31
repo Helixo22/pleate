@@ -30,6 +30,7 @@
   --pl-fg-subtle: #6b6b6b;
   --pl-separator: #e7e7e9;
   --pl-border: #d4d4d8;
+  --pl-border-strong: #8e8e94; /* form-control edges: 3:1 on bg and surface */
 
   /* Status: fill (white text on top, AA) · ink (text and icons on the page, AA) · soft (tinted wells) */
   --pl-success: #15803d;
@@ -78,6 +79,7 @@
   --pl-fg-subtle: #8b8b91;
   --pl-separator: #2a2a2d;
   --pl-border: #3a3a3e;
+  --pl-border-strong: #6b6b71;
 
   --pl-success: #1d7a3f;
   --pl-success-ink: #4cc38a;
@@ -101,6 +103,11 @@
   --pl-highlight: inset 0 1px 0 rgb(255 255 255 / 0.12);
   --pl-knob: #ededed;
   --pl-knob-shadow: 0 0 0 1px rgb(0 0 0 / 0.3), 0 1px 2px rgb(0 0 0 / 0.4);
+}
+
+/* A pinned theme subtree also resets the text color, or it would inherit the outer theme's. */
+[data-theme] {
+  color: var(--pl-fg);
 }
 
 /* Derived shades, recomputed wherever the theme or the palette changes. */

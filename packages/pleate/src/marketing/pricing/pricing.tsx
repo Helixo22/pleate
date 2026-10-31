@@ -103,7 +103,7 @@ export function Pricing({
               { value: "yearly", label: l.yearly },
             ]}
           />
-          {saving > 0 && <span className="rounded-full bg-success-soft px-2.5 py-1 text-footnote font-semibold text-success-ink">{l.save(saving)}</span>}
+          {saving > 0 && <span className="rounded-sm bg-success-soft px-2 py-0.5 text-footnote font-medium text-success-ink">{l.save(saving)}</span>}
         </div>
       )}
       <div className={cn("grid w-full items-stretch gap-4", plans.length === 2 ? "md:grid-cols-2" : plans.length >= 3 ? "md:grid-cols-2 lg:grid-cols-3" : "", plans.length === 4 && "xl:grid-cols-4")}>
@@ -111,15 +111,15 @@ export function Pricing({
           <div
             key={plan.id}
             className={cn(
-              "relative flex flex-col gap-6 rounded-3xl bg-surface p-6 md:p-7",
-              plan.highlighted ? "shadow-[0_0_0_2px_var(--pl-accent),var(--pl-shadow-lg)]" : "shadow-sm",
+              "relative flex flex-col gap-6 rounded-xl bg-surface p-6 md:p-7",
+              plan.highlighted ? "shadow-[inset_0_0_0_2px_var(--pl-accent)]" : "pl-field [--pl-field-border:var(--pl-separator)]",
             )}
           >
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="text-title3">{plan.name}</h3>
                 {(plan.badge || plan.highlighted) && (
-                  <span className="rounded-full bg-accent px-2.5 py-1 text-caption1 font-semibold text-on-accent">{plan.badge ?? l.popular}</span>
+                  <span className="rounded-sm bg-accent-soft px-2 py-0.5 text-caption1 font-medium text-accent-ink">{plan.badge ?? l.popular}</span>
                 )}
               </div>
               {plan.description && <p className="text-subhead text-fg-muted">{plan.description}</p>}
@@ -149,11 +149,11 @@ export function Pricing({
                   <li key={i} className={cn("flex items-start gap-2.5 text-subhead", !item.included && "text-fg-subtle")}>
                     <span
                       className={cn(
-                        "mt-px grid size-5 shrink-0 place-items-center rounded-full [&_svg]:size-3",
-                        item.included ? "bg-accent-soft text-accent-ink" : "bg-fill-2 text-fg-subtle",
+                        "mt-0.5 grid size-4 shrink-0 place-items-center [&_svg]:size-4",
+                        item.included ? "text-accent-ink" : "text-fg-subtle",
                       )}
                     >
-                      {item.included ? <CheckIcon strokeWidth={3} /> : <MinusIcon strokeWidth={3} />}
+                      {item.included ? <CheckIcon strokeWidth={2} /> : <MinusIcon strokeWidth={2} />}
                     </span>
                     <span className="flex flex-col">
                       <span>

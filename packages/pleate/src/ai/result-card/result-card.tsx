@@ -4,6 +4,9 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";
 
+// Links come from model citations: only http(s) may become an href.
+const safeHref = (url?: string) => (url && /^https?:\/\//i.test(url) ? url : undefined);
+
 const domain = (url?: string) => {
   try {
     return url ? new URL(url).hostname.replace(/^www\./, "") : undefined;
@@ -16,7 +19,7 @@ function SiteIcon({ src, label }: { src?: string; label?: string }) {
   return src ? (
     <img src={src} alt="" className="size-4 shrink-0 rounded-[0.25rem] bg-fill-2" />
   ) : (
-    <span aria-hidden="true" className="grid size-4 shrink-0 place-items-center rounded-[0.25rem] bg-fill text-[0.5625rem] font-bold text-fg-muted uppercase">
+    <span aria-hidden="true" className="grid size-4 shrink-0 place-items-center rounded-[0.25rem] bg-fill text-[0.6875rem] font-medium text-fg-muted uppercase">
       {label?.[0] ?? "·"}
     </span>
   );
@@ -43,11 +46,11 @@ export type ResultCardProps = Omit<HTMLAttributes<HTMLElement>, "title"> & {
 export function ResultCard({ title, href, site, favicon, snippet, image, imageAlt = "", meta, tags, actions, index, layout = "vertical", className, ...props }: ResultCardProps) {
   const host = site ?? domain(href);
   const horizontal = layout === "horizontal";
-  const Title = href ? "a" : "span";
+  const Title = safeHref(href) ? "a" : "span";
   return (
     <article
       className={cn(
-        "group relative flex overflow-hidden rounded-2xl bg-surface shadow-xs transition-shadow duration-(--pl-duration-base) hover:shadow-md",
+        "group relative flex overflow-hidden pl-field [--pl-field-border:var(--pl-separator)] rounded-xl bg-surface transition-[box-shadow] duration-(--pl-duration-base) hover:[--pl-field-border:var(--pl-border)]",
         horizontal ? "flex-row" : "flex-col",
         className,
       )}
@@ -66,11 +69,11 @@ export function ResultCard({ title, href, site, favicon, snippet, image, imageAl
           <div className="flex items-center gap-1.5 text-caption1 text-fg-muted">
             <SiteIcon src={favicon} label={host} />
             <span className="truncate">{host}</span>
-            {index !== undefined && <span className="ms-auto rounded-md bg-fill-2 px-1.5 font-semibold pl-tabular">{index}</span>}
+            {index !== undefined && <span className="ms-auto rounded-md bg-fill-2 px-1.5 font-medium pl-tabular">{index}</span>}
           </div>
         )}
         <Title
-          {...(href && { href, target: "_blank", rel: "noreferrer" })}
+          {...(safeHref(href) && { href: safeHref(href), target: "_blank", rel: "noreferrer" })}
           className={cn(
             "line-clamp-2 text-headline text-fg",
             // The whole card is clickable through the title's link.
@@ -92,14 +95,14 @@ export type SourceChipProps = { index: number; href?: string; site?: string; tit
 
 export function SourceChip({ index, href, site, title, className }: SourceChipProps) {
   const host = site ?? domain(href);
-  const Comp = href ? "a" : "span";
+  const Comp = safeHref(href) ? "a" : "span";
   return (
     <Comp
-      {...(href && { href, target: "_blank", rel: "noreferrer" })}
+      {...(safeHref(href) && { href: safeHref(href), target: "_blank", rel: "noreferrer" })}
       title={[title, host].filter(Boolean).join(", ") || undefined}
       aria-label={`Source ${index}${host ? `: ${host}` : ""}`}
       className={cn(
-        "pl-focus-ring mx-0.5 inline-flex h-[1.15rem] min-w-[1.15rem] -translate-y-px items-center justify-center rounded-md bg-fill-2 px-1 align-middle text-caption2 font-semibold text-fg-muted no-underline",
+        "pl-focus-ring mx-0.5 inline-flex h-[1.15rem] min-w-[1.15rem] -translate-y-px items-center justify-center rounded-md bg-fill-2 px-1 align-middle text-caption2 font-medium text-fg-muted no-underline",
         href && "transition-colors hover:bg-accent hover:text-on-accent",
         className,
       )}
@@ -118,7 +121,7 @@ export function SourceList({ sources, label = "Sources", className }: SourceList
       {sources.map((s, i) => (
         <li key={s.href} className="w-44 shrink-0">
           <a
-            href={s.href}
+            href={safeHref(s.href)}
             target="_blank"
             rel="noreferrer"
             className="pl-focus-ring flex h-full flex-col gap-1.5 rounded-xl bg-fill-3 p-2.5 transition-colors hover:bg-fill-2"

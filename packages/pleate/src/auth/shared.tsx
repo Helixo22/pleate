@@ -57,7 +57,7 @@ export function useSubmitError(error?: string, fallback = "Something went wrong.
 
 export function Footer({ children }: { children?: ReactNode }) {
   if (!children) return null;
-  return <div className="text-center text-subhead text-fg-muted [&_a]:font-semibold [&_a]:text-accent-ink [&_a:hover]:underline">{children}</div>;
+  return <div className="text-center text-subhead text-fg-muted [&_a]:font-medium [&_a]:text-accent-ink [&_a:hover]:underline">{children}</div>;
 }
 
-export const linkClass = "pl-focus-ring rounded-sm text-subhead font-semibold text-accent-ink hover:underline";
+export const linkClass = "pl-focus-ring rounded-sm text-subhead font-medium text-accent-ink hover:underline";

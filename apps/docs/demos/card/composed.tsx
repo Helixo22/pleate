@@ -1,4 +1,4 @@
-import { MapPin, Star } from "lucide-react";
+import { Building2, MapPin, Star } from "lucide-react";
 import { Badge } from "pleate/badge";
 import { Button } from "pleate/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardMedia, CardTitle } from "pleate/card";
@@ -6,11 +6,13 @@ import { Grid } from "pleate/grid";
 
 export default function Demo() {
   return (
-    <div className="w-full rounded-3xl bg-bg p-4 md:p-6">
+    <div className="w-full rounded-xl bg-bg p-4 md:p-6">
       <Grid columns={{ base: 1, md: 2 }} gap={4}>
         <Card>
           <CardMedia>
-            <div className="aspect-[16/9] bg-[linear-gradient(135deg,var(--pl-accent-300),var(--pl-accent-700))]" />
+            <div className="grid aspect-[16/9] place-items-center bg-surface-2 text-fg-subtle">
+              <Building2 className="size-8" strokeWidth={1.5} aria-hidden="true" />
+            </div>
           </CardMedia>
           <CardHeader>
             <div className="flex items-center justify-between gap-2">

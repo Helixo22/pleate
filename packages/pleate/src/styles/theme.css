@@ -40,6 +40,7 @@
   --color-fg-subtle: var(--pl-fg-subtle);
   --color-separator: var(--pl-separator);
   --color-border: var(--pl-border);
+  --color-border-strong: var(--pl-border-strong);
 
   --color-accent: var(--pl-accent);
   --color-accent-hover: var(--pl-accent-hover);

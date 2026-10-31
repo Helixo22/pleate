@@ -131,7 +131,7 @@ export function DatePicker(props: DatePickerProps) {
             set(preset.value());
             setOpen(false);
           }}
-          className="pl-focus-ring cursor-pointer rounded-full bg-fill-2 px-3 py-1.5 text-start text-footnote font-medium text-fg transition-colors hover:bg-fill md:rounded-md md:bg-transparent md:text-subhead md:hover:bg-fill-2"
+          className="pl-focus-ring cursor-pointer rounded-md bg-fill-2 px-3 py-1.5 text-start text-footnote font-medium text-fg transition-colors hover:bg-fill md:rounded-md md:bg-transparent md:text-subhead md:hover:bg-fill-2"
         >
           {preset.label}
         </button>
@@ -215,7 +215,7 @@ export function DatePicker(props: DatePickerProps) {
           type="button"
           aria-label={clearLabel}
           onClick={() => set(range ? { from: null, to: null } : null)}
-          className="pl-focus-ring absolute end-2.5 top-1/2 grid size-6 -translate-y-1/2 cursor-pointer place-items-center rounded-full bg-fill text-fg-muted hover:text-fg [&_svg]:size-3"
+          className="pl-focus-ring pl-hit absolute end-2.5 top-1/2 grid size-6 -translate-y-1/2 cursor-pointer place-items-center rounded-xs bg-fill text-fg-muted hover:text-fg [&_svg]:size-3"
         >
           <XIcon strokeWidth={3} />
         </button>

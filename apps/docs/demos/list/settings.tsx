@@ -13,13 +13,13 @@ export default function Demo() {
   const [lang, setLang] = useState("English");
   const [trips, setTrips] = useState(["Weekend in Lisbon", "Kyoto in spring", "Road trip in Andalusia"]);
   return (
-    <div className="w-full max-w-md rounded-3xl bg-bg p-4">
+    <div className="w-full max-w-md rounded-xl bg-bg p-4">
       <List>
         <ListSection>
           <ListItem
             leading={<Avatar name="Sofia Rossi" size="lg" />}
             title={<span className="text-title3">Sofia Rossi</span>}
-            subtitle="Apple Account, iCloud and more"
+            subtitle="Account, plan and devices"
             href="#settings"
           />
         </ListSection>

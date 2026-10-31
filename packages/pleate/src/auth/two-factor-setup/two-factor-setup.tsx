@@ -187,7 +187,7 @@ export function TwoFactorSetup({
           <div className="flex flex-col gap-2 rounded-2xl bg-fill-3 p-3.5">
             <span className="text-footnote text-fg-muted">{l.secretLabel}</span>
             <div className="flex items-center gap-3">
-              <code className="min-w-0 flex-1 font-mono text-subhead font-semibold tracking-wide break-all">{grouped}</code>
+              <code className="min-w-0 flex-1 font-mono text-subhead font-medium tracking-wide break-all">{grouped}</code>
               <CopyButton value={secret.replace(/\s+/g, "")} label={l.copy} copiedLabel={l.copied} />
             </div>
           </div>
@@ -232,7 +232,7 @@ export function TwoFactorSetup({
       {step === "backup" && (
         <>
           <Header step={index} label={l.step(index, 3)} title={l.backupTitle} description={l.backupDescription} />
-          <ul aria-label={l.backupTitle} className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-2xl bg-fill-3 p-4 font-mono text-subhead font-semibold tracking-wide pl-tabular">
+          <ul aria-label={l.backupTitle} className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-2xl bg-fill-3 p-4 font-mono text-subhead font-medium tracking-wide pl-tabular">
             {codes.map((c) => (
               <li key={c} className="text-center">
                 {c}

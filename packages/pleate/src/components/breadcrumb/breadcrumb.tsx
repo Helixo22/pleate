@@ -48,7 +48,7 @@ export function Breadcrumb({ items, maxItems, renderLink, separator, children, l
                     type="button"
                     aria-label="Show full path"
                     onClick={() => setExpanded(true)}
-                    className="pl-focus-ring cursor-pointer rounded-md px-1 text-fg-muted hover:bg-fill-2 hover:text-fg"
+                    className="pl-focus-ring pl-hit relative cursor-pointer rounded-md px-1 text-fg-muted hover:bg-fill-2 hover:text-fg"
                   >
                     …
                   </button>

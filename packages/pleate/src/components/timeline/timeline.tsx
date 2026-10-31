@@ -44,7 +44,7 @@ export function TimelineItem({ title, time, description, icon, status = "done", 
       <span
         aria-hidden="true"
         className={cn(
-          "relative z-[1] mt-0.5 grid size-6 shrink-0 place-items-center rounded-full text-caption2 font-bold [&_svg]:size-3.5",
+          "relative z-[1] mt-0.5 grid size-6 shrink-0 place-items-center rounded-full text-caption2 font-medium [&_svg]:size-3.5",
           status === "done" && t.fill,
           status === "current" && cn("bg-surface ring-2 ring-offset-0", t.ring, t.ink),
           status === "upcoming" && "bg-surface ring-2 ring-separator",
@@ -53,7 +53,7 @@ export function TimelineItem({ title, time, description, icon, status = "done", 
         {icon ?? (status === "done" ? <CheckIcon strokeWidth={3} /> : status === "current" ? <span className={cn("size-2 rounded-full", t.line)} /> : null)}
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        {time && <span className={cn("text-footnote", status === "current" ? cn("font-semibold", t.ink) : "text-fg-muted")}>{time}</span>}
+        {time && <span className={cn("text-footnote", status === "current" ? cn("font-medium", t.ink) : "text-fg-muted")}>{time}</span>}
         <span className={cn("text-headline", status === "upcoming" ? "text-fg-muted" : "text-fg")}>{title}</span>
         {description && <div className="text-subhead text-fg-muted">{description}</div>}
         {children && <div className="mt-2">{children}</div>}

@@ -79,7 +79,7 @@ export function ChatThread({ className, contentClassName, threshold = 80, latest
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.9 }}
             transition={reduced ? { duration: 0.1 } : spring.snap}
-            className="pl-focus-ring absolute start-1/2 bottom-4 grid size-9 -translate-x-1/2 cursor-pointer place-items-center rounded-full bg-elevated text-fg shadow-lg [&_svg]:size-5"
+            className="pl-focus-ring pl-hit absolute start-1/2 bottom-4 grid size-9 -translate-x-1/2 cursor-pointer place-items-center rounded-md bg-elevated text-fg shadow-lg [&_svg]:size-5"
           >
             <ChevronDownIcon strokeWidth={2.5} />
           </motion.button>
@@ -124,7 +124,7 @@ export function Message({
   const reduced = useReducedMotion();
   if (role === "system") {
     return (
-      <div className={cn("self-center rounded-full bg-fill-2 px-3 py-1 text-center text-footnote text-fg-muted", className)} {...props}>
+      <div className={cn("self-center rounded-md bg-fill-2 px-3 py-1 text-center text-footnote text-fg-muted", className)} {...props}>
         {children}
       </div>
     );
@@ -144,7 +144,7 @@ export function Message({
       <div className={cn("flex min-w-0 flex-col gap-1", user ? "items-end" : "items-start", doc ? "flex-1" : "max-w-[min(85%,36rem)]")}>
         {(name || time) && !continued && (
           <div className={cn("flex items-baseline gap-2 px-1 text-footnote", user && "flex-row-reverse")}>
-            {name && <span className="font-semibold text-fg">{name}</span>}
+            {name && <span className="font-medium text-fg">{name}</span>}
             {time && <span className="text-fg-subtle">{time}</span>}
           </div>
         )}

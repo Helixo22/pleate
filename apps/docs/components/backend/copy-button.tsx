@@ -4,7 +4,7 @@ import { Check, Copy } from "lucide-react";
 import { IconButton } from "pleate";
 import { useEffect, useRef, useState } from "react";
 
-export function CopyButton({ text, className, variant = "plain" }: { text: string; className?: string; variant?: "plain" | "gray" }) {
+export function CopyButton({ text, className, variant = "plain" }: { text: string; className?: string; variant?: "plain" | "gray" | "surface" }) {
   const [copied, setCopied] = useState(false);
   const timer = useRef<number>(undefined);
   useEffect(() => () => window.clearTimeout(timer.current), []);

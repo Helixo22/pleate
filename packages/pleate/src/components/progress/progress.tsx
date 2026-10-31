@@ -115,7 +115,7 @@ export function ProgressCircle({ value, max = 100, size = 48, thickness = 4, ton
           className={cn(STROKE[tone], "transition-[stroke-dashoffset] duration-(--pl-duration-slow) ease-ios")}
         />
       </svg>
-      {children && <div className="pl-tabular absolute inset-0 grid place-items-center text-footnote font-semibold">{children}</div>}
+      {children && <div className="pl-tabular absolute inset-0 grid place-items-center text-footnote font-medium">{children}</div>}
     </div>
   );
 }

@@ -1,73 +1,78 @@
-import { ArrowRight, Accessibility, Palette, Sparkles, Waves } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "pleate/button";
 import { CodeLine } from "@/components/page-header";
 import { Showcase } from "@/components/showcase";
 
 const FEATURES = [
-  { icon: Palette, title: "Palettes at runtime", text: "Ten presets, or a full AA-checked palette generated from a single color in OKLCH." },
-  { icon: Waves, title: "Native-feeling motion", text: "Shared springs and iOS easing. Everything stops for reduce motion." },
-  { icon: Accessibility, title: "Accessible by default", text: "Radix primitives, keyboard support, visible focus and AA contrast." },
-  { icon: Sparkles, title: "Solid, not glass", text: "Opaque surfaces and soft shadows. No blur, no transparency tricks." },
+  { title: "Palettes at runtime", text: "Eleven presets, or a full AA-checked palette generated from one color in OKLCH." },
+  { title: "Motion with a reason", text: "One easing curve and short durations. Everything stops for reduced motion." },
+  { title: "Accessible by default", text: "Radix primitives, keyboard support, visible focus and AA contrast." },
+  { title: "Solid surfaces", text: "Hairline borders, no blur, shadows only on things that float." },
 ];
 
 export default function Home() {
   return (
-    <div className="mx-auto max-w-5xl">
-      <section className="pt-4 pb-14 md:pt-10 md:pb-20">
-        <p className="mb-4 text-subhead font-semibold text-accent-ink">pleate · v0.1 · 90+ components</p>
-        <h1 className="max-w-4xl text-display-xl">Interfaces that feel native.</h1>
-        <p className="mt-6 max-w-2xl text-title3 font-normal text-fg-muted">
-          iOS-inspired React components, design tokens and themes for Next.js. Rounded, airy, precise, and yours
-          down to the last color.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Button asChild size="lg">
-            <Link href="/components/button">
-              Browse components <ArrowRight />
-            </Link>
-          </Button>
-          <Button asChild size="lg" variant="tinted">
-            <Link href="/examples/landing">Example landing page</Link>
-          </Button>
-          <Button asChild size="lg" variant="plain">
-            <Link href="/theming">Theming</Link>
-          </Button>
-        </div>
-      </section>
-
-      <Showcase />
-
-      <section className="mt-20 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {FEATURES.map(({ icon: Icon, title, text }) => (
-          <div key={title} className="rounded-3xl bg-surface p-6 shadow-xs">
-            <span className="mb-4 grid size-10 place-items-center rounded-xl bg-accent-soft text-accent-ink">
-              <Icon className="size-5" />
-            </span>
-            <h2 className="text-headline">{title}</h2>
-            <p className="mt-1.5 text-subhead text-fg-muted">{text}</p>
+    <div className="mx-auto max-w-6xl">
+      <section className="grid items-center gap-10 pt-2 pb-16 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:pt-6">
+        <div>
+          <p className="mb-4 font-mono text-caption1 text-fg-subtle">pleate 0.1 · 100+ components</p>
+          <h1 className="text-display">React components for Next.js, with a backend to match</h1>
+          <p className="mt-5 max-w-xl text-[1.0625rem] leading-7 text-fg-muted">
+            Tokens, themes and accessible components on Radix and Tailwind v4, plus a Django and MongoDB backend
+            for auth, billing and AI chat that speaks to the same UI.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-2">
+            <Button asChild size="lg">
+              <Link href="/components/button">
+                Browse components <ArrowRight />
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="plain" tone="neutral">
+              <Link href="/examples/landing">Example landing page</Link>
+            </Button>
           </div>
-        ))}
+        </div>
+        <Showcase />
       </section>
 
-      <section className="mt-20 grid gap-4">
-        <h2 className="text-title1">Get started</h2>
-        <CodeLine>{"npm install pleate"}</CodeLine>
-        <CodeLine>{`/* app/globals.css */
+      <section className="border-t border-separator">
+        <ol className="grid sm:grid-cols-2">
+          {FEATURES.map(({ title, text }, i) => (
+            <li key={title} className="flex gap-4 border-b border-separator py-5 sm:odd:pe-8 sm:even:ps-8 sm:even:border-s">
+              <span className="font-mono text-caption1 text-fg-subtle pt-1">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <h2 className="text-headline">{title}</h2>
+                <p className="mt-1 text-subhead text-fg-muted">{text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="mt-16 grid gap-3 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-10">
+        <div>
+          <h2 className="text-title1">Get started</h2>
+          <p className="mt-2 text-subhead text-fg-muted">Install, import the styles, wrap the app.</p>
+        </div>
+        <div className="grid gap-3">
+          <CodeLine>{"npm install pleate"}</CodeLine>
+          <CodeLine>{`/* app/globals.css */
 @import "tailwindcss";
 @import "pleate/styles.css";
 @source "../node_modules/pleate/dist";`}</CodeLine>
-        <CodeLine>{`// app/layout.tsx
+          <CodeLine>{`// app/layout.tsx
 import { ThemeProvider, ThemeScript } from "pleate/theme";
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head><ThemeScript defaultPalette="blue" /></head>
-      <body><ThemeProvider defaultPalette="blue">{children}</ThemeProvider></body>
+      <head><ThemeScript /></head>
+      <body><ThemeProvider>{children}</ThemeProvider></body>
     </html>
   );
 }`}</CodeLine>
+        </div>
       </section>
     </div>
   );

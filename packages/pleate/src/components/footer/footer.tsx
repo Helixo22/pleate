@@ -40,7 +40,7 @@ export function FooterColumn({ title, children, className }: { title: ReactNode;
   // server render is already right on desktop).
   return (
     <div className={cn("border-b border-separator md:border-0", className)}>
-      <h3 className="text-footnote font-semibold text-fg">
+      <h3 className="text-footnote font-medium text-fg">
         <button
           type="button"
           aria-expanded={open}
@@ -55,7 +55,7 @@ export function FooterColumn({ title, children, className }: { title: ReactNode;
         </button>
         <span className="hidden pb-3 md:block">{title}</span>
       </h3>
-      <ul id={id} className={cn("flex-col gap-2.5 pb-4 md:flex md:pb-0", open ? "flex" : "hidden")}>
+      <ul id={id} className={cn("flex-col gap-2.5 pb-4 pointer-coarse:gap-0 md:flex md:pb-0", open ? "flex" : "hidden")}>
         {children}
       </ul>
     </div>
@@ -68,7 +68,7 @@ export function FooterLink({ className, asChild, ...props }: FooterLinkProps) {
   const Comp = asChild ? Slot.Root : "a";
   return (
     <li>
-      <Comp className={cn("pl-focus-ring rounded-xs text-fg-muted transition-colors hover:text-fg hover:underline", className)} {...props} />
+      <Comp className={cn("pl-focus-ring rounded-xs text-fg-muted pointer-coarse:inline-flex pointer-coarse:min-h-11 pointer-coarse:items-center transition-colors hover:text-fg hover:underline", className)} {...props} />
     </li>
   );
 }

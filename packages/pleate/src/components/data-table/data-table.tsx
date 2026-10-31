@@ -158,12 +158,12 @@ export function DataTable<T>({
   const showPagination = page !== undefined && pageCount !== undefined && pageCount > 0 && onPageChange;
 
   return (
-    <div className={cn("flex w-full min-w-0 flex-col overflow-hidden rounded-2xl bg-surface shadow-xs", className)}>
+    <div className={cn("flex w-full min-w-0 flex-col overflow-hidden pl-field [--pl-field-border:var(--pl-separator)] rounded-2xl bg-surface", className)}>
       {hasToolbar && (
         <div className="flex flex-wrap items-center gap-2 border-b border-separator p-3">
           {selectable && selected.size > 0 ? (
             <div className="flex min-h-10 flex-1 flex-wrap items-center gap-2">
-              <span className="px-1 text-subhead font-semibold text-fg pl-tabular" aria-live="polite">
+              <span className="px-1 text-subhead font-medium text-fg pl-tabular" aria-live="polite">
                 {l.selected(selected.size)}
               </span>
               {selectionActions}

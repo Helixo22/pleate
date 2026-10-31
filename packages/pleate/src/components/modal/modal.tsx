@@ -21,8 +21,8 @@ const contentVariants = cva(
   {
     variants: {
       mobile: {
-        sheet: "max-md:pl-dialog-sheet inset-x-0 bottom-0 max-h-[94dvh] rounded-t-3xl pb-(--pl-safe-bottom) md:pl-dialog",
-        center: "pl-dialog inset-x-4 top-1/2 max-h-[88dvh] -translate-y-1/2 rounded-3xl",
+        sheet: "max-md:pl-dialog-sheet inset-x-0 bottom-0 max-h-[94dvh] rounded-t-xl pb-(--pl-safe-bottom) md:pl-dialog",
+        center: "pl-dialog inset-x-4 top-1/2 max-h-[88dvh] -translate-y-1/2 rounded-xl",
       },
       size: {
         sm: "md:max-w-sm",
@@ -37,13 +37,13 @@ const contentVariants = cva(
 );
 
 const desktop =
-  "md:inset-x-auto md:start-1/2 md:top-1/2 md:bottom-auto md:w-[calc(100%-3rem)] md:max-h-[85dvh] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-3xl md:pb-0 rtl:md:translate-x-1/2";
+  "md:inset-x-auto md:start-1/2 md:top-1/2 md:bottom-auto md:w-[calc(100%-3rem)] md:max-h-[85dvh] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-xl md:pb-0 rtl:md:translate-x-1/2";
 
 const ModalContext = createContext<{ mobile: "sheet" | "center" }>({ mobile: "sheet" });
 
 export type ModalContentProps = ComponentProps<typeof Dialog.Content> &
   VariantProps<typeof contentVariants> & {
-    /** Round × in the top corner. */
+    /** × button in the top corner. */
     showClose?: boolean;
     closeLabel?: string;
   };
@@ -54,10 +54,10 @@ export function ModalContent({ className, size, mobile = "sheet", showClose = tr
       <Dialog.Overlay className={overlayBackdrop} />
       <Dialog.Content className={cn(contentVariants({ size, mobile }), desktop, size === "full" && "md:h-[85dvh]", className)} {...props}>
         <ModalContext.Provider value={{ mobile: mobile ?? "sheet" }}>
-          {mobile === "sheet" && <div aria-hidden="true" className="mx-auto mt-2 h-1.5 w-9 shrink-0 rounded-full bg-fill md:hidden" />}
+          {mobile === "sheet" && <div aria-hidden="true" className="mx-auto mt-2 h-1 w-8 shrink-0 rounded-full bg-fill md:hidden" />}
           {children}
           {showClose && (
-            <Dialog.Close className={cn(closeButton, "absolute end-4 top-4")} aria-label={closeLabel}>
+            <Dialog.Close className={cn(closeButton, "absolute end-3 top-3")} aria-label={closeLabel}>
               <XIcon strokeWidth={2.5} />
             </Dialog.Close>
           )}
@@ -71,7 +71,7 @@ type DivProps = HTMLAttributes<HTMLDivElement>;
 
 export function ModalHeader({ className, ...props }: DivProps) {
   const { mobile } = useContext(ModalContext);
-  return <div className={cn("flex shrink-0 flex-col gap-1.5 px-6 pt-6 pe-14 pb-2", mobile === "sheet" && "max-md:pt-3", className)} {...props} />;
+  return <div className={cn("flex shrink-0 flex-col gap-1 px-5 pt-5 pe-12 pb-2", mobile === "sheet" && "max-md:pt-3", className)} {...props} />;
 }
 
 export function ModalTitle({ className, ...props }: ComponentProps<typeof Dialog.Title>) {
@@ -83,13 +83,13 @@ export function ModalDescription({ className, ...props }: ComponentProps<typeof 
 }
 
 export function ModalBody({ className, ...props }: DivProps) {
-  return <div className={cn("min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-3 text-body", className)} {...props} />;
+  return <div className={cn("min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-3 text-body", className)} {...props} />;
 }
 
 export function ModalFooter({ className, ...props }: DivProps) {
   return (
     <div
-      className={cn("flex shrink-0 flex-col-reverse gap-2 px-6 pt-3 pb-6 md:flex-row md:justify-end [&>*]:max-md:w-full", className)}
+      className={cn("mt-2 flex shrink-0 flex-col-reverse gap-2 border-t border-separator bg-surface-2 px-5 py-3.5 md:flex-row md:justify-end [&>*]:max-md:w-full", className)}
       {...props}
     />
   );

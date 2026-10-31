@@ -21,8 +21,7 @@ export function PopoverContent({ className, sideOffset = 8, collisionPadding = 8
         collisionPadding={collisionPadding}
         align={align}
         className={cn(
-          "pl-pop z-(--pl-z-dropdown) w-72 max-w-[calc(100vw-1rem)] rounded-2xl bg-elevated p-4 text-fg shadow-xl outline-none",
-          "[--radix-popper-transform-origin:var(--radix-popover-content-transform-origin)]",
+          "pl-pop z-(--pl-z-dropdown) w-72 max-w-[calc(100vw-1rem)] rounded-lg bg-elevated p-3 text-fg shadow-lg outline-none",
           className,
         )}
         {...props}

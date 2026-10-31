@@ -204,7 +204,7 @@ export function OTPInput({
           onPaste={(event) => onPaste(i, event)}
           onFocus={(event) => event.target.select()}
           className={cn(
-            "w-full min-w-0 bg-fill-2 text-center font-semibold text-fg caret-accent outline-2 outline-offset-2 outline-transparent pl-tabular",
+            "w-full min-w-0 bg-fill-2 text-center font-medium text-fg caret-accent outline-2 outline-offset-2 outline-transparent pl-tabular",
             "transition-[background-color,box-shadow,outline-color] duration-(--pl-duration-fast) ease-ios",
             "focus:bg-surface focus:shadow-[inset_0_0_0_1.5px_var(--pl-accent)] focus:outline-ring/40 disabled:cursor-not-allowed",
             ch && "bg-surface shadow-[inset_0_0_0_1px_var(--pl-border)]",

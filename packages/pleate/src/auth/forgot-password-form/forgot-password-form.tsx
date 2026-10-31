@@ -35,7 +35,7 @@ const L = {
   sentDescription: (email: string): ReactNode =>
     email ? (
       <>
-        If an account exists for <span className="font-semibold text-fg">{email}</span>, a link to reset the password is on its way.
+        If an account exists for <span className="font-medium text-fg">{email}</span>, a link to reset the password is on its way.
       </>
     ) : (
       "If an account exists for that address, a link to reset the password is on its way."

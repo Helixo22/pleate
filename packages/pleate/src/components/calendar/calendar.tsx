@@ -148,7 +148,7 @@ export function Calendar(props: CalendarProps) {
   const canPrev = !min || compareDay(startOfMonth(month), startOfMonth(min)) > 0;
   const canNext = !max || compareDay(startOfMonth(month), startOfMonth(max)) < 0;
   const navButton =
-    "pl-focus-ring grid size-9 cursor-pointer place-items-center rounded-full text-accent-ink transition-colors hover:bg-fill-2 disabled:pointer-events-none disabled:opacity-30";
+    "pl-focus-ring grid size-9 cursor-pointer place-items-center rounded-md text-accent-ink transition-colors hover:bg-fill-2 disabled:pointer-events-none disabled:opacity-30";
 
   return (
     <div className={cn("w-full max-w-[20rem] select-none", className)}>
@@ -166,7 +166,7 @@ export function Calendar(props: CalendarProps) {
       <div role="grid" aria-label={title} ref={grid} onKeyDown={onKeyDown} className="-m-1 overflow-hidden p-1">
         <div role="row" className="grid grid-cols-7">
           {weekdays.map((d) => (
-            <span key={d.getDay()} role="columnheader" aria-label={fmt.weekdayLong.format(d)} className="py-1 text-center text-caption1 font-semibold text-fg-subtle uppercase">
+            <span key={d.getDay()} role="columnheader" aria-label={fmt.weekdayLong.format(d)} className="py-1 text-center text-caption1 font-medium text-fg-subtle">
               {fmt.weekday.format(d)}
             </span>
           ))}
@@ -218,11 +218,11 @@ export function Calendar(props: CalendarProps) {
                         }}
                         onMouseEnter={() => range && setHover(d)}
                         className={cn(
-                          "pl-focus-ring pl-tabular grid size-10 cursor-pointer place-items-center rounded-full text-body transition-colors duration-(--pl-duration-instant)",
+                          "pl-focus-ring pl-tabular grid size-10 cursor-pointer place-items-center rounded-md text-body transition-colors duration-(--pl-duration-instant)",
                           outside && "text-fg-subtle",
                           !selected && !off && "hover:bg-fill-2",
-                          today && sameDay(d, today) && !selected && "font-semibold text-accent-ink",
-                          selected && "bg-accent font-semibold text-on-accent",
+                          today && sameDay(d, today) && !selected && "font-medium text-accent-ink",
+                          selected && "bg-accent font-medium text-on-accent",
                           off && "cursor-not-allowed text-fg-subtle line-through decoration-fg-subtle/60",
                           outside && !selected && "opacity-60",
                         )}

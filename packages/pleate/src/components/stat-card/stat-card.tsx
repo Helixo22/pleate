@@ -3,7 +3,7 @@
 "use client";
 
 import { animate, useInView } from "motion/react";
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";
 import { useReducedMotion } from "../../motion/use-reduced-motion.ts";
 
@@ -29,7 +29,6 @@ export type StatCardProps = {
 const percent = new Intl.NumberFormat(undefined, { style: "percent", maximumFractionDigits: 1, signDisplay: "always" });
 
 function Sparkline({ data, className }: { data: number[]; className?: string }) {
-  const id = useId();
   if (data.length < 2) return null;
   const min = Math.min(...data);
   const max = Math.max(...data);
@@ -38,13 +37,6 @@ function Sparkline({ data, className }: { data: number[]; className?: string }) 
   const line = points.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(2)} ${y.toFixed(2)}`).join(" ");
   return (
     <svg viewBox="0 0 100 32" preserveAspectRatio="none" className={cn("h-10 w-full overflow-visible", className)} aria-hidden="true">
-      <defs>
-        <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor="currentColor" stopOpacity="0.22" />
-          <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path d={`${line} L100 32 L0 32 Z`} fill={`url(#${id})`} />
       <path d={line} fill="none" stroke="currentColor" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
     </svg>
   );
@@ -66,6 +58,8 @@ export function StatCard({
   const inView = useInView(ref, { once: true, margin: "-10% 0px" });
   const reduced = useReducedMotion();
   const [shown, setShown] = useState(animated ? 0 : value);
+  // Later updates tween from the number on screen, not from zero.
+  const last = useRef(0);
 
   useEffect(() => {
     if (!animated || reduced) {
@@ -73,16 +67,23 @@ export function StatCard({
       return;
     }
     if (!inView) return;
-    const controls = animate(0, value, { duration: 1.1, ease: [0.22, 1, 0.36, 1], onUpdate: setShown });
+    const controls = animate(last.current, value, {
+      duration: last.current ? 0.6 : 1.1,
+      ease: [0.22, 1, 0.36, 1],
+      onUpdate: (v) => {
+        last.current = v;
+        setShown(v);
+      },
+    });
     return () => controls.stop();
   }, [animated, reduced, inView, value]);
 
   const good = delta === undefined ? null : invertTrend ? delta <= 0 : delta >= 0;
   return (
-    <div ref={ref} className={cn("flex flex-col gap-3 rounded-2xl bg-surface p-5 shadow-xs", className)}>
+    <div ref={ref} className={cn("flex flex-col gap-3 pl-field [--pl-field-border:var(--pl-separator)] rounded-2xl bg-surface p-5", className)}>
       <div className="flex items-center justify-between gap-3">
         <span className="text-subhead font-medium text-fg-muted">{label}</span>
-        {icon && <span className="grid size-8 place-items-center rounded-lg bg-accent-soft text-accent-ink [&_svg]:size-[1.125rem]">{icon}</span>}
+        {icon && <span className="grid size-8 place-items-center rounded-md bg-fill-2 text-fg-muted [&_svg]:size-[1.125rem]">{icon}</span>}
       </div>
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="pl-tabular text-large-title tracking-tight text-fg">
@@ -94,7 +95,7 @@ export function StatCard({
           <span className="flex items-center gap-1 text-footnote">
             <span
               className={cn(
-                "pl-tabular inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 font-semibold",
+                "pl-tabular inline-flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 font-medium",
                 good ? "bg-success-soft text-success-ink" : "bg-danger-soft text-danger-ink",
               )}
             >

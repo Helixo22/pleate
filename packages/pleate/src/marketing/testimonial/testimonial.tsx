@@ -31,13 +31,13 @@ function Stars({ rating }: { rating: number }) {
 
 export function TestimonialCard({ quote, name, role, avatar, rating, className }: Testimonial & { className?: string }) {
   return (
-    <figure className={cn("flex flex-col gap-4 rounded-3xl bg-surface p-6 shadow-xs", className)}>
+    <figure className={cn("flex flex-col gap-4 pl-field [--pl-field-border:var(--pl-separator)] rounded-xl bg-surface p-6", className)}>
       {rating !== undefined && <Stars rating={rating} />}
       <blockquote className="text-body text-pretty text-fg">{quote}</blockquote>
       <figcaption className="mt-auto flex items-center gap-3">
         <Avatar src={avatar} name={name} size="md" />
         <span className="flex min-w-0 flex-col">
-          <span className="truncate text-subhead font-semibold">{name}</span>
+          <span className="truncate text-subhead font-medium">{name}</span>
           {role && <span className="truncate text-footnote text-fg-muted">{role}</span>}
         </span>
       </figcaption>
@@ -79,7 +79,7 @@ export function Testimonials({ items, layout = "grid", label = "Testimonials", c
       if (el) el.scrollBy({ left: dir * el.clientWidth * 0.85, behavior: "smooth" });
     };
     const arrow =
-      "pl-focus-ring grid size-10 cursor-pointer place-items-center rounded-full bg-surface text-fg shadow-sm transition-colors hover:bg-surface-2 [&_svg]:size-5";
+      "pl-focus-ring pl-hit relative grid size-10 cursor-pointer place-items-center rounded-md pl-field bg-surface text-fg transition-colors hover:bg-surface-2 [&_svg]:size-5";
     return (
       <div className={cn("flex flex-col gap-5", className)}>
         <ul

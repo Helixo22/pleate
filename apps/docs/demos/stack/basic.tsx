@@ -1,7 +1,7 @@
 import { HStack, Stack, VStack } from "pleate/stack";
 
 const Box = ({ children }: { children: React.ReactNode }) => (
-  <div className="grid h-12 min-w-16 place-items-center rounded-lg bg-accent-soft px-4 text-subhead font-semibold text-accent-ink">{children}</div>
+  <div className="grid h-12 min-w-16 place-items-center rounded-lg bg-accent-soft px-4 text-subhead font-medium text-accent-ink">{children}</div>
 );
 
 export default function Demo() {

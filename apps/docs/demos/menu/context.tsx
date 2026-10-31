@@ -4,7 +4,7 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator,
 export default function Demo() {
   return (
     <ContextMenu>
-      <ContextMenuTrigger className="grid h-40 w-full max-w-sm place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--pl-accent-200),var(--pl-accent-500))] text-center text-headline text-accent-950">
+      <ContextMenuTrigger className="grid h-40 w-full max-w-sm place-items-center rounded-lg border border-dashed border-border bg-surface-2 text-center text-subhead text-fg-muted">
         Right-click or long-press
       </ContextMenuTrigger>
       <ContextMenuContent>

@@ -1,4 +1,4 @@
-// <Toaster />: renders the toasts queued with toast(). iOS-style notifications, solid rounded cards with an icon,
+// <Toaster />: renders the toasts queued with toast(). compact bordered cards with a status glyph,
 // title, description and an optional action, stacked newest first, at the top center by default (like a banner
 // dropping in) or in a corner. Timers pause on hover and focus; swipe or drag a toast away to dismiss it.
 // Mount it once, near the root of the app.
@@ -26,20 +26,23 @@ export type ToasterProps = {
 };
 
 const TONE: Record<Exclude<ToastTone, "loading" | "default">, { className: string; path: string }> = {
-  success: { className: "bg-success-vivid", path: "M7.5 12.5l3 3 6-6.5" },
-  error: { className: "bg-danger", path: "M9 9l6 6M15 9l-6 6" },
-  warning: { className: "bg-warning", path: "M12 7.5v5.5M12 16.5h.01" },
-  info: { className: "bg-info", path: "M12 8h.01M11 11.5h1v5h1" },
+  success: { className: "text-success-ink", path: "M8 12.5l2.75 2.75L16 9.5" },
+  error: { className: "text-danger-ink", path: "M9 9l6 6M15 9l-6 6" },
+  warning: { className: "text-warning-ink", path: "M12 7.5v5.5M12 16.5v.01" },
+  info: { className: "text-info-ink", path: "M12 8v.01M11 11.5h1v5h1" },
 };
 
 function ToneIcon({ tone }: { tone: ToastTone }) {
   if (tone === "loading") return <Spinner size="md" label={null} className="text-fg-muted" />;
   if (tone === "default") return null;
   const t = TONE[tone];
+  // The ring draws first, then the glyph: a status that arrives, not one that was already there.
+  const draw = (delay: number) => ({ pathLength: { duration: 0.4, delay, ease: [0.22, 1, 0.36, 1] as const }, opacity: { duration: 0.1, delay } });
   return (
-    <span className={cn("grid size-7 shrink-0 place-items-center rounded-full text-on-status", t.className)} aria-hidden="true">
-      <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-        <path d={t.path} />
+    <span className={cn("grid size-5 shrink-0 place-items-center", t.className)} aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <motion.circle cx="12" cy="12" r="9" initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }} transition={draw(0.05)} style={{ rotate: -90 }} />
+        <motion.path d={t.path} initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }} transition={draw(0.3)} />
       </svg>
     </span>
   );
@@ -93,11 +96,11 @@ function ToastItem({ data, position, duration, closeLabel }: { data: ToastData; 
       onPointerLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
-      className="group pointer-events-auto relative flex w-full touch-none items-center gap-3 rounded-2xl bg-elevated p-3 ps-3.5 text-fg shadow-xl select-none"
+      className="group pointer-events-auto relative flex w-full touch-none items-center gap-3 rounded-lg bg-elevated p-3 ps-3.5 text-fg shadow-lg select-none"
     >
       {data.icon ?? <ToneIcon tone={tone} />}
       <div className="flex min-w-0 flex-1 flex-col">
-        <p className="text-subhead font-semibold">{data.title}</p>
+        <p className="text-subhead font-medium">{data.title}</p>
         {data.description && <p className="text-footnote text-fg-muted">{data.description}</p>}
       </div>
       {data.action && (
@@ -107,7 +110,7 @@ function ToastItem({ data, position, duration, closeLabel }: { data: ToastData; 
             data.action!.onClick();
             toast.dismiss(data.id);
           }}
-          className="pl-focus-ring shrink-0 cursor-pointer rounded-full bg-accent-soft px-3 py-1.5 text-footnote font-semibold text-accent-ink hover:bg-accent-soft-hover"
+          className="pl-focus-ring shrink-0 cursor-pointer rounded-sm bg-accent-soft px-2.5 py-1 text-footnote font-medium text-accent-ink hover:bg-accent-soft-hover"
         >
           {data.action.label}
         </button>
@@ -117,7 +120,7 @@ function ToastItem({ data, position, duration, closeLabel }: { data: ToastData; 
           type="button"
           aria-label={closeLabel}
           onClick={() => toast.dismiss(data.id)}
-          className="pl-focus-ring absolute -start-2 -top-2 grid size-6 cursor-pointer place-items-center rounded-full bg-elevated text-fg-muted opacity-0 shadow-md transition-opacity group-hover:opacity-100 focus-visible:opacity-100 [&_svg]:size-3"
+          className="pl-focus-ring absolute -start-2 -top-2 grid size-6 cursor-pointer place-items-center rounded-xs bg-elevated text-fg-muted opacity-0 shadow-md transition-opacity group-hover:opacity-100 focus-visible:opacity-100 [&_svg]:size-3"
         >
           <XIcon strokeWidth={3} />
         </button>

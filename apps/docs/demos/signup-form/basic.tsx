@@ -17,7 +17,7 @@ export default function Demo() {
     toast.success("Account created", { description: `Check ${values.email} to confirm it.` });
   };
   return (
-    <div className="grid w-full place-items-center rounded-3xl sm:bg-bg sm:px-4 sm:py-10">
+    <div className="grid w-full place-items-center rounded-xl sm:bg-bg sm:px-4 sm:py-10">
       <AuthCard
         title="Create your Plate account"
         description="Free for households up to six people."

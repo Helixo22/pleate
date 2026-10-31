@@ -27,7 +27,7 @@ import { ThemeSwitch } from "@/components/theme-controls";
 
 function Brand() {
   return (
-    <Link href="/examples/landing" className="pl-focus-ring flex items-center gap-2 rounded-md text-headline font-bold">
+    <Link href="/examples/landing" className="pl-focus-ring flex items-center gap-2 rounded-md text-headline font-semibold">
       <span aria-hidden className="grid size-7 place-items-center rounded-[30%] bg-accent text-on-accent">
         <Compass className="size-4" />
       </span>
@@ -39,7 +39,7 @@ function Brand() {
 function PhoneMockup() {
   return (
     <div className="mx-auto w-full max-w-[19rem] rounded-[3rem] bg-fg p-2.5 shadow-xl">
-      <div data-theme="light" className="flex h-[36rem] flex-col overflow-hidden rounded-[2.4rem] bg-bg">
+      <div data-theme="light" className="flex h-[36rem] flex-col overflow-hidden rounded-[1.75rem] bg-bg">
         <div className="px-5 pt-10 pb-3">
           <p className="text-footnote font-semibold text-fg-muted">Fri 12 June</p>
           <p className="text-large-title">Lisbon</p>
@@ -98,7 +98,7 @@ export function Landing() {
       <Hero
         layout="split"
         background="wash"
-        eyebrow={<a href="#assistant">New · Plan with an assistant <ArrowRight className="inline size-3.5" /></a>}
+        eyebrow={<a href="#assistant">Trip assistant, now in every plan</a>}
         title={
           <>
             Weekend in <RotatingText words={["Lisbon", "Kyoto", "Naples", "Oaxaca"]} pillClassName="text-accent-ink" />
@@ -121,7 +121,7 @@ export function Landing() {
         <p className="mb-6 text-center text-footnote font-semibold text-fg-muted">Trusted by travel partners across 30 countries</p>
         <LogoMarquee label="Partners">
           {PARTNERS.map((n) => (
-            <span key={n} className="text-title3 font-bold whitespace-nowrap text-fg-subtle">{n}</span>
+            <span key={n} className="text-title3 font-semibold whitespace-nowrap text-fg-subtle">{n}</span>
           ))}
         </LogoMarquee>
       </Container>
@@ -137,7 +137,7 @@ export function Landing() {
               title: "One live itinerary",
               description: "Flights, stays and plans in a single timeline everyone can edit, and it works offline.",
               media: (
-                <div className="flex h-56 items-end justify-center gap-3 bg-[linear-gradient(180deg,transparent,var(--pl-accent-soft))] px-6">
+                <div className="flex h-56 items-end justify-center gap-3 bg-accent-soft px-6">
                   {["Belém", "Sintra", "Alfama"].map((d, i) => (
                     <div key={d} className="w-28 rounded-t-2xl bg-surface p-3 shadow-md" style={{ height: `${7 + i * 2}rem` }}>
                       <p className="text-caption1 text-fg-muted">Day {i + 1}</p>
@@ -173,7 +173,7 @@ export function Landing() {
 
       <Section spacing="lg">
         <ScrollRevealText
-          className="mx-auto max-w-4xl text-title1 leading-tight font-bold md:text-[2.75rem] md:leading-[1.15]"
+          className="mx-auto max-w-4xl text-title1 leading-tight font-semibold md:text-[2.75rem] md:leading-[1.15]"
           text="The best trips are the ones where nobody had to be the organiser. Everyone sees the plan, everyone can change it, and the app quietly keeps it all in order."
         />
       </Section>

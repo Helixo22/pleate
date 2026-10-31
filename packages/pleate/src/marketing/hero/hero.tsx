@@ -63,13 +63,13 @@ export function Hero({
       {background === "wash" && (
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,var(--pl-accent-soft),transparent_70%)]"
+          className="absolute inset-0 -z-10 border-b border-separator bg-surface-2"
         />
       )}
       <Container size={container} className={cn("grid items-center gap-12", split ? "lg:grid-cols-[1.05fr_1fr] lg:gap-16" : "justify-items-center text-center")}>
         <div className={cn("flex flex-col gap-6", split ? "items-start" : "max-w-4xl items-center")}>
           {eyebrow && (
-            <motion.div {...item(0)} className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-3.5 py-1.5 text-footnote font-semibold text-accent-ink [&_a]:pl-focus-ring">
+            <motion.div {...item(0)} className="inline-flex items-center gap-2 font-mono text-caption1 text-fg-subtle [&_a]:pl-focus-ring [&_a]:text-accent-ink">
               {eyebrow}
             </motion.div>
           )}

@@ -114,7 +114,7 @@ export function SidebarGroup({ className, label, children, ...props }: DivProps 
   return (
     <div role="group" aria-label={typeof label === "string" ? label : undefined} className={cn("flex flex-col", className)} {...props}>
       {label && (
-        <p className={cn("px-3 pb-1.5 text-footnote font-semibold text-fg-muted", collapsed && "sr-only")}>{label}</p>
+        <p className={cn("px-3 pb-1.5 text-footnote font-medium text-fg-muted", collapsed && "sr-only")}>{label}</p>
       )}
       <ul className="flex flex-col gap-px">{children}</ul>
     </div>
@@ -128,7 +128,7 @@ const itemVariants = cva(
   ],
   {
     variants: {
-      active: { true: "font-semibold", false: "text-fg hover:bg-fill-2" },
+      active: { true: "font-medium", false: "text-fg hover:bg-fill-2" },
       selection: { soft: "", filled: "" },
       collapsed: { true: "justify-center px-0", false: "" },
     },

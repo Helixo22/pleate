@@ -8,7 +8,7 @@ export default function ThemingPage() {
   return (
     <div className="mx-auto max-w-5xl">
       <PageHeader eyebrow="Getting started" title="Theming">
-        Light, dark or system. Ten palettes, or your own from a single color: pleate derives fills, inks and a full
+        Light, dark or system. Eleven palettes, or your own from a single color: pleate derives fills, inks and a full
         tonal scale in OKLCH and checks every pair for WCAG AA contrast.
       </PageHeader>
       <ThemingPlayground />

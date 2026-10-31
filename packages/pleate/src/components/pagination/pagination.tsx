@@ -68,7 +68,7 @@ export function Pagination({
   const box = size === "sm" ? "h-8 min-w-8 text-footnote" : "h-9 min-w-9 text-subhead sm:h-10 sm:min-w-10";
   const cell = (target: number, content: ReactNode, extra: { label?: string; current?: boolean; disabled?: boolean; className?: string } = {}) => {
     const classes = cn(
-      "pl-focus-ring pl-touch inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full px-2 font-semibold pl-tabular",
+      "pl-focus-ring pl-touch pl-hit relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-md px-2 font-medium pl-tabular",
       "transition-colors duration-(--pl-duration-fast)",
       box,
       extra.current ? "bg-accent text-on-accent" : "text-fg hover:bg-fill-2",
@@ -93,7 +93,7 @@ export function Pagination({
   if (variant === "dots") {
     return (
       <nav aria-label={label} className={cn("flex items-center justify-center", className)}>
-        <ul className="flex items-center gap-2 rounded-full px-2 py-1.5">
+        <ul className="flex items-center gap-2 rounded-md px-2 py-1.5">
           {Array.from({ length: pageCount }, (_, i) => {
             const p = i + 1;
             const current = p === page;

@@ -1,9 +1,8 @@
-// Spinner: the iOS activity indicator (8 fading spokes) in currentColor. Announces itself as a status with a label.
-import type { CSSProperties, HTMLAttributes } from "react";
+// Spinner: a thin ring with a rotating arc in currentColor. Announces itself as a status with a label.
+import type { HTMLAttributes } from "react";
 import { cn } from "../../lib/cn.ts";
 
 const SIZES = { xs: 14, sm: 16, md: 20, lg: 28, xl: 40 } as const;
-const SPOKES = 8;
 
 export type SpinnerProps = HTMLAttributes<HTMLSpanElement> & {
   size?: keyof typeof SIZES | number;
@@ -20,19 +19,10 @@ export function Spinner({ size = "md", label = "Loading", className, style, ...p
       style={{ width: px, height: px, ...style }}
       {...props}
     >
-      {Array.from({ length: SPOKES }, (_, i) => (
-        <span
-          key={i}
-          className="absolute top-0 left-[45.5%] h-[29%] w-[9%] rounded-full bg-current opacity-20"
-          style={
-            {
-              transform: `rotate(${(i * 360) / SPOKES}deg)`,
-              transformOrigin: "50% 172%",
-              animation: `pl-spoke 0.8s linear ${((i - SPOKES) * 0.8) / SPOKES}s infinite`,
-            } as CSSProperties
-          }
-        />
-      ))}
+      <svg viewBox="0 0 24 24" className="size-full animate-[pl-spin_0.7s_linear_infinite]" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <circle cx="12" cy="12" r="9.5" opacity="0.2" />
+        <path d="M21.5 12a9.5 9.5 0 0 0-9.5-9.5" strokeLinecap="round" />
+      </svg>
     </span>
   );
 }
