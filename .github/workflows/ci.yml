@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build -w pleate
+      - run: npm run build -w pleate-client
+      - run: npm run typecheck
+      - run: npx vitest run
+        working-directory: packages/pleate-client
+        env:
+          NODE_ENV: test
+      - run: npm run build -w docs
+
+  python:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/pleate-backend
+    env:
+      PLEATE_TEST_MONGO_URI: mongodb://localhost:27027/?directConnection=true
+    steps:
+      - uses: actions/checkout@v4
+      # Single node replica set from docker-compose.yml; --wait blocks on its healthcheck (rs.initiate).
+      - run: docker compose up -d --wait mongo
+        working-directory: .
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync
+      - run: uv run ruff check .
+      - run: uv run pytest -q

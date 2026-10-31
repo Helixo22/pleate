@@ -17,6 +17,9 @@ import hashlib
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
+from django.utils.translation import gettext as _
+
+from pleate_backend.core.exceptions import ApiError
 
 from .models import Feature, ObjectPermission, RoleInfo
 
@@ -202,6 +205,20 @@ def assign_default_roles(user) -> list[str]:
         user.groups.add(*groups)
         _clear_perm_cache(user)
     return [g.name for g in groups]
+
+
+def ensure_can_grant(user, perms) -> None:
+    """Refuse (403) when a non-superuser hands out a permission it does not hold itself."""
+    if user.is_superuser:
+        return
+    if set(perms) - user.get_all_permissions():
+        raise ApiError("permission_not_held", _("You can only grant permissions you have yourself."), 403)
+
+
+def ensure_can_assign(user, groups) -> None:
+    """Same check for every permission of ``groups`` (roles given, taken or edited)."""
+    by_group = permissions_by_group([g.pk for g in groups])
+    ensure_can_grant(user, [p for names in by_group.values() for p in names])
 
 
 def global_permissions(user) -> list[str]:

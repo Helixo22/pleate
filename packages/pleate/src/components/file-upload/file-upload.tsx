@@ -6,8 +6,9 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useId, useMemo, useRef, useState, type DragEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type DragEvent, type ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";
+import { fileKey, matchesAccept, useImageUrl } from "../../lib/files.ts";
 import { CheckIcon, RetryIcon, XIcon } from "../../lib/icons.tsx";
 import { useReducedMotion } from "../../motion/use-reduced-motion.ts";
 import { Button } from "../button/button.tsx";
@@ -65,19 +66,8 @@ export function formatBytes(bytes: number, locale?: string) {
   return new Intl.NumberFormat(locale, { style: "unit", unit: units[i], unitDisplay: "short", maximumFractionDigits: i ? 1 : 0 }).format(n);
 }
 
-function matches(file: File, accept?: string) {
-  if (!accept) return true;
-  return accept.split(",").some((raw) => {
-    const rule = raw.trim().toLowerCase();
-    if (!rule) return false;
-    if (rule.startsWith(".")) return file.name.toLowerCase().endsWith(rule);
-    if (rule.endsWith("/*")) return file.type.toLowerCase().startsWith(rule.slice(0, -1));
-    return file.type.toLowerCase() === rule;
-  });
-}
-
 /** The key FileUpload uses for a file: name, size and last modified time. Use it to key `uploads`. */
-export const fileKey = (f: File) => `${f.name}-${f.size}-${f.lastModified}`;
+export { fileKey };
 const key = fileKey;
 
 type FileRowProps = {
@@ -93,8 +83,7 @@ type FileRowProps = {
 
 function FileRow({ file, progress: legacy, upload, onRemove, onRetry, removeLabel, retryLabel, disabled }: FileRowProps) {
   const image = file.type.startsWith("image/");
-  const url = useMemo(() => (image ? URL.createObjectURL(file) : null), [file, image]);
-  useEffect(() => () => (url ? URL.revokeObjectURL(url) : undefined), [url]);
+  const url = useImageUrl(file);
   const ext = file.name.includes(".") ? file.name.split(".").pop()!.slice(0, 4).toUpperCase() : "FILE";
   const status = upload?.status;
   const progress = upload ? (status === "uploading" ? Math.min(100, Math.max(0, (upload.progress ?? 0) * 100)) : undefined) : legacy;
@@ -210,11 +199,11 @@ export function FileUpload({
     const existing = new Set(files.map(key));
     for (const file of incoming) {
       if (existing.has(key(file))) continue;
-      if (!matches(file, accept)) rejected.push({ file, reason: "type", message: `${file.name}: this file type isn't supported.` });
+      if (!matchesAccept(file, accept)) rejected.push({ file, reason: "type", message: `${file.name}: this file type isn't supported.` });
       else if (maxSize && file.size > maxSize) rejected.push({ file, reason: "size", message: `${file.name} is larger than ${formatBytes(maxSize)}.` });
       else accepted.push(file);
     }
-    let next = multiple ? [...files, ...accepted] : accepted.slice(0, 1);
+    let next = multiple ? [...files, ...accepted] : accepted.length ? accepted.slice(0, 1) : files;
     if (maxFiles && next.length > maxFiles) {
       next.slice(maxFiles).forEach((file) => rejected.push({ file, reason: "count", message: `Up to ${maxFiles} files.` }));
       next = next.slice(0, maxFiles);

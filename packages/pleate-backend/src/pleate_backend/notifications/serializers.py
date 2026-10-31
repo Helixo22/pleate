@@ -2,7 +2,7 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 
 from .models import Notification, PushSubscription
-from .services import available_channels
+from .services import available_channels, push_endpoint_allowed
 
 
 class NotificationSerializer(serializers.ModelSerializer):
@@ -56,6 +56,10 @@ class PushSubscriptionSerializer(serializers.Serializer):
     def validate_endpoint(self, value):
         if not value.startswith("https://"):
             raise serializers.ValidationError(_("The endpoint must use HTTPS."), code="insecure_endpoint")
+        if not push_endpoint_allowed(value):
+            raise serializers.ValidationError(
+                _("This is not a known Web Push service."), code="unknown_push_service"
+            )
         return value
 
 

@@ -124,10 +124,12 @@ class WaitlistJoinSerializer(serializers.Serializer):
 
 
 class WaitlistStatusSerializer(serializers.Serializer):
-    position = serializers.IntegerField(help_text="1 is next in line, 0 once invited.")
-    referral_code = serializers.CharField()
-    referrals = serializers.IntegerField()
-    invited = serializers.BooleanField()
+    """Every field is null when the email was already on the list."""
+
+    position = serializers.IntegerField(allow_null=True, help_text="1 is next in line, 0 once invited.")
+    referral_code = serializers.CharField(allow_null=True)
+    referrals = serializers.IntegerField(allow_null=True)
+    invited = serializers.BooleanField(allow_null=True)
 
 
 class WaitlistPublicStatusSerializer(serializers.Serializer):

@@ -151,19 +151,18 @@ export function commerceRoutes(r: Router) {
       const v = new Validator(data);
       const email = v.email("email");
       v.throwIfAny();
-      let entry = db.waitlist.find((e) => e.email === email);
-      if (!entry) {
-        const referrer = data.ref ? db.waitlist.find((e) => e.referral_code === String(data.ref)) : undefined;
-        entry = {
-          id: db.id(),
-          email: email!,
-          referral_code: db.random.chars(8, "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"),
-          referred_by: referrer?.id ?? null,
-          created_at: new Date().toISOString(),
-          invited_at: null,
-        };
-        db.waitlist.push(entry);
-      }
+      // Already on the list: same shape, nothing about the entry (like the backend).
+      if (db.waitlist.some((e) => e.email === email)) return json({ position: null, referral_code: null, referrals: null, invited: null });
+      const referrer = data.ref ? db.waitlist.find((e) => e.referral_code === String(data.ref)) : undefined;
+      const entry = {
+        id: db.id(),
+        email: email!,
+        referral_code: db.random.chars(8, "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"),
+        referred_by: referrer?.id ?? null,
+        created_at: new Date().toISOString(),
+        invited_at: null,
+      };
+      db.waitlist.push(entry);
       return json(waitlistStatus(db, entry));
     },
     "public",

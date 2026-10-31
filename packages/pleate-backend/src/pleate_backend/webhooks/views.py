@@ -4,9 +4,11 @@ from django.utils.translation import gettext as _
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from pleate_backend.apikeys.permissions import DenyAPIKey
 from pleate_backend.core.exceptions import ApiError
 from pleate_backend.core.filters import OrderingFilter
 from pleate_backend.core.pagination import PagePagination
@@ -47,6 +49,7 @@ def owned_delivery(request, pk) -> Delivery:
     ),
 )
 class EndpointListView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated, DenyAPIKey]
     serializer_class = s.EndpointSerializer
     pagination_class = PagePagination
     filter_backends = [OrderingFilter]
@@ -77,6 +80,7 @@ class EndpointListView(generics.ListCreateAPIView):
     delete=extend_schema(tags=["webhooks"], summary="Remove an endpoint"),
 )
 class EndpointDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, DenyAPIKey]
     serializer_class = s.EndpointSerializer
     http_method_names = ["get", "patch", "delete", "head", "options"]
 
@@ -91,6 +95,8 @@ class EndpointDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class RotateSecretView(APIView):
+    permission_classes = [IsAuthenticated, DenyAPIKey]
+
     @extend_schema(
         request=None, responses=s.SecretSerializer, tags=["webhooks"], summary="New signing secret"
     )

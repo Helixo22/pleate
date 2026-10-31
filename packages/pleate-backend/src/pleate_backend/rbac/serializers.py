@@ -4,8 +4,10 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from pleate_backend.core.exceptions import ApiError
+
 from .models import Feature, RoleInfo
-from .services import perm_name, permissions_by_group
+from .services import ensure_can_assign, ensure_can_grant, perm_name, permissions_by_group
 
 User = get_user_model()
 
@@ -90,6 +92,20 @@ class RoleSerializer(serializers.Serializer):
 
     def validate_permissions(self, value):
         return resolve_permissions(value)
+
+    def validate(self, attrs):
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if user is None or user.is_superuser:
+            return attrs
+        info = self.instance.role_info if self.instance is not None and _has_info(self.instance) else None
+        current = bool(info and info.is_default)
+        if "is_default" in attrs and attrs["is_default"] != current:
+            raise ApiError("permission_denied", _("Only a superuser can change the default roles."), 403)
+        if self.instance is not None:
+            ensure_can_assign(user, [self.instance])
+        ensure_can_grant(user, [perm_name(p) for p in attrs.get("permissions", [])])
+        return attrs
 
     def _save_info(self, group, data):
         if "description" not in data and "is_default" not in data:

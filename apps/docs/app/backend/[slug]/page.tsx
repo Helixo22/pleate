@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
 import { BACKEND_CONTENT } from "@/content/backend";
 import { BACKEND_PAGES } from "@/lib/backend-pages";
+import { BACKEND_NAV } from "@/lib/nav";
 
 export const dynamicParams = false;
 
@@ -21,12 +22,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function BackendGuide({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const index = BACKEND_PAGES.findIndex((p) => p.slug === slug);
-  const page = BACKEND_PAGES[index];
+  const page = BACKEND_PAGES.find((p) => p.slug === slug);
   const Content = BACKEND_CONTENT[slug];
   if (!page || !Content) notFound();
-  const prev = BACKEND_PAGES[index - 1];
-  const next = BACKEND_PAGES[index + 1];
+  // Previous and next follow the sidebar order, not the order of BACKEND_PAGES.
+  const order = BACKEND_NAV.flatMap((s) => s.items).map((item) => item.href.slice("/backend/".length));
+  const index = order.indexOf(slug);
+  const prev = BACKEND_PAGES.find((p) => p.slug === order[index - 1]);
+  const next = BACKEND_PAGES.find((p) => p.slug === order[index + 1]);
 
   return (
     <article className="mx-auto max-w-4xl">

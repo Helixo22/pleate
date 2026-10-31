@@ -8,21 +8,22 @@ from urllib.parse import urlencode
 from django.contrib.auth import get_user, get_user_model
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
+from rest_framework.generics import get_object_or_404
 from rest_framework.parsers import FormParser, MultiPartParser
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from pleate_backend.accounts import signals as account_signals
 from pleate_backend.accounts.services import complete_login, login_challenges
 from pleate_backend.accounts.views import send_security_notice
+from pleate_backend.apikeys.permissions import DenyAPIKey
 from pleate_backend.core.conf import frontend_url, pleate_settings
 from pleate_backend.core.csrf import CsrfProtectedMixin
 from pleate_backend.core.exceptions import ApiError
@@ -112,6 +113,8 @@ class StartView(APIView):
             raise ApiError("invalid_mode", _("Unknown mode."), 400)
         if mode == "link" and not request.user.is_authenticated:
             raise ApiError("not_authenticated", _("Sign in first."), 401)
+        if mode == "link" and not DenyAPIKey().has_permission(request, self):
+            self.permission_denied(request, DenyAPIKey.message, DenyAPIKey.code)
 
         state = secrets.token_urlsafe(32)
         nonce = secrets.token_urlsafe(32)
@@ -266,14 +269,19 @@ class CallbackView(APIView):
                 return done("error", next_path, "oauth_email_exists")
             if not _conf().get("ALLOW_SIGNUP", True):
                 return done("error", next_path, "oauth_signup_disabled")
-            user = User.objects.create_user(
-                email=identity.email,
-                password=None,
-                name=(identity.name or "")[:150],
-                email_verified=True,
-                has_password=False,
-                locale=get_language() or "",
-            )
+            if not pleate_settings.AUTH["SIGNUP_ENABLED"]:
+                return done("error", next_path, "signup_disabled")
+            try:
+                user = User.objects.create_user(
+                    email=identity.email,
+                    password=None,
+                    name=(identity.name or "")[:150],
+                    email_verified=True,
+                    has_password=False,
+                    locale=get_language() or "",
+                )
+            except IntegrityError:  # same email signed up concurrently
+                return done("error", next_path, "oauth_email_exists")
             try:
                 account = SocialAccount.objects.create(
                     user=user,
@@ -319,6 +327,8 @@ class AccountListView(APIView):
 
 
 class AccountDetailView(CsrfProtectedMixin, APIView):
+    permission_classes = [IsAuthenticated, DenyAPIKey]
+
     @extend_schema(responses={204: None}, tags=["oauth"])
     def delete(self, request, pk):
         user = request.user

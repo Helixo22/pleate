@@ -1,9 +1,11 @@
 import hashlib
 
+from django.conf import settings
 from django.contrib.auth import login
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
-from pleate_backend.core.conf import pleate_settings
+from pleate_backend.core.conf import frontend_url, pleate_settings
 from pleate_backend.core.utils import client_ip, user_agent
 
 # Callables ``(request, user, remember) -> dict | None``. A non None result
@@ -27,6 +29,24 @@ def complete_login(request, user, remember: bool = False):
     )
 
 
+def send_password_reset(user, language: str):
+    from pleate_backend.emails import send_email
+
+    from .tokens import make_reset_token
+
+    send_email(
+        "password_reset",
+        user.email,
+        {
+            "name": user.display_name,
+            "action_url": frontend_url("RESET_PASSWORD", token=make_reset_token(user)),
+            "action_label": _("Choose a new password"),
+            "minutes": settings.PASSWORD_RESET_TIMEOUT // 60,
+        },
+        language,
+    )
+
+
 def public_session_id(session_key: str) -> str:
     """Sessions are listed by a hash: the key itself is the cookie secret."""
     return hashlib.sha256(session_key.encode()).hexdigest()[:24]
@@ -41,6 +61,35 @@ def revoke_sessions(user, keep: str | None = None) -> int:
     count = qs.count()
     qs.delete()
     return count
+
+
+def revoke_credentials(user, *, unverified: bool = False):
+    """
+    After a password change or reset: revokes every API key. ``unverified`` (a
+    reset of an account whose email was never confirmed) also deletes what
+    someone may have attached before the owner proved the inbox: social links,
+    2FA and webhook endpoints. Apps that are not installed are skipped.
+    """
+    from django.apps import apps
+
+    def model(name):
+        try:
+            return apps.get_model(name)
+        except LookupError:
+            return None
+
+    if keys := model("pleate_apikeys.APIKey"):
+        keys.objects.filter(user=user, revoked_at__isnull=True).update(revoked_at=timezone.now())
+    if not unverified:
+        return
+    for name, field in (
+        ("pleate_oauth.SocialAccount", "user"),
+        ("pleate_mfa.TOTPDevice", "user"),
+        ("pleate_mfa.BackupCode", "user"),
+        ("pleate_webhooks.Endpoint", "owner"),
+    ):
+        if cls := model(name):
+            cls.objects.filter(**{field: user}).delete()
 
 
 def describe_user_agent(ua: str) -> dict:

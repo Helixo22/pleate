@@ -18,7 +18,15 @@ from urllib.parse import urlparse
 def database(uri: str, name: str | None = None) -> dict:
     """Return a DATABASES dict for a MongoDB connection string."""
     db_name = name or urlparse(uri).path.lstrip("/") or "pleate"
-    return {"default": {"ENGINE": "django_mongodb_backend", "HOST": uri, "NAME": db_name}}
+    return {
+        "default": {
+            "ENGINE": "django_mongodb_backend",
+            "HOST": uri,
+            "NAME": db_name,
+            # Fail fast (and let /api/health answer 503) when MongoDB is down.
+            "OPTIONS": {"serverSelectionTimeoutMS": 5000},
+        }
+    }
 
 
 # MongoDB primary keys are ObjectIds. The contrib apps get Mongo aware configs
@@ -74,6 +82,9 @@ AUTHENTICATION_BACKENDS = [
 
 SESSION_ENGINE = "pleate_backend.accounts.sessions"
 SESSION_COOKIE_HTTPONLY = True
+# Secure by default; local development over http turns both off (see the deployment docs).
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 14
 SESSION_SAVE_EVERY_REQUEST = False
@@ -165,6 +176,8 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "REST API that backs the pleate components.",
     "VERSION": "0.1.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    # Schema and Swagger UI are for staff only; projects can relax it in DEBUG.
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
     "COMPONENT_SPLIT_REQUEST": True,
     "SCHEMA_PATH_PREFIX": r"/api/",
     "PREPROCESSING_HOOKS": ["pleate_backend.core.schema.drop_slash_twins"],

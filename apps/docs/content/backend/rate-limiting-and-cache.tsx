@@ -40,7 +40,10 @@ class RedeemCodeView(APIView):
     throttle_classes = [StrictScopedRateThrottle]   # denies when the cache is down
     throttle_scope = "auth"
 `}</Code>
-      <P>Responses carry the state of the tightest throttle that applied, and a 429 says when to come back:</P>
+      <P>
+        Responses carry the state of the tightest throttle that applied (<C>RateLimit-Reset</C> is the seconds left in
+        the current window), and a 429 says when to come back:
+      </P>
       <Code lang="http">{`
 HTTP/1.1 429 Too Many Requests
 RateLimit-Limit: 10
@@ -63,16 +66,16 @@ RateLimit-Reset: 42
       <Code lang="python">{`
 from pleate_backend.ratelimit import limits
 
-allowed, retry_after = limits.peek(f"redeem:{user.pk}", limit=5, window=3600, fail_closed=True)
+# Count first, check after: a peek then a hit lets parallel requests all pass.
+allowed, retry_after = limits.hit(f"redeem:{user.pk}", limit=5, window=3600, fail_closed=True)
 if not allowed:
     raise ApiError("too_many_attempts", _("Too many attempts. Try again later."), 429, {"retry_after": retry_after})
-if not code_is_valid:
-    limits.hit(f"redeem:{user.pk}", 5, 3600, fail_closed=True)   # count only failures
-else:
-    limits.reset(f"redeem:{user.pk}", 3600)
+if code_is_valid:
+    limits.reset(f"redeem:{user.pk}", 3600)   # only failures stay counted
 `}</Code>
       <UL>
-        <LI><C>hit(key, limit, window)</C> counts one event and returns <C>(allowed, retry_after)</C>.</LI>
+        <LI><C>hit(key, limit, window)</C> counts one event atomically and returns <C>(allowed, retry_after)</C>. A refused event is not counted.</LI>
+        <LI><C>consume</C> is the same and also returns <C>remaining</C> and <C>reset</C>, the seconds left in the current window.</LI>
         <LI><C>peek</C> checks without counting, <C>reset</C> clears, <C>remaining</C> tells what is left.</LI>
         <LI><C>fail_closed=True</C> denies when the cache is unreachable. Use it on authentication paths; everything else fails open.</LI>
       </UL>
@@ -122,7 +125,8 @@ PLEATE["REDIS_URL"] = "redis://localhost:6389/0"      # health check and RedisBr
 `}</Code>
       <Callout tone="warning">
         Without a shared cache each worker counts on its own, so the effective limit is multiplied by the number of
-        processes, and bans take up to their cache lifetime to reach every process.
+        processes, and bans take up to their cache lifetime to reach every process. With <C>DEBUG</C> off and{" "}
+        <C>LocMemCache</C> as the default cache, startup prints the <C>pleate_ratelimit.W001</C> warning.
       </Callout>
     </>
   );

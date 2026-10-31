@@ -56,6 +56,8 @@ class StripeEvent(models.Model):
     event_id = models.CharField(max_length=255, unique=True)
     type = models.CharField(max_length=100)
     received_at = models.DateTimeField(auto_now_add=True)
+    # When a delivery claimed the event; another delivery waits until the lease expires.
+    started_at = models.DateTimeField(null=True, blank=True)
     processed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:

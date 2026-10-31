@@ -1,19 +1,22 @@
-import json
-
 import django_filters
-from django.shortcuts import get_object_or_404
+from django.db import IntegrityError
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import generics
-from rest_framework.renderers import BaseRenderer, JSONRenderer
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from pleate_backend.apikeys.permissions import DenyAPIKey
 from pleate_backend.core.conf import pleate_settings
+from pleate_backend.core.exceptions import ApiError
 from pleate_backend.core.pagination import CursorPagination
-from pleate_backend.core.realtime import channel_stream, sse_response
+from pleate_backend.core.realtime import EventStreamRenderer, channel_stream, sse_response
 from pleate_backend.core.utils import user_agent
 
 from . import services
@@ -133,17 +136,6 @@ class PreferencesView(APIView):
         return Response(services.preferences_payload(request.user))
 
 
-class EventStreamRenderer(BaseRenderer):
-    """Lets DRF accept ``Accept: text/event-stream``. Errors are still written as JSON."""
-
-    media_type = "text/event-stream"
-    format = "sse"
-    charset = "utf-8"
-
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        return b"" if data is None else json.dumps(data, default=str).encode()
-
-
 class StreamView(APIView):
     renderer_classes = [JSONRenderer, EventStreamRenderer]
 
@@ -175,6 +167,8 @@ class PushPublicKeyView(APIView):
 
 
 class PushSubscriptionView(APIView):
+    permission_classes = [IsAuthenticated, DenyAPIKey]
+
     @extend_schema(
         request=PushSubscriptionSerializer,
         responses={201: PushSubscriptionOutSerializer},
@@ -184,16 +178,33 @@ class PushSubscriptionView(APIView):
         ser = PushSubscriptionSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         data = ser.validated_data
-        # The same browser may have been subscribed by another account before.
-        sub, _created = PushSubscription.objects.update_or_create(
-            endpoint=data["endpoint"],
-            defaults={
-                "user": request.user,
-                "p256dh": data["keys"]["p256dh"],
-                "auth": data["keys"]["auth"],
-                "user_agent": user_agent(request),
-            },
-        )
+        fields = {
+            "user": request.user,
+            "p256dh": data["keys"]["p256dh"],
+            "auth": data["keys"]["auth"],
+            "user_agent": user_agent(request),
+        }
+        for _attempt in range(2):
+            sub = PushSubscription.objects.filter(endpoint=data["endpoint"]).first()
+            if sub is None:
+                try:
+                    sub = PushSubscription.objects.create(endpoint=data["endpoint"], **fields)
+                    break
+                except IntegrityError:
+                    continue  # created concurrently: read it again
+            # The same browser may have been subscribed by another account before: it
+            # posts the same keys. Knowing only the endpoint is not enough to take it.
+            same_keys = (sub.p256dh, sub.auth) == (fields["p256dh"], fields["auth"])
+            if sub.user_id != request.user.pk and not same_keys:
+                raise ApiError(
+                    "push_subscription_taken", _("This push subscription belongs to another account."), 409
+                )
+            for name, value in fields.items():
+                setattr(sub, name, value)
+            sub.save(update_fields=list(fields))
+            break
+        else:
+            raise ApiError("push_subscription_conflict", _("Try again."), 409)
         return Response(PushSubscriptionOutSerializer(sub).data, status=201)
 
     @extend_schema(request=PushEndpointSerializer, responses={204: None}, tags=["notifications"])

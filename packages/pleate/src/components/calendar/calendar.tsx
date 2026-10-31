@@ -4,7 +4,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
 import { cn } from "../../lib/cn.ts";
 import { addDays, addMonths, between, compareDay, localeWeekStart, monthGrid, sameDay, sameMonth, startOfDay, startOfMonth } from "../../lib/date.ts";
 import { ChevronRightIcon } from "../../lib/icons.tsx";
@@ -31,22 +31,48 @@ export type CalendarProps =
   | (BaseProps & { mode?: "single"; value?: Date | null; onValueChange?: (value: Date) => void })
   | (BaseProps & { mode: "range"; value?: DateRange; onValueChange?: (value: DateRange) => void });
 
+const noopSubscribe = () => () => {};
+// Any month works here: it only feeds the weekday header before the client knows today.
+const PLACEHOLDER_MONTH = new Date(2000, 0, 1);
+
 export function Calendar(props: CalendarProps) {
-  const { min, max, isDisabled, locale, className, previousLabel = "Previous month", nextLabel = "Next month" } = props;
+  const { min, max, isDisabled, className, previousLabel = "Previous month", nextLabel = "Next month" } = props;
   const reduced = useReducedMotion();
-  const today = startOfDay(new Date());
+  // Server and hydration render without the runtime's clock, locale and time zone, so the markup matches.
+  const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false);
+  const locale = props.locale ?? (hydrated ? undefined : "en-US");
+  const today = hydrated ? startOfDay(new Date()) : null;
   const single = props.mode !== "range" ? (props.value ?? null) : null;
   const range = props.mode === "range" ? (props.value ?? { from: null, to: null }) : null;
-  const anchor = single ?? range?.from ?? props.defaultMonth ?? today;
+  const selection = single ?? range?.from ?? null;
+  const anchor = selection ?? props.defaultMonth ?? today;
 
-  const [month, setMonth] = useState(() => startOfMonth(anchor));
-  const [focused, setFocused] = useState(() => startOfDay(anchor));
+  // null until the user navigates: the grid follows the anchor.
+  const [monthState, setMonth] = useState(() => (anchor ? startOfMonth(anchor) : null));
+  const [focusedState, setFocused] = useState(() => (anchor ? startOfDay(anchor) : null));
   const [direction, setDirection] = useState(0);
   const [hover, setHover] = useState<Date | null>(null);
   const grid = useRef<HTMLDivElement>(null);
   const focusOnRender = useRef(false);
+  const ready = Boolean(monthState ?? anchor);
+  const month = monthState ?? (anchor ? startOfMonth(anchor) : PLACEHOLDER_MONTH);
+  const focused = focusedState ?? (anchor ? startOfDay(anchor) : month);
 
-  const weekStartsOn = props.weekStartsOn ?? localeWeekStart(locale);
+  // A controlled value changed from outside (preset, reset): bring its month into view.
+  const selectionKey = selection ? startOfDay(selection).getTime() : null;
+  const [prevSelection, setPrevSelection] = useState(selectionKey);
+  if (selectionKey !== prevSelection) {
+    setPrevSelection(selectionKey);
+    if (selection) {
+      setFocused(startOfDay(selection));
+      if (!sameMonth(selection, month)) {
+        setDirection(compareDay(selection, month) > 0 ? 1 : -1);
+        setMonth(startOfMonth(selection));
+      }
+    }
+  }
+
+  const weekStartsOn = props.weekStartsOn ?? (hydrated ? localeWeekStart(props.locale) : 1);
   const days = useMemo(() => monthGrid(month, weekStartsOn), [month, weekStartsOn]);
   const fmt = useMemo(
     () => ({
@@ -57,6 +83,7 @@ export function Calendar(props: CalendarProps) {
     }),
     [locale],
   );
+  const title = ready ? fmt.title.format(month) : undefined;
 
   const disabled = (d: Date) => (min && compareDay(d, min) < 0) || (max && compareDay(d, max) > 0) || Boolean(isDisabled?.(d));
 
@@ -126,17 +153,17 @@ export function Calendar(props: CalendarProps) {
   return (
     <div className={cn("w-full max-w-[20rem] select-none", className)}>
       <div className="mb-2 flex items-center justify-between ps-2">
-        <h2 aria-live="polite" className="text-headline capitalize">{fmt.title.format(month)}</h2>
+        <h2 aria-live="polite" className="min-h-[1lh] text-headline capitalize">{title}</h2>
         <div className="flex">
-          <button type="button" aria-label={previousLabel} disabled={!canPrev} onClick={() => goToMonth(addMonths(month, -1))} className={navButton}>
+          <button type="button" aria-label={previousLabel} disabled={!ready || !canPrev} onClick={() => goToMonth(addMonths(month, -1))} className={navButton}>
             <ChevronRightIcon className="size-5 rotate-180 rtl:rotate-0" strokeWidth={2.5} />
           </button>
-          <button type="button" aria-label={nextLabel} disabled={!canNext} onClick={() => goToMonth(addMonths(month, 1))} className={navButton}>
+          <button type="button" aria-label={nextLabel} disabled={!ready || !canNext} onClick={() => goToMonth(addMonths(month, 1))} className={navButton}>
             <ChevronRightIcon className="size-5 rtl:rotate-180" strokeWidth={2.5} />
           </button>
         </div>
       </div>
-      <div role="grid" aria-label={fmt.title.format(month)} ref={grid} onKeyDown={onKeyDown} className="-m-1 overflow-hidden p-1">
+      <div role="grid" aria-label={title} ref={grid} onKeyDown={onKeyDown} className="-m-1 overflow-hidden p-1">
         <div role="row" className="grid grid-cols-7">
           {weekdays.map((d) => (
             <span key={d.getDay()} role="columnheader" aria-label={fmt.weekdayLong.format(d)} className="py-1 text-center text-caption1 font-semibold text-fg-subtle uppercase">
@@ -154,7 +181,8 @@ export function Calendar(props: CalendarProps) {
             transition={{ duration: reduced ? 0.1 : 0.22, ease: [0.22, 1, 0.36, 1] }}
             onMouseLeave={() => setHover(null)}
           >
-            {Array.from({ length: 6 }, (_, w) => (
+            {!ready && <div className="h-60" />}
+            {ready && Array.from({ length: 6 }, (_, w) => (
               <div role="row" key={w} className="grid grid-cols-7">
                 {days.slice(w * 7, w * 7 + 7).map((d) => {
                   const outside = !sameMonth(d, month);
@@ -181,7 +209,7 @@ export function Calendar(props: CalendarProps) {
                         tabIndex={isFocused ? 0 : -1}
                         data-focused={isFocused}
                         aria-label={fmt.full.format(d)}
-                        aria-current={sameDay(d, today) ? "date" : undefined}
+                        aria-current={today && sameDay(d, today) ? "date" : undefined}
                         aria-disabled={off || undefined}
                         onClick={() => select(d)}
                         onFocus={() => {
@@ -193,7 +221,7 @@ export function Calendar(props: CalendarProps) {
                           "pl-focus-ring pl-tabular grid size-10 cursor-pointer place-items-center rounded-full text-body transition-colors duration-(--pl-duration-instant)",
                           outside && "text-fg-subtle",
                           !selected && !off && "hover:bg-fill-2",
-                          sameDay(d, today) && !selected && "font-semibold text-accent-ink",
+                          today && sameDay(d, today) && !selected && "font-semibold text-accent-ink",
                           selected && "bg-accent font-semibold text-on-accent",
                           off && "cursor-not-allowed text-fg-subtle line-through decoration-fg-subtle/60",
                           outside && !selected && "opacity-60",

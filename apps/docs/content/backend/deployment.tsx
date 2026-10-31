@@ -83,10 +83,26 @@ PLEATE["REALTIME"] = {"BACKEND": "pleate_backend.core.realtime.RedisBroker"}
         <LI>The Next.js rewrite is a proxy too: keep the API private and let the browser reach it only through <C>/api</C>, or expose it directly and list the frontend in <C>CSRF_TRUSTED_ORIGINS</C>.</LI>
       </UL>
 
+      <H2>Secure defaults</H2>
+      <P>
+        The base settings set <C>SESSION_COOKIE_SECURE</C>, <C>CSRF_COOKIE_SECURE</C> and{" "}
+        <C>SECURE_CONTENT_TYPE_NOSNIFF</C> to <C>True</C>. Browsers never send secure cookies over plain http, so local
+        development on <C>http://localhost</C> needs the two cookie settings off:
+      </P>
+      <Code lang="python" title="settings.py">{`
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+`}</Code>
+      <P>
+        Errors that are not API errors are logged with their traceback and answer a JSON 500 with code{" "}
+        <C>server_error</C> and the <C>request_id</C>, never an HTML page. With <C>DEBUG</C> off,{" "}
+        <C>manage.py check</C> warns (<C>pleate_core.W001</C>) when realtime still uses the in memory broker.
+      </P>
+
       <H2>Health</H2>
       <P>
         <C>GET /api/health</C> checks MongoDB and, when <C>{`PLEATE["REDIS_URL"]`}</C> is set, Redis. It answers 200{" "}
-        <C>ok</C> or 503 <C>degraded</C>, needs no authentication, is never throttled or banned: point readiness probes at
+        <C>ok</C> or 503 <C>degraded</C> (MongoDB server selection times out after 5 seconds), needs no authentication, is never throttled or banned: point readiness probes at
         it. Logs are JSON lines on stdout with the request id of each request.
       </P>
 
@@ -94,7 +110,8 @@ PLEATE["REALTIME"] = {"BACKEND": "pleate_backend.core.realtime.RedisBroker"}
       <UL>
         <LI><C>DEBUG = False</C>, a long random <C>SECRET_KEY</C> from a secret store. Rotate with <C>SECRET_KEY_FALLBACKS</C> so sessions and 2FA secrets keep working.</LI>
         <LI>Set <C>{`PLEATE["MFA"]["ENCRYPTION_KEY"]`}</C> to its own Fernet key, so rotating <C>SECRET_KEY</C> never touches TOTP secrets.</LI>
-        <LI><C>SESSION_COOKIE_SECURE = True</C> and <C>CSRF_COOKIE_SECURE = True</C> (the demo derives both from <C>DEBUG</C>), plus <C>SECURE_SSL_REDIRECT</C> and <C>SECURE_HSTS_SECONDS</C>.</LI>
+        <LI><C>SECURE_SSL_REDIRECT</C> and <C>SECURE_HSTS_SECONDS</C> (the demo reads both from the environment when <C>DEBUG</C> is off). Secure session and CSRF cookies are already on in the base settings.</LI>
+        <LI>The OpenAPI schema and Swagger UI (<C>/api/schema</C>, <C>/api/docs</C>) answer only staff users unless <C>DEBUG</C> is on; change <C>{`SPECTACULAR_SETTINGS["SERVE_PERMISSIONS"]`}</C> to open or close them further.</LI>
         <LI>Exact <C>ALLOWED_HOSTS</C> and <C>CSRF_TRUSTED_ORIGINS</C>; no wildcards.</LI>
         <LI>Redis as the cache, so login lockouts and throttles hold across workers. Authentication counters fail closed if it is down.</LI>
         <LI>MongoDB with authentication, TLS, a replica set and backups. GridFS files live in the same database: include them, or move files to S3.</LI>

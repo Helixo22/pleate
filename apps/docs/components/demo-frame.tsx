@@ -1,10 +1,10 @@
 // One example on a component page: live preview on a solid card, with a Code tab showing the example's own file.
 "use client";
 
-import { Check, Copy } from "lucide-react";
 import { motion } from "motion/react";
-import { cn, IconButton, spring } from "pleate";
+import { cn, spring } from "pleate";
 import { useState, type ReactNode } from "react";
+import { CopyButton } from "./backend/copy-button";
 
 export function DemoFrame({
   id,
@@ -22,7 +22,6 @@ export function DemoFrame({
   align?: "center" | "start" | "stretch";
 }) {
   const [tab, setTab] = useState<"preview" | "code">("preview");
-  const [copied, setCopied] = useState(false);
   return (
     <section id={id} className="scroll-mt-20">
       <div className="mb-3 flex items-end justify-between gap-4">
@@ -66,19 +65,7 @@ export function DemoFrame({
           </div>
         ) : (
           <div role="tabpanel" className="relative">
-            <IconButton
-              aria-label={copied ? "Copied" : "Copy code"}
-              size="sm"
-              variant="gray"
-              tone="neutral"
-              className="absolute end-3 top-3"
-              onClick={() => {
-                void navigator.clipboard.writeText(code);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 1400);
-              }}
-              icon={copied ? <Check /> : <Copy />}
-            />
+            <CopyButton text={code} variant="gray" className="absolute end-3 top-3" />
             <pre className="max-h-[32rem] overflow-auto bg-surface-2 p-6 pe-14 font-mono text-[0.8125rem] leading-relaxed text-fg">
               <code>{code}</code>
             </pre>

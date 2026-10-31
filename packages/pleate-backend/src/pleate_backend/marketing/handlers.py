@@ -1,5 +1,5 @@
 def export_user_data(sender, user, **kwargs):
-    """Newsletter, contact and waitlist rows that match the user's email (or link to the user)."""
+    """Rows linked to the user, plus rows that match its email once that email is verified."""
     from django.db.models import Q
 
     from .models import ContactMessage, NewsletterSubscriber, WaitlistEntry
@@ -7,7 +7,9 @@ def export_user_data(sender, user, **kwargs):
     def when(value):
         return value.isoformat() if value else None
 
-    match = Q(email__iexact=user.email) | Q(user=user)
+    # An unverified email may belong to someone else: matching on it would leak their rows.
+    by_email = Q(email__iexact=user.email) if user.email_verified else Q(pk__in=[])
+    match = by_email | Q(user=user)
     newsletter = [
         {
             "email": sub.email,
@@ -37,6 +39,6 @@ def export_user_data(sender, user, **kwargs):
             "created_at": when(e.created_at),
             "invited_at": when(e.invited_at),
         }
-        for e in WaitlistEntry.objects.filter(email__iexact=user.email)
+        for e in WaitlistEntry.objects.filter(by_email)
     ]
     return "marketing", {"newsletter": newsletter, "contact_messages": messages, "waitlist": waitlist}

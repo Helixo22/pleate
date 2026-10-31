@@ -1,4 +1,4 @@
-// RadioGroup + Radio: a filled accent circle with a white dot that pops in. Arrow keys move between options (Radix).
+// RadioGroup + Radio: a bordered circle that fills with the accent around a dot. Arrow keys move between options (Radix).
 "use client";
 
 import { cva, type VariantProps } from "class-variance-authority";
@@ -13,17 +13,17 @@ export function RadioGroup({ className, ...props }: ComponentProps<typeof RadioP
 
 export const radioVariants = cva(
   [
-    "pl-focus-ring relative grid shrink-0 cursor-pointer place-items-center rounded-full bg-surface",
-    "shadow-[inset_0_0_0_1.5px_var(--pl-border)] transition-[background-color,box-shadow] duration-(--pl-duration-fast) ease-ios",
-    "data-[state=checked]:bg-accent data-[state=checked]:shadow-none disabled:cursor-not-allowed disabled:opacity-50",
+    "pl-focus-ring pl-field relative grid shrink-0 cursor-pointer place-items-center rounded-full bg-surface",
+    "transition-[background-color,box-shadow] duration-(--pl-duration-fast) ease-out hover:[--pl-field-border:var(--pl-fg-subtle)]",
+    "data-[state=checked]:bg-accent data-[state=checked]:pl-lift disabled:cursor-not-allowed disabled:opacity-50",
     "after:absolute after:-inset-2.5 after:content-['']",
   ],
   {
     variants: {
       size: {
-        sm: "size-[1.125rem] [--pl-dot:0.4375rem]",
-        md: "size-[1.375rem] [--pl-dot:0.5rem]",
-        lg: "size-[1.625rem] [--pl-dot:0.625rem]",
+        sm: "size-4 [--pl-dot:0.375rem]",
+        md: "size-[1.125rem] [--pl-dot:0.375rem]",
+        lg: "size-5 [--pl-dot:0.5rem]",
       },
     },
     defaultVariants: { size: "md" },
@@ -48,7 +48,7 @@ export function Radio({ className, size, label, description, labelPlacement, id,
         className={cn(radioVariants({ size }), description && "mt-px", className)}
         {...props}
       >
-        <RadioPrimitive.Indicator className="block size-(--pl-dot) rounded-full bg-on-accent motion-safe:animate-[pl-pop-in_var(--pl-duration-base)_var(--pl-ease-spring)]" />
+        <RadioPrimitive.Indicator className="block size-(--pl-dot) rounded-full bg-on-accent motion-safe:animate-[pl-pop-in_var(--pl-duration-fast)_var(--pl-ease-out)]" />
       </RadioPrimitive.Item>
     </ChoiceLabel>
   );

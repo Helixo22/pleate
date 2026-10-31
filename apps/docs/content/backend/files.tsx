@@ -25,7 +25,7 @@ export default function Files() {
       <UL>
         <LI><strong>Size and quota.</strong> At most <C>MAX_SIZE</C> per file and <C>USER_QUOTA</C> per user.</LI>
         <LI><strong>Type sniffing.</strong> The type is detected from the bytes with <C>filetype</C>. The type the browser claims and the extension are ignored, except that UTF-8 text with a <C>.txt</C>, <C>.md</C>, <C>.log</C> or <C>.csv</C> extension becomes <C>text/plain</C> or <C>text/csv</C>. Then it must be in <C>ALLOWED_TYPES</C>.</LI>
-        <LI><strong>Image cleaning.</strong> Images are decoded and re-encoded with Pillow: EXIF and GPS metadata are dropped, the EXIF orientation is applied, and they are downscaled to <C>IMAGE_MAX_DIMENSION</C>.</LI>
+        <LI><strong>Image cleaning.</strong> Images are decoded and re-encoded with Pillow: EXIF and GPS metadata are dropped, the EXIF orientation is applied, and they are downscaled to <C>IMAGE_MAX_DIMENSION</C>. Animations are limited to 300 frames and <C>ANIMATION_MAX_PIXELS</C> decoded pixels.</LI>
         <LI><strong>Safe names.</strong> Paths, control and reserved characters are removed from the name; storage keys are random.</LI>
         <LI><strong>Safe downloads.</strong> <C>Content-Disposition: attachment</C> with an RFC 5987 <C>filename*</C>, <C>nosniff</C> and a <C>private</C> cache. <C>?inline=1</C> is honored only for images and PDF.</LI>
       </UL>
@@ -122,6 +122,7 @@ with open_file(file) as handle:
           ["ALLOWED_TYPES", "images, PDF, text, CSV, zip, docx, xlsx", "Content types accepted after sniffing."],
           ["USER_QUOTA", "524288000", <>Bytes per user (500 MB), <C>None</C> for unlimited.</>],
           ["IMAGE_MAX_DIMENSION", "2400", "Longest side of stored images, in pixels."],
+          ["ANIMATION_MAX_PIXELS", "100000000", "Frames times width times height allowed for animated images."],
           ["AVATAR_MAX_SIZE", "2097152", "Avatar upload limit (2 MB)."],
           ["AVATAR_DIMENSION", "512", "Avatars are cropped to this square."],
           ["PRESIGNED_UPLOADS", "False", "Enable presign and complete. Needs the S3 storage."],

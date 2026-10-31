@@ -1,15 +1,17 @@
 import pyotp
 import segno
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from drf_spectacular.utils import extend_schema
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from pleate_backend.accounts.services import complete_login
 from pleate_backend.accounts.views import me_payload, send_security_notice
+from pleate_backend.apikeys.permissions import DenyAPIKey
 from pleate_backend.core.csrf import CsrfProtectedMixin
 from pleate_backend.core.exceptions import ApiError
 from pleate_backend.ratelimit import limits
@@ -21,13 +23,17 @@ from .models import BackupCode, TOTPDevice
 
 User = get_user_model()
 
-# Wrong codes per user across pending logins, on top of the per login limit.
+# Code attempts per user across pending logins, on top of the per login limit.
 USER_FAILURE_LIMIT = 20
 USER_FAILURE_WINDOW = 15 * 60
 
 
 def _invalid_code(extra=None):
     return ApiError("invalid_code", _("The code is not valid."), 400, extra)
+
+
+def _already_enabled():
+    return ApiError("mfa_already_enabled", _("Two factor authentication is already enabled."), 409)
 
 
 def _require_device(user) -> TOTPDevice:
@@ -38,6 +44,7 @@ def _require_device(user) -> TOTPDevice:
 
 
 class MfaView(CsrfProtectedMixin, APIView):
+    permission_classes = [IsAuthenticated, DenyAPIKey]
     throttle_classes = [StrictScopedRateThrottle]
     throttle_scope = "auth"
 
@@ -60,12 +67,15 @@ class SetupView(MfaView):
     def post(self, request):
         user = request.user
         if services.is_enabled(user):
-            raise ApiError("mfa_already_enabled", _("Two factor authentication is already enabled."), 409)
+            raise _already_enabled()
         TOTPDevice.objects.filter(user=user).delete()
         secret = pyotp.random_base32()
         device = TOTPDevice(user=user)
         device.secret = secret
-        device.save()
+        try:
+            device.save()
+        except IntegrityError as exc:  # a parallel setup created the device first
+            raise _already_enabled() from exc
         url = pyotp.TOTP(secret).provisioning_uri(name=user.email, issuer_name=services.issuer())
         svg = segno.make(url, error="m").svg_inline(scale=4, border=2, omitsize=True)
         return Response({"secret": secret, "otpauth_url": url, "qr_svg": svg})
@@ -81,7 +91,7 @@ class ConfirmView(MfaView):
         if device is None:
             raise ApiError("mfa_setup_required", _("Start the setup first."), 400)
         if device.confirmed:
-            raise ApiError("mfa_already_enabled", _("Two factor authentication is already enabled."), 409)
+            raise _already_enabled()
         if not services.verify_totp(device, ser.validated_data["code"]):
             raise _invalid_code()
         device.confirmed_at = timezone.now()
@@ -144,25 +154,27 @@ class VerifyView(MfaView):
             services.clear_pending(request)
             raise expired
 
+        # Count first, verify after: a check then a count would let parallel guesses all pass.
         user_key = f"mfa:user:{user.pk}"
-        allowed, retry = limits.peek(user_key, USER_FAILURE_LIMIT, USER_FAILURE_WINDOW, fail_closed=True)
+        allowed, retry = limits.hit(user_key, USER_FAILURE_LIMIT, USER_FAILURE_WINDOW, fail_closed=True)
         if not allowed:
             services.clear_pending(request)
             raise ApiError(
                 "too_many_attempts", _("Too many attempts. Try again later."), 429, {"retry_after": retry}
             )
+        attempts = services.count_pending_attempt(pending)
+        if attempts > services.MAX_PENDING_ATTEMPTS:
+            services.clear_pending(request)
+            raise expired
 
         ok = services.verify_totp(device, code) if code else services.use_backup_code(user, backup, request)
         if not ok:
-            limits.hit(user_key, USER_FAILURE_LIMIT, USER_FAILURE_WINDOW, fail_closed=True)
-            attempts = int(pending.get("attempts", 0)) + 1
-            left = max(0, services.MAX_PENDING_ATTEMPTS - attempts)
-            if left:
-                request.session[services.PENDING_KEY] = {**pending, "attempts": attempts}
-            else:
+            left = services.MAX_PENDING_ATTEMPTS - attempts
+            if not left:
                 services.clear_pending(request)
             raise _invalid_code({"attempts_left": left})
 
+        limits.reset(user_key, USER_FAILURE_WINDOW)
         services.clear_pending(request)
         complete_login(request, user, bool(pending.get("remember")))
         return Response({"user": me_payload(user), "mfa_required": False})

@@ -16,7 +16,7 @@ from pleate_backend.core.conf import pleate_settings
 
 from . import registry
 from .models import Delivery, Endpoint
-from .security import UrlNotAllowed, check_url, signature_header
+from .security import PinnedTransport, UrlNotAllowed, check_url, signature_header
 
 logger = logging.getLogger("pleate.webhooks")
 
@@ -25,6 +25,7 @@ RETRY_SCHEDULE = [60, 300, 1800, 7200, 18000, 36000, 86400]
 DISABLE_AFTER_FAILURES = 20
 MAX_ENDPOINTS = 20
 EXCERPT_BYTES = 1024
+TEST_TIMEOUT_SECONDS = 5
 
 
 def _conf(key, default):
@@ -54,7 +55,15 @@ def envelope(event: str, data, event_id: str | None = None) -> dict:
         "data": data,
     }
     # Round trip so dates, ObjectIds and decimals become plain JSON.
-    return json.loads(json.dumps(body, cls=DjangoJSONEncoder, default=str))
+    return json.loads(json.dumps(body, cls=_Encoder))
+
+
+class _Encoder(DjangoJSONEncoder):
+    def default(self, o):
+        try:
+            return super().default(o)
+        except TypeError:
+            return str(o)
 
 
 def encode(payload: dict) -> bytes:
@@ -127,7 +136,7 @@ def claim(delivery_id) -> Delivery | None:
     return Delivery.objects.select_related("endpoint").filter(pk=delivery_id).first()
 
 
-def send(delivery: Delivery) -> dict:
+def send(delivery: Delivery, timeout: float | None = None) -> dict:
     """
     Makes one HTTP attempt and returns ``{ok, status_code, error, excerpt,
     duration_ms}``. Never raises for network problems.
@@ -144,9 +153,13 @@ def send(delivery: Delivery) -> dict:
     result = {"ok": False, "status_code": None, "error": "", "excerpt": "", "duration_ms": 0}
     started = time.monotonic()
     try:
-        check_url(endpoint.url)
-        timeout = float(_conf("TIMEOUT_SECONDS", 10))
-        with httpx.Client(timeout=timeout, follow_redirects=False) as client:
+        address = check_url(endpoint.url)
+        transport = PinnedTransport(address) if address else None
+        timeout = float(_conf("TIMEOUT_SECONDS", 10)) if timeout is None else timeout
+        # trust_env=False: an environment proxy would resolve the host again.
+        with httpx.Client(
+            timeout=timeout, follow_redirects=False, transport=transport, trust_env=False
+        ) as client:
             with client.stream("POST", endpoint.url, content=body, headers=headers) as response:
                 chunk = b""
                 for part in response.iter_bytes():
@@ -186,7 +199,7 @@ def attempt(delivery: Delivery, *, manual: bool = False) -> Delivery:
         delivery.save(update_fields=["status", "last_error", "next_attempt_at"])
         return delivery
 
-    result = send(delivery)
+    result = send(delivery, timeout=TEST_TIMEOUT_SECONDS if manual else None)
     delivery.attempts += 1
     delivery.last_status_code = result["status_code"]
     delivery.last_error = result["error"][:500]

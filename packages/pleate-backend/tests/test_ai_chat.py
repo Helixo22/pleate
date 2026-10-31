@@ -305,7 +305,8 @@ def test_errored_messages_are_left_out_of_history(auth_api, monkeypatch):
     assert [m["role"] for m in seen["h"]] == ["user", "user"]
 
 
-def test_stop_during_stream(auth_api):
+def test_stop_during_stream(auth_api, monkeypatch):
+    monkeypatch.setattr(services, "STOP_CHECK_INTERVAL", 0)
     conv = conversation(auth_api)
     res = send(auth_api, conv["id"], "one two three four five six seven")
     chunks = iter(res.streaming_content)
@@ -813,3 +814,134 @@ def test_anthropic_connection_error_is_an_error_event(auth_api):
         events = stream_events(send(auth_api, conv["id"], "Hi"))
     assert events[-2] == ("error", {**events[-2][1], "code": "provider_unavailable"})
     assert events[-1][1]["message"]["status"] == "error"
+
+
+# Review fixes
+
+
+def test_failed_request_without_output_records_no_usage(auth_api, user, monkeypatch):
+    def broken(self, *a, **kw):
+        raise ProviderError("provider_unavailable")
+        yield
+
+    monkeypatch.setattr("pleate_backend.ai_chat.providers.EchoProvider.stream", broken)
+    conv = conversation(auth_api)
+    final = send_json(auth_api, conv["id"], "a long question " * 50).json()["assistant_message"]
+    assert final["status"] == "error" and (final["input_tokens"], final["output_tokens"]) == (0, 0)
+    assert not DailyUsage.objects.filter(user=user).exists()
+
+
+def test_concurrent_generations_are_capped(auth_api, user):
+    conv = conversation(auth_api)
+    with ai_settings(MAX_CONCURRENT_GENERATIONS=1):
+        services.acquire_slot(user)  # a generation already running
+        res = send(auth_api, conv["id"])
+        assert res.status_code == 429 and res.json()["error"]["code"] == "too_many_generations"
+        services.release_slot(user.pk)
+        assert send_json(auth_api, conv["id"]).status_code == 201
+        assert send_json(auth_api, conv["id"]).status_code == 201  # the slot was released
+        assert services.cache.get(services.slot_key(user.pk)) is None
+
+
+def test_stop_uses_stream_start_not_creation_date(auth_api, user):
+    conv = Conversation.objects.create(user=user, title="x")
+    msg = Message.objects.create(
+        conversation=conv,
+        role="assistant",
+        status="streaming",
+        created_at=timezone.now() - timedelta(hours=1),
+        stream_started_at=timezone.now(),
+    )
+    assert auth_api.post(f"/api/ai/messages/{msg.pk}/stop").json()["status"] == "streaming"
+    assert Message.objects.get(pk=msg.pk).status == "streaming"
+
+
+def test_regenerate_claims_the_message_atomically(auth_api, monkeypatch):
+    conv = conversation(auth_api)
+    first = send_json(auth_api, conv["id"], "Hi").json()["assistant_message"]
+    # Another request claimed it between the status check and the update.
+    monkeypatch.setattr(
+        services, "check_quota", lambda u: Message.objects.filter(pk=first["id"]).update(status="streaming")
+    )
+    res = auth_api.post(f"/api/ai/messages/{first['id']}/regenerate", HTTP_ACCEPT="application/json")
+    assert res.status_code == 409 and res.json()["error"]["code"] == "message_streaming"
+    msg = Message.objects.get(pk=first["id"])
+    assert msg.content == "You said: Hi" and msg.variants == []
+
+
+def test_regenerate_sets_stream_started_at(auth_api):
+    conv = conversation(auth_api)
+    first = send_json(auth_api, conv["id"], "Hi").json()["assistant_message"]
+    before = Message.objects.get(pk=first["id"]).stream_started_at
+    auth_api.post(f"/api/ai/messages/{first['id']}/regenerate", HTTP_ACCEPT="application/json")
+    assert Message.objects.get(pk=first["id"]).stream_started_at > before
+
+
+def test_stop_and_send_survive_a_broken_cache(auth_api, monkeypatch):
+    def down(*a, **kw):
+        raise ConnectionError("cache down")
+
+    for name in ("get", "set", "delete", "add", "incr", "decr", "touch"):
+        monkeypatch.setattr(services.cache, name, down)
+    conv = conversation(auth_api)
+    final = send_json(auth_api, conv["id"]).json()["assistant_message"]
+    assert final["status"] == "complete"
+    msg = Message.objects.get(pk=final["id"])
+    msg.status = "streaming"
+    msg.save()
+    assert auth_api.post(f"/api/ai/messages/{msg.pk}/stop").status_code == 202
+
+
+def _file(owner, name, data: bytes):
+    from django.core.files.base import ContentFile
+
+    from pleate_backend.files.models import File
+    from pleate_backend.files.storage import get_storage
+
+    key = get_storage().save(f"ai-test/{name}", ContentFile(data))
+    return File.objects.create(
+        owner=owner, name=name, key=key, size=len(data), content_type="text/plain", purpose="attachment"
+    )
+
+
+@needs_files
+def test_history_attachments_respect_the_byte_budget(user, django_assert_max_num_queries):
+    conv = Conversation.objects.create(user=user, title="x")
+    old, new = _file(user, "old.txt", b"o" * 10), _file(user, "new.txt", b"n" * 10)
+    now = timezone.now()
+    Message.objects.create(
+        conversation=conv, role="user", content="a", attachments=[str(old.pk)], created_at=now
+    )
+    Message.objects.create(
+        conversation=conv,
+        role="user",
+        content="b",
+        attachments=[str(new.pk)],
+        created_at=now + timedelta(seconds=1),
+    )
+    target = Message.objects.create(
+        conversation=conv, role="assistant", created_at=now + timedelta(seconds=2)
+    )
+    with ai_settings(HISTORY_ATTACHMENT_BYTES=15), django_assert_max_num_queries(2):
+        history = services.build_history(conv, target)
+    assert history[0]["attachments"] == [] and history[0]["content"] == "a\n[attachment: old.txt]"
+    assert history[1]["attachments"][0]["data"] == b"n" * 10 and history[1]["content"] == "b"
+
+
+@needs_files
+def test_message_list_loads_attachments_in_one_query(auth_api, user, django_assert_max_num_queries):
+    conv = Conversation.objects.create(user=user, title="x")
+    for i in range(5):
+        f = _file(user, f"f{i}.txt", b"x")
+        Message.objects.create(conversation=conv, role="user", content=str(i), attachments=[str(f.pk)])
+    with django_assert_max_num_queries(4):
+        res = auth_api.get(f"/api/ai/conversations/{conv.pk}/messages")
+    assert [m["attachments"][0]["name"] for m in res.json()["results"]] == [f"f{i}.txt" for i in range(5)]
+
+
+def test_provider_clients_are_reused_with_a_default_timeout():
+    a = OpenAIProvider(api_key="k", default_headers={"x": "1"}).client()
+    b = OpenAIProvider(api_key="k", default_headers={"x": "1"}).client()
+    c = AnthropicProvider(api_key="k").client()
+    assert a is b and a.timeout == 120.0 and c.timeout == 120.0
+    assert OpenAIProvider(api_key="other").client() is not a

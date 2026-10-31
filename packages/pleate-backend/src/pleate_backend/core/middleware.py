@@ -3,6 +3,7 @@ import uuid
 
 from django.conf import settings
 from django.utils import translation
+from django.utils.cache import patch_vary_headers
 
 from .logging import request_id_var
 
@@ -58,5 +59,6 @@ class LocaleMiddleware:
                 # Applies from the next request on, the user model loads lazily.
                 response.set_cookie(self.cookie_name, pref, samesite="Lax", max_age=60 * 60 * 24 * 365)
         response.setdefault("Content-Language", translation.get_language())
+        patch_vary_headers(response, ("Accept-Language", "Cookie"))
         translation.deactivate()
         return response

@@ -1,6 +1,8 @@
 // Table: data in rows and columns on a rounded surface. Comfortable or compact density, optional stripes, hover and
 // sticky header. Sortable headers are buttons that announce their order (aria-sort). With stackOnMobile each row
 // becomes a card on phones and every cell shows its column name (TableCell label).
+"use client";
+
 import { createContext, useContext, type HTMLAttributes, type ReactNode, type TdHTMLAttributes, type ThHTMLAttributes } from "react";
 import { cn } from "../../lib/cn.ts";
 import { ChevronUpIcon } from "../../lib/icons.tsx";

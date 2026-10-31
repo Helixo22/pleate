@@ -52,6 +52,7 @@ export function SearchBar({
   className,
   onFocus,
   onBlur,
+  onKeyDown,
   ...props
 }: SearchBarProps) {
   const inner = useRef<HTMLInputElement | null>(null);
@@ -59,6 +60,7 @@ export function SearchBar({
   const [focused, setFocused] = useState(false);
   const reduced = useReducedMotion();
   const timer = useRef<number>(undefined);
+  useEffect(() => () => window.clearTimeout(timer.current), []);
   const [isMac, setIsMac] = useState(false);
 
   useEffect(() => {
@@ -121,6 +123,8 @@ export function SearchBar({
           placeholder={placeholder}
           onChange={(event) => change(event.target.value)}
           onKeyDown={(event) => {
+            onKeyDown?.(event);
+            if (event.defaultPrevented) return;
             if (event.key === "Escape" && text) {
               event.preventDefault();
               change("");

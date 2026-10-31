@@ -69,6 +69,8 @@ DEFAULTS: dict = {
         ],
         "USER_QUOTA": 500 * 1024 * 1024,
         "IMAGE_MAX_DIMENSION": 2400,
+        # Animated images are decoded whole: frames * width * height must stay under this.
+        "ANIMATION_MAX_PIXELS": 100_000_000,
         "AVATAR_MAX_SIZE": 2 * 1024 * 1024,
         "AVATAR_DIMENSION": 512,
         "PRESIGNED_UPLOADS": False,
@@ -80,6 +82,17 @@ DEFAULTS: dict = {
         "VAPID_PUBLIC_KEY": None,
         "VAPID_PRIVATE_KEY": None,
         "VAPID_SUBJECT": "mailto:admin@localhost",
+        # Push is sent from a Celery task; False sends inside the request.
+        "ASYNC": True,
+        # Push endpoints must be on one of these hosts or their subdomains (SSRF guard).
+        "PUSH_ALLOWED_HOSTS": [
+            "fcm.googleapis.com",
+            "updates.push.services.mozilla.com",
+            "push.services.mozilla.com",
+            "web.push.apple.com",
+            "push.apple.com",
+            "notify.windows.com",
+        ],
     },
     "EMAILS": {
         "ASYNC": True,
@@ -91,6 +104,8 @@ DEFAULTS: dict = {
     "REALTIME": {
         "BACKEND": "pleate_backend.core.realtime.MemoryBroker",
         "HEARTBEAT_SECONDS": 20,
+        # Notification streams close after this; clients reconnect. 0 keeps them open.
+        "MAX_STREAM_SECONDS": 300,
     },
     "WEBHOOKS": {
         "MAX_ATTEMPTS": 8,
@@ -111,6 +126,8 @@ DEFAULTS: dict = {
         "SUGGESTIONS": [],
         "MAX_MESSAGE_CHARS": 32_000,
         "MAX_ATTACHMENTS": 10,
+        "MAX_CONCURRENT_GENERATIONS": 2,
+        "HISTORY_ATTACHMENT_BYTES": 20 * 1024 * 1024,
     },
     "MARKETING": {
         "CONTACT_RECIPIENTS": [],
@@ -124,6 +141,8 @@ DEFAULTS: dict = {
         # [{"id": "pro", "name": "Pro", "prices": {"month": "price_x", "year": "price_y"}, ...}]
         "PLANS": [],
         "TRIAL_DAYS": 0,
+        # Webhook events are kept this long for idempotency. Stripe retries for 3 days.
+        "EVENT_RETENTION_DAYS": 30,
     },
 }
 

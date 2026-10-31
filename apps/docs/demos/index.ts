@@ -382,6 +382,7 @@ export const DOCS: Record<string, ComponentDoc> = {
     name: "Form Field",
     description: "Accessible validation without a form library. Rules run on blur, live once an error shows, and for every field on submit. Then focus jumps to the first problem.",
     importName: "Form, FormField, useForm, useFormField",
+    importPath: "pleate/form",
     demos: [{ id: "booking", title: "Booking request", description: "Submit it empty to see every message; values are read from the form itself.", align: "stretch", Component: FormFieldBooking }],
     props: [
       { name: "Form onSubmit", type: "(values, event) => void | Promise", description: "Runs only when valid; useForm().submitting is true while it awaits." },
@@ -396,7 +397,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   "date-picker": {
     name: "Date Picker",
     description: "A field that opens a calendar: popover on desktop, bottom sheet on phones. Single dates or ranges, presets, limits, localized names.",
-    importName: "DatePicker, Calendar",
+    importName: "DatePicker",
     demos: [{ id: "basic", title: "Single, range with presets, standalone calendar", align: "stretch", Component: DatePickerBasic }],
     props: [
       { name: "mode", type: '"single" | "range"', default: '"single"', description: "One day or from–to." },
