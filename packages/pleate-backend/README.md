@@ -73,6 +73,8 @@ Remove an app from `INSTALLED_APPS` and its routes disappear. Every option lives
 | marketing | `/api/marketing/` | newsletter with double opt in, contact form with honeypot, waitlist with referrals |
 | billing | `/api/billing/` | Stripe Checkout, customer portal, subscriptions, idempotent webhook |
 | staff | `/api/staff/` | back office API: users, roles, sessions, IP bans, stats |
+| usage | `/api/usage` | plan and use of every limit (storage, AI tokens, API keys, webhooks) for UsageMeter |
+| search | `/api/search` | search over the user's own files, conversations and notifications |
 
 The OpenAPI schema is served at `/api/schema` and Swagger UI at `/api/docs`.
 Messages are translated in English, Italian and Spanish.

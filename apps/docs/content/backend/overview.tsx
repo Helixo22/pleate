@@ -113,6 +113,8 @@ export default function Login() {
           ["marketing", "/api/marketing", "Newsletter, ContactForm, waitlist"],
           ["billing", "/api/billing", "Pricing"],
           ["staff", "/api/staff", "Back office tables and StatCard"],
+          ["usage", "/api/usage", "UsageMeter"],
+          ["search", "/api/search", "CommandPalette"],
         ]}
       />
 

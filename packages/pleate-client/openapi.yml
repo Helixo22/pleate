@@ -891,6 +891,46 @@ paths:
       responses:
         '200':
           description: JSON file with every piece of the user's data
+  /api/auth/me/preferences:
+    get:
+      operationId: auth_me_preferences_retrieve
+      description: 'UI preferences: theme, palette, motion and the bottom bar. Readable
+        with an API key.'
+      tags:
+      - account
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UiPreferences'
+          description: ''
+    patch:
+      operationId: auth_me_preferences_partial_update
+      description: 'Partial update: only the keys sent change.'
+      tags:
+      - account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUiPreferencesRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUiPreferencesRequest'
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UiPreferences'
+          description: ''
   /api/auth/mfa:
     get:
       operationId: auth_mfa_retrieve
@@ -2740,6 +2780,46 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/search:
+    get:
+      operationId: search_list
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          maximum: 10
+          minimum: 1
+          default: 5
+        description: Per type.
+      - in: query
+        name: q
+        schema:
+          type: string
+          minLength: 2
+          maxLength: 100
+        required: true
+      - in: query
+        name: types
+        schema:
+          type: string
+          minLength: 1
+        description: 'Comma separated: files, conversations, notifications. Default
+          all.'
+      tags:
+      - search
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchResult'
+          description: ''
   /api/staff/bans:
     get:
       operationId: staff_bans_list
@@ -3055,6 +3135,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Count'
+          description: ''
+  /api/usage:
+    get:
+      operationId: usage_retrieve
+      tags:
+      - usage
+      security:
+      - apiKey: []
+      - session: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageSummary'
           description: ''
   /api/webhooks/deliveries/{id}:
     get:
@@ -4569,6 +4664,14 @@ components:
       required:
       - default
       - models
+    MotionEnum:
+      enum:
+      - system
+      - 'off'
+      type: string
+      description: |-
+        * `system` - system
+        * `off` - off
     NewsletterStatus:
       type: object
       properties:
@@ -5206,6 +5309,30 @@ components:
           items:
             type: string
             minLength: 1
+    PatchedUiPreferencesRequest:
+      type: object
+      description: The UI preferences kept in ``User.preferences``. PATCH merges what
+        is sent.
+      properties:
+        theme:
+          $ref: '#/components/schemas/ThemeEnum'
+        palette:
+          type: string
+          nullable: true
+          minLength: 1
+          description: A palette name or "#rrggbb".
+          maxLength: 32
+        motion:
+          $ref: '#/components/schemas/MotionEnum'
+        bottom_bar:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 64
+            pattern: ^[a-z0-9_/-]{1,64}$
+          description: Ordered nav ids, up to 4.
+          maxItems: 4
     Permission:
       type: object
       properties:
@@ -5542,6 +5669,26 @@ components:
       description: |-
         * `read` - Read
         * `write` - Write
+    SearchResult:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        id:
+          type: string
+        title:
+          type: string
+        subtitle:
+          type: string
+          nullable: true
+        url:
+          type: string
+      required:
+      - id
+      - subtitle
+      - title
+      - type
+      - url
     Secret:
       type: object
       properties:
@@ -6041,6 +6188,16 @@ components:
       - error
       - status
       - status_code
+    ThemeEnum:
+      enum:
+      - light
+      - dark
+      - system
+      type: string
+      description: |-
+        * `light` - light
+        * `dark` - dark
+        * `system` - system
     TokenRequest:
       type: object
       properties:
@@ -6049,6 +6206,38 @@ components:
           minLength: 1
       required:
       - token
+    TypeEnum:
+      enum:
+      - files
+      - conversations
+      - notifications
+      type: string
+      description: |-
+        * `files` - files
+        * `conversations` - conversations
+        * `notifications` - notifications
+    UiPreferences:
+      type: object
+      description: The UI preferences kept in ``User.preferences``. PATCH merges what
+        is sent.
+      properties:
+        theme:
+          $ref: '#/components/schemas/ThemeEnum'
+        palette:
+          type: string
+          nullable: true
+          description: A palette name or "#rrggbb".
+          maxLength: 32
+        motion:
+          $ref: '#/components/schemas/MotionEnum'
+        bottom_bar:
+          type: array
+          items:
+            type: string
+            maxLength: 64
+            pattern: ^[a-z0-9_/-]{1,64}$
+          description: Ordered nav ids, up to 4.
+          maxItems: 4
     UploadRequest:
       type: object
       properties:
@@ -6082,6 +6271,39 @@ components:
       - input_tokens
       - limit
       - output_tokens
+    UsageItem:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        used:
+          type: integer
+        limit:
+          type: integer
+          nullable: true
+        unit:
+          type: string
+      required:
+      - id
+      - label
+      - limit
+      - unit
+      - used
+    UsageSummary:
+      type: object
+      properties:
+        plan:
+          type: string
+          nullable: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsageItem'
+      required:
+      - items
+      - plan
     UserRoles:
       type: object
       properties:

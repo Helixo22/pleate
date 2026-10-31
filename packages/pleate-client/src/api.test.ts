@@ -235,6 +235,17 @@ describe("oauth", () => {
     const unknown = await fetch("http://localhost/api/auth/oauth/apple/start", { redirect: "manual" });
     expect((await unknown.json()).error.code).toBe("oauth_unknown_provider");
   });
+
+  it("only redirects to frontend paths after sign in", async () => {
+    const nextOf = async (next: string) => {
+      const res = await fetch(api.oauth.startUrl("google", { next }), { redirect: "manual" });
+      return new URL(res.headers.get("Location") ?? "", "http://localhost").searchParams.get("next");
+    };
+    expect(await nextOf("/app?tab=1")).toBe("/app?tab=1");
+    for (const evil of ["//evil.com", "/\\evil.com", "https://evil.com", "/a\nb"]) {
+      expect(await nextOf(evil)).toBe("/");
+    }
+  });
 });
 
 describe("api keys", () => {
@@ -257,6 +268,37 @@ describe("api keys", () => {
     expect(byName.results.map((k) => k.name)).toEqual([...byName.results.map((k) => k.name)].sort((a, b) => a.localeCompare(b)));
     const bad = await expectError(api.apiKeys.create({ name: "" }), "validation_error");
     expect(bad.fields.name[0].code).toBe("blank");
+  });
+});
+
+describe("preferences, usage and search", () => {
+  it("reads defaults, merges partial updates and validates", async () => {
+    expect(await api.auth.preferences()).toEqual({ theme: "system", palette: null, motion: "system", bottom_bar: [] });
+    await api.auth.updatePreferences({ theme: "dark", palette: "#ABCDEF" });
+    expect(await api.auth.updatePreferences({ bottom_bar: ["home", "files"] })).toEqual({
+      theme: "dark",
+      palette: "#abcdef",
+      motion: "system",
+      bottom_bar: ["home", "files"],
+    });
+    const error = await expectError(api.auth.updatePreferences({ bottom_bar: ["a", "a"] }), "validation_error", 400);
+    expect(error.fields?.bottom_bar?.[0].code).toBe("duplicate_item");
+    await expectError(api.auth.updatePreferences({ palette: "hotpink" }), "validation_error", 400);
+  });
+
+  it("summarizes usage against the limits", async () => {
+    const usage = await api.usage.summary();
+    expect(usage.items.map((i) => i.id)).toEqual(["storage", "ai_tokens", "api_keys", "webhooks"]);
+    expect(usage.items[0]).toMatchObject({ unit: "bytes", limit: 500 * 1024 * 1024 });
+  });
+
+  it("searches only the signed in user's data, with validation", async () => {
+    const results = await api.search("SPRING");
+    expect(results.length).toBeGreaterThan(0);
+    expect(results.every((r) => r.title.toLowerCase().includes("spring"))).toBe(true);
+    expect((await api.search("spring", { types: ["files"], limit: 1 })).map((r) => r.type)).toEqual(["files"]);
+    await expectError(api.search("s"), "validation_error", 400);
+    await expectError(api.search("spring", { limit: 11 }), "validation_error", 400);
   });
 });
 

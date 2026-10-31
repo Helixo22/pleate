@@ -1,7 +1,7 @@
 import { C, Callout, Code, H2, H3, P, Table } from "@/components/backend/prose";
 
 const MODULES: [string, string][] = [
-  ["auth", "csrf, me, updateMe, signup, login, logout, changePassword, requestPasswordReset, validateResetToken, resetPassword, verifyEmail, resendVerification, changeEmail, confirmEmailChange, uploadAvatar, removeAvatar, exportData, deleteAccount"],
+  ["auth", "csrf, me, updateMe, signup, login, logout, changePassword, requestPasswordReset, validateResetToken, resetPassword, verifyEmail, resendVerification, changeEmail, confirmEmailChange, uploadAvatar, removeAvatar, exportData, preferences, updatePreferences, deleteAccount"],
   ["sessions", "list, revoke, revokeOthers"],
   ["mfa", "status, setup, confirm, disable, regenerateBackupCodes, verify"],
   ["oauth", "providers, startUrl (a URL to navigate to), accounts, unlink"],
@@ -15,6 +15,8 @@ const MODULES: [string, string][] = [
   ["webhooks", "events, endpoints, createEndpoint, updateEndpoint, deleteEndpoint, rotateSecret, test, deliveries, delivery, redeliver"],
   ["rbac", "myFeatures, roles, createRole, updateRole, deleteRole, permissions, assignRole, removeRole, features"],
   ["staff", "users, user, updateUser, deleteUser, revokeSessions, sendPasswordReset, stats, bans, createBan, deleteBan"],
+  ["usage", "summary"],
+  ["search(q, { types, limit, signal })", "The signed in user's files, conversations and notifications → SearchResult[]."],
   ["list<T>(path, params)", "Any list endpoint of your own that follows the conventions → Page<T>."],
   ["http", "The underlying Http: get, post, put, patch, delete, raw, stream, upload, url, ensureCsrf."],
 ];
@@ -43,6 +45,9 @@ const HOOKS: [string, string, string][] = [
   ["useSuggestions(onSelect)", "promptSuggestionsProps", "PromptSuggestions"],
   ["useConversations({ archived })", "useList result for conversations", "Chat sidebar"],
   ["useAiUsage()", "query of today's tokens", "Quota meter"],
+  ["usePreferences()", "preferences, update (optimistic, rolls back on error)", "Theme and bottom bar settings"],
+  ["useUsage()", "plan, items, usageMeterProps", "UsageMeter"],
+  ["useSearch(q, { types, limit })", "results, query state; runs from 2 characters", "Command palette"],
   ["usePricing({ isSignedIn, signInHref, renderCta })", "pricingProps, billing, setBilling, checkout, portal", "Pricing"],
   ["useSubscription()", "subscription, openPortal", "Billing settings"],
   ["useNewsletter({ source })", "newsletterProps, confirmationRequired", "Newsletter"],

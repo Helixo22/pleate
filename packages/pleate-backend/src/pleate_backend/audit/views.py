@@ -5,6 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics
 
+from pleate_backend.apikeys.permissions import DenyAPIKey
 from pleate_backend.core.filters import OrderingFilter, SearchFilter
 from pleate_backend.core.pagination import CursorPagination, PagePagination
 from pleate_backend.core.permissions import IsStaff
@@ -57,7 +58,7 @@ class MyActivityView(generics.ListAPIView):
 @extend_schema_view(get=extend_schema(tags=["activity"], summary="Every activity entry (staff)"))
 class ActivityListView(generics.ListAPIView):
     serializer_class = ActivityLogSerializer
-    permission_classes = [IsStaff]
+    permission_classes = [DenyAPIKey, IsStaff]
     pagination_class = PagePagination
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ActivityFilter
@@ -70,7 +71,7 @@ class ActivityListView(generics.ListAPIView):
 @extend_schema_view(get=extend_schema(tags=["activity"], summary="One activity entry (staff)"))
 class ActivityDetailView(generics.RetrieveAPIView):
     serializer_class = ActivityLogSerializer
-    permission_classes = [IsStaff]
+    permission_classes = [DenyAPIKey, IsStaff]
     queryset = ActivityLog.objects.all()
 
     def get_object(self):

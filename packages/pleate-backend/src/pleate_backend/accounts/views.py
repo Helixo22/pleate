@@ -33,6 +33,8 @@ from .services import (
     revoke_credentials,
     revoke_sessions,
     send_password_reset,
+    ui_preferences,
+    update_ui_preferences,
 )
 from .tokens import make_signed, read_reset_token, read_signed
 
@@ -112,12 +114,18 @@ class LoginView(AuthView):
         email = ser.validated_data["email"].strip().lower()
         conf = pleate_settings.AUTH
         window = conf["LOGIN_LOCKOUT_SECONDS"]
-        acct_key = f"login:acct:{email}"
-        ip_key = f"login:ip:{client_ip(request)}"
+        ip = client_ip(request)
+        # Per account and IP, so guessing from one address cannot lock the owner out everywhere;
+        # the wider per account cap still slows guesses spread over many addresses.
+        counters = (
+            (f"login:acct:{email}:{ip}", conf["LOGIN_MAX_ATTEMPTS"], window),
+            (f"login:acct:{email}", conf["LOGIN_ACCOUNT_MAX_ATTEMPTS"], conf["LOGIN_ACCOUNT_WINDOW_SECONDS"]),
+            (f"login:ip:{ip}", conf["LOGIN_IP_MAX_ATTEMPTS"], window),
+        )
 
         # Count first: a check then a count would let parallel guesses all pass.
-        for key, limit in ((acct_key, conf["LOGIN_MAX_ATTEMPTS"]), (ip_key, conf["LOGIN_IP_MAX_ATTEMPTS"])):
-            allowed, retry = limits.hit(key, limit, window, fail_closed=True)
+        for key, limit, seconds in counters:
+            allowed, retry = limits.hit(key, limit, seconds, fail_closed=True)
             if not allowed:
                 raise ApiError(
                     "too_many_attempts",
@@ -130,8 +138,11 @@ class LoginView(AuthView):
         if user is None:
             raise ApiError("invalid_credentials", _("Email or password is wrong."), 400)
 
-        limits.reset(acct_key, window)
-        # Successful logins do not count, so many users behind one NAT are not locked out.
+        acct_ip_key, acct_key, ip_key = (c[0] for c in counters)
+        limits.reset(acct_ip_key, window)
+        # Successful logins do not count, so the owner does not use up the account cap
+        # and many users behind one NAT are not locked out.
+        limits.refund(acct_key, conf["LOGIN_ACCOUNT_WINDOW_SECONDS"])
         limits.refund(ip_key, window)
         if conf["REQUIRE_EMAIL_VERIFICATION"] and not user.email_verified:
             raise ApiError("email_not_verified", _("Confirm your email before signing in."), 403)
@@ -197,6 +208,27 @@ class MeView(APIView):
         logout(request)
         user.delete()
         return Response(status=204)
+
+
+class MePreferencesView(APIView):
+    """UI preferences: theme, palette, motion and the bottom bar. Readable with an API key."""
+
+    def get_permissions(self):
+        perms = super().get_permissions()
+        return perms if self.request.method in SAFE_METHODS else [*perms, DenyAPIKey()]
+
+    @extend_schema(responses=s.UiPreferencesSerializer, tags=["account"])
+    def get(self, request):
+        return Response(ui_preferences(request.user))
+
+    @extend_schema(request=s.UiPreferencesSerializer, responses=s.UiPreferencesSerializer, tags=["account"])
+    def patch(self, request):
+        """Partial update: only the keys sent change."""
+        if not isinstance(request.data, dict):
+            raise ApiError("invalid", _("Preferences must be a small object."), 400)
+        ser = s.UiPreferencesSerializer(data=request.data, partial=True)
+        ser.is_valid(raise_exception=True)
+        return Response(update_ui_preferences(request.user, ser.validated_data))
 
 
 class ExportView(APIView):
@@ -282,7 +314,9 @@ class PasswordResetConfirmView(AuthView):
         revoke_sessions(user)
         # Whoever signed up with this email before the owner may have attached ways back in.
         revoke_credentials(user, unverified=not was_verified)
-        limits.reset(f"login:acct:{user.email}", pleate_settings.AUTH["LOGIN_LOCKOUT_SECONDS"])
+        auth = pleate_settings.AUTH
+        limits.reset(f"login:acct:{user.email}", auth["LOGIN_ACCOUNT_WINDOW_SECONDS"])
+        limits.reset(f"login:acct:{user.email}:{client_ip(request)}", auth["LOGIN_LOCKOUT_SECONDS"])
         signals.password_reset.send(sender=User, user=user, request=request)
         send_security_notice(user, _("The password of your account was reset."))
         return Response(status=204)
@@ -429,6 +463,7 @@ class SessionRevokeOthersView(CsrfProtectedMixin, APIView):
 
 
 class AvatarView(CsrfProtectedMixin, APIView):
+    permission_classes = [IsAuthenticated, DenyAPIKey]
     parser_classes = [MultiPartParser]
 
     @extend_schema(

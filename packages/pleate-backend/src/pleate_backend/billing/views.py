@@ -5,10 +5,11 @@ from django.utils.translation import gettext as _
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.parsers import JSONParser
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from pleate_backend.apikeys.permissions import DenyAPIKey
 from pleate_backend.core.csrf import CsrfProtectedMixin
 from pleate_backend.core.exceptions import ApiError
 
@@ -46,6 +47,9 @@ class CheckoutView(CsrfProtectedMixin, APIView):
 
 
 class PortalView(CsrfProtectedMixin, APIView):
+    # The portal can cancel the plan and change the payment method: not for API keys.
+    permission_classes = [IsAuthenticated, DenyAPIKey]
+
     @extend_schema(request=None, responses=s.RedirectSerializer, tags=["billing"])
     def post(self, request):
         """Opens the Stripe billing portal (change plan, payment method, invoices, cancel)."""

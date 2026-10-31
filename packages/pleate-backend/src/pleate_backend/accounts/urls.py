@@ -9,6 +9,7 @@ urlpatterns = [
     path("login", v.LoginView.as_view(), name="login"),
     path("logout", v.LogoutView.as_view(), name="logout"),
     path("me", v.MeView.as_view(), name="me"),
+    path("me/preferences", v.MePreferencesView.as_view(), name="me-preferences"),
     path("me/export", v.ExportView.as_view(), name="export"),
     path("me/avatar", v.AvatarView.as_view(), name="me-avatar"),
     path("avatars/<str:user_id>", v.AvatarImageView.as_view(), name="avatar"),

@@ -1,4 +1,4 @@
-import type { Session } from "../../api.ts";
+import type { Session, UiPreferences } from "../../api.ts";
 import { DEMO_TOTP_CODE, type MockDb, type MockUser, VALID_TOKEN } from "../db.ts";
 import type { Ctx, Router } from "../router.ts";
 import { describeUserAgent, USER_AGENTS } from "../seed.ts";
@@ -205,6 +205,36 @@ export function authRoutes(r: Router) {
     db.users = db.users.filter((u) => u.id !== user.id);
     db.auth = { userId: null, sessionId: null, pendingMfa: null };
     return noContent();
+  });
+  r.get("/auth/me/preferences", ({ user }) => json(uiPreferences(user)));
+  r.patch("/auth/me/preferences", async ({ user, body }) => {
+    const data = await body();
+    const v = new Validator(data);
+    for (const key of Object.keys(data)) {
+      if (!["theme", "palette", "motion", "bottom_bar"].includes(key)) v.add(key, "unknown_field", "Unknown preference.");
+    }
+    if (data.theme !== undefined && !["light", "dark", "system"].includes(String(data.theme))) {
+      v.add("theme", "invalid_choice", `"${data.theme}" is not a valid choice.`);
+    }
+    if (data.motion !== undefined && !["system", "off"].includes(String(data.motion))) {
+      v.add("motion", "invalid_choice", `"${data.motion}" is not a valid choice.`);
+    }
+    let palette = data.palette;
+    if (typeof palette === "string" && /^#[0-9a-fA-F]{6}$/.test(palette)) palette = palette.toLowerCase();
+    else if (palette !== undefined && palette !== null && !PALETTES.includes(String(palette))) {
+      v.add("palette", "invalid_palette", "Pick a palette or a #rrggbb color.");
+    }
+    const bar = data.bottom_bar;
+    if (bar !== undefined) {
+      if (!Array.isArray(bar)) v.add("bottom_bar", "not_a_list", "Expected a list of items.");
+      else if (bar.length > 4) v.add("bottom_bar", "max_length", "Ensure this field has no more than 4 elements.");
+      else if (bar.some((id) => typeof id !== "string" || !/^[a-z0-9_/-]{1,64}$/.test(id))) {
+        v.add("bottom_bar", "invalid", "This value does not match the required pattern.");
+      } else if (new Set(bar).size !== bar.length) v.add("bottom_bar", "duplicate_item", "Each item can appear once.");
+    }
+    v.throwIfAny();
+    user.preferences = { ...user.preferences, ...data, ...(palette !== undefined ? { palette } : {}) };
+    return json(uiPreferences(user));
   });
   r.get("/auth/me/export", ({ db, user }) =>
     json(
@@ -450,7 +480,7 @@ export function authRoutes(r: Router) {
       }
       const mode = url.searchParams.get("mode") ?? "login";
       if (!["login", "link"].includes(mode)) throw fail(400, "invalid_mode", "Unknown mode.");
-      const next = (url.searchParams.get("next") ?? "/").startsWith("/") ? (url.searchParams.get("next") ?? "/") : "/";
+      const next = safeNext(url.searchParams.get("next"));
       const ada = db.users.find((u) => u.email === "ada@plate.dev") ?? db.users[0];
       if (mode === "link") {
         const user = db.currentUser();
@@ -489,4 +519,19 @@ export function authRoutes(r: Router) {
     db.log("oauth.unlinked", user);
     return noContent();
   });
+}
+
+/** Mirrors the backend safe_next: frontend paths only, never "//host", "/\\host" or a scheme. */
+function safeNext(value: string | null): string {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/";
+  if (value.includes("\\") || /[\u0000-\u001f]/.test(value)) return "/";
+  return value.slice(0, 1000);
+}
+
+const PALETTES = ["cobalt", "blue", "violet", "indigo", "ocean", "teal", "green", "amber", "orange", "rose", "graphite"];
+
+/** accounts.services.ui_preferences */
+function uiPreferences(user: MockUser): UiPreferences {
+  const p = user.preferences as Partial<UiPreferences>;
+  return { theme: p.theme ?? "system", palette: p.palette ?? null, motion: p.motion ?? "system", bottom_bar: [...(p.bottom_bar ?? [])] };
 }

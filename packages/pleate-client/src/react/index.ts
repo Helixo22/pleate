@@ -8,6 +8,7 @@ export {
   useLogout,
   useMe,
   useOAuth,
+  usePreferences,
   useResetPassword,
   useSessions,
   useSignup,
@@ -20,3 +21,5 @@ export { fileKey, useUpload } from "./files.ts";
 export { useNotifications, usePushSubscription } from "./notifications.ts";
 export { useAiUsage, useChat, useConversations, useModels, useSuggestions } from "./chat.ts";
 export { useContactForm, useNewsletter, usePricing, useSubscription, useWaitlist } from "./commerce.tsx";
+export { usageMeterProps, useUsage } from "./usage.ts";
+export { useSearch } from "./search.ts";

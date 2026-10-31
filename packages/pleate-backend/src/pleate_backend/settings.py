@@ -63,6 +63,8 @@ PLEATE_APPS = [
     "pleate_backend.marketing",
     "pleate_backend.billing",
     "pleate_backend.staff",
+    "pleate_backend.usage",
+    "pleate_backend.search",
 ]
 
 INSTALLED_APPS = [*DJANGO_APPS, *PLEATE_APPS]

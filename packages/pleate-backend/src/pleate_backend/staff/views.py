@@ -91,8 +91,9 @@ class UserDetailView(generics.GenericAPIView):
 
         if user.pk == request.user.pk and (data.get("is_active") is False or data.get("is_staff") is False):
             raise ApiError("cannot_modify_self", _("You cannot deactivate or demote your own account."), 400)
-        if "is_staff" in data and data["is_staff"] != user.is_staff and not request.user.is_staff:
-            raise ApiError("permission_denied", _("Only staff can change staff access."), 403)
+        # Superuser only: a staff account could otherwise mint staff peers that other staff can't demote.
+        if "is_staff" in data and data["is_staff"] != user.is_staff and not request.user.is_superuser:
+            raise ApiError("permission_denied", _("Only a superuser can change staff access."), 403)
         if "roles" in data and not (request.user.is_staff or request.user.has_perm("auth.change_group")):
             raise ApiError("permission_denied", _("You cannot change roles."), 403)
         if "roles" in data and not request.user.is_superuser:

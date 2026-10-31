@@ -146,9 +146,12 @@ export default function ResetPassword() {
 
       <H2>Login protection</H2>
       <P>
-        Login attempts are counted per account and per IP address in a sliding window, before the password is checked, so
-        parallel guesses cannot slip past the limit. Past the limit the endpoint answers 429 <C>too_many_attempts</C> with{" "}
-        <C>retry_after</C>, even for the right password. A successful login or reset clears the account counter and gives back its IP attempt. The counters fail closed: if the cache is down, logins are refused rather than left
+        Failed logins are counted in sliding windows, before the password is checked, so parallel guesses cannot slip past
+        the limit: per account and IP address (5 in 15 minutes), per account from any address (50 in an hour) and per IP
+        address (30 in 15 minutes). Someone guessing from one address locks only that address out of the account, not
+        the owner. Past a limit the endpoint answers 429 <C>too_many_attempts</C> with <C>retry_after</C>, even for the
+        right password. A successful login clears its account and IP counter and gives back its other attempts; a
+        password reset clears the account counters. The counters fail closed: if the cache is down, logins are refused rather than left
         unprotected.
       </P>
 
@@ -196,8 +199,10 @@ def export_orders(sender, user, request, **kwargs):
         rows={[
           ["SIGNUP_ENABLED", "True", <>False closes signup (<C>signup_disabled</C>).</>],
           ["REQUIRE_EMAIL_VERIFICATION", "False", "Refuse logins until the email is confirmed."],
-          ["LOGIN_MAX_ATTEMPTS", "5", "Failed attempts per account in the window (a success clears it)."],
+          ["LOGIN_MAX_ATTEMPTS", "5", "Failed attempts per account and IP in the window (a success clears it)."],
           ["LOGIN_LOCKOUT_SECONDS", "900", "Length of the window."],
+          ["LOGIN_ACCOUNT_MAX_ATTEMPTS", "50", "Failed attempts per account from any IP, against guesses spread over many addresses."],
+          ["LOGIN_ACCOUNT_WINDOW_SECONDS", "3600", "Window of the per account cap."],
           ["LOGIN_IP_MAX_ATTEMPTS", "30", "Failed attempts per IP in the window; a successful login gives its attempt back."],
           ["REMEMBER_ME_AGE", "31536000", <>Session age in seconds with <C>remember</C> (one year).</>],
           ["EMAIL_TOKEN_MAX_AGE", "259200", "Validity of verification and email change links (three days)."],

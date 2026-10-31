@@ -125,6 +125,24 @@ export const BACKEND_PAGES: BackendPage[] = [
     description: "A back office API: users, roles, sessions, IP bans and the numbers for a dashboard.",
   },
   {
+    slug: "preferences",
+    name: "Preferences",
+    title: "UI preferences",
+    description: "Theme, palette, motion and bottom bar saved on the account, validated and merged one key at a time.",
+  },
+  {
+    slug: "usage",
+    name: "Usage",
+    title: "Usage",
+    description: "The user's plan and how much of each limit they use: storage, AI tokens, API keys and webhooks, ready for UsageMeter.",
+  },
+  {
+    slug: "search",
+    name: "Search",
+    title: "Search",
+    description: "One query over the user's own files, conversations and notifications, shaped for a command palette.",
+  },
+  {
     slug: "internationalization",
     name: "Internationalization",
     title: "Internationalization",

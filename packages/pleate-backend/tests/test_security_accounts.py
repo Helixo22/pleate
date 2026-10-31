@@ -277,3 +277,57 @@ def test_concurrent_mfa_setup_is_409(auth_api):
 def test_user_indexes():
     assert User._meta.get_field("date_joined").db_index
     assert User._meta.get_field("is_staff").db_index
+
+
+# Account lockout is per account and IP, with a wider cap per account
+
+
+def _login(ip, email, password="wrong"):
+    return APIClient().post(
+        "/api/auth/login", {"email": email, "password": password}, format="json", REMOTE_ADDR=ip
+    )
+
+
+def test_failed_logins_from_one_ip_do_not_lock_the_owner_elsewhere(user):
+    for _ in range(6):
+        _login("203.0.113.1", user.email)
+    assert _login("203.0.113.1", user.email, PASSWORD).status_code == 429
+    assert _login("198.51.100.2", user.email, PASSWORD).status_code == 200
+
+
+def test_wide_account_cap_throttles_distributed_guessing(user):
+    auth = {"LOGIN_ACCOUNT_MAX_ATTEMPTS": 3}
+    with override_settings(PLEATE={**settings.PLEATE, "AUTH": auth}):
+        for i in range(3):
+            assert _login(f"203.0.113.{i + 1}", user.email).status_code == 400
+        res = _login("198.51.100.9", user.email, PASSWORD)
+    assert res.status_code == 429
+    assert res.json()["error"]["code"] == "too_many_attempts"
+    assert res.json()["error"]["retry_after"] > 0
+
+
+def test_owner_logins_do_not_use_up_the_wide_account_cap(user):
+    with override_settings(PLEATE={**settings.PLEATE, "AUTH": {"LOGIN_ACCOUNT_MAX_ATTEMPTS": 2}}):
+        for _ in range(3):
+            assert _login("198.51.100.9", user.email, PASSWORD).status_code == 200
+
+
+def test_password_reset_clears_the_wide_account_cap(api, user):
+    with override_settings(PLEATE={**settings.PLEATE, "AUTH": {"LOGIN_ACCOUNT_MAX_ATTEMPTS": 1}}):
+        _login("203.0.113.1", user.email)
+        assert _login("198.51.100.9", user.email, PASSWORD).status_code == 429
+        token = make_reset_token(user)
+        res = api.post(
+            "/api/auth/password/reset/confirm",
+            {"token": token, "new_password": "Another-pass-4242"},
+            format="json",
+        )
+        assert res.status_code == 204
+        assert _login("198.51.100.9", user.email, "Another-pass-4242").status_code == 200
+
+
+def test_billing_portal_refuses_api_keys(api, user):
+    _key, raw = create_key(user, "ci", scopes=["read", "write"])
+    res = api.post("/api/billing/portal", HTTP_AUTHORIZATION=f"Bearer {raw}")
+    assert res.status_code == 403
+    assert res.json()["error"]["code"] == "api_key_not_allowed"

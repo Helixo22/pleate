@@ -77,6 +77,11 @@ PLEATE["REALTIME"] = {"BACKEND": "pleate_backend.core.realtime.RedisBroker"}
       </P>
 
       <H2>Behind a proxy</H2>
+      <Callout>
+        Behind a reverse proxy, <C>{`PLEATE["TRUSTED_PROXIES"]`}</C> must list it. Otherwise every request seems to come
+        from the proxy address, and the per IP limits (login attempts, anonymous throttles, bans) become one global
+        counter that a single client can use up for everyone. Without Redis these counters are also per process.
+      </Callout>
       <UL>
         <LI>Add the proxy networks to <C>{`PLEATE["TRUSTED_PROXIES"]`}</C> so <C>X-Forwarded-For</C> is used for rate limits, bans and the activity log. Only trusted hops are read.</LI>
         <LI>Set <C>SECURE_PROXY_SSL_HEADER = (&quot;HTTP_X_FORWARDED_PROTO&quot;, &quot;https&quot;)</C> when TLS ends at the proxy.</LI>

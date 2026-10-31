@@ -432,6 +432,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/me/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description UI preferences: theme, palette, motion and the bottom bar. Readable with an API key. */
+        get: operations["auth_me_preferences_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** @description Partial update: only the keys sent change. */
+        patch: operations["auth_me_preferences_partial_update"];
+        trace?: never;
+    };
     "/api/auth/mfa": {
         parameters: {
             query?: never;
@@ -1519,6 +1537,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["search_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/staff/bans": {
         parameters: {
             query?: never;
@@ -1640,6 +1674,22 @@ export interface paths {
         put?: never;
         /** Sign a user out everywhere */
         post: operations["staff_users_revoke_sessions_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["usage_retrieve"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2233,6 +2283,12 @@ export interface components {
             models: components["schemas"]["ModelOption"][];
             default: string;
         };
+        /**
+         * @description * `system` - system
+         *     * `off` - off
+         * @enum {string}
+         */
+        MotionEnum: "system" | "off";
         NewsletterStatus: {
             /** Format: email */
             email: string;
@@ -2497,6 +2553,15 @@ export interface components {
             email_verified?: boolean;
             roles?: string[];
         };
+        /** @description The UI preferences kept in ``User.preferences``. PATCH merges what is sent. */
+        PatchedUiPreferencesRequest: {
+            theme?: components["schemas"]["ThemeEnum"];
+            /** @description A palette name or "#rrggbb". */
+            palette?: string | null;
+            motion?: components["schemas"]["MotionEnum"];
+            /** @description Ordered nav ids, up to 4. */
+            bottom_bar?: string[];
+        };
         Permission: {
             readonly id: string;
             /** @description "app_label.codename" */
@@ -2633,6 +2698,13 @@ export interface components {
          * @enum {string}
          */
         ScopesEnum: "read" | "write";
+        SearchResult: {
+            type: components["schemas"]["TypeEnum"];
+            id: string;
+            title: string;
+            subtitle: string | null;
+            url: string;
+        };
         Secret: {
             secret: string;
         };
@@ -2817,8 +2889,31 @@ export interface components {
             duration_ms: number | null;
             error: string;
         };
+        /**
+         * @description * `light` - light
+         *     * `dark` - dark
+         *     * `system` - system
+         * @enum {string}
+         */
+        ThemeEnum: "light" | "dark" | "system";
         TokenRequest: {
             token: string;
+        };
+        /**
+         * @description * `files` - files
+         *     * `conversations` - conversations
+         *     * `notifications` - notifications
+         * @enum {string}
+         */
+        TypeEnum: "files" | "conversations" | "notifications";
+        /** @description The UI preferences kept in ``User.preferences``. PATCH merges what is sent. */
+        UiPreferences: {
+            theme?: components["schemas"]["ThemeEnum"];
+            /** @description A palette name or "#rrggbb". */
+            palette?: string | null;
+            motion?: components["schemas"]["MotionEnum"];
+            /** @description Ordered nav ids, up to 4. */
+            bottom_bar?: string[];
         };
         UploadRequest: {
             /** Format: binary */
@@ -2833,6 +2928,17 @@ export interface components {
             input_tokens: number;
             output_tokens: number;
             limit: number | null;
+        };
+        UsageItem: {
+            id: string;
+            label: string;
+            used: number;
+            limit: number | null;
+            unit: string;
+        };
+        UsageSummary: {
+            plan: string | null;
+            items: components["schemas"]["UsageItem"][];
         };
         UserRoles: {
             roles: string[];
@@ -3661,6 +3767,49 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    auth_me_preferences_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UiPreferences"];
+                };
+            };
+        };
+    };
+    auth_me_preferences_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedUiPreferencesRequest"];
+                "multipart/form-data": components["schemas"]["PatchedUiPreferencesRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UiPreferences"];
+                };
             };
         };
     };
@@ -5374,6 +5523,31 @@ export interface operations {
             };
         };
     };
+    search_list: {
+        parameters: {
+            query: {
+                /** @description Per type. */
+                limit?: number;
+                q: string;
+                /** @description Comma separated: files, conversations, notifications. Default all. */
+                types?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchResult"][];
+                };
+            };
+        };
+    };
     staff_bans_list: {
         parameters: {
             query?: {
@@ -5649,6 +5823,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Count"];
+                };
+            };
+        };
+    };
+    usage_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageSummary"];
                 };
             };
         };
