@@ -132,6 +132,7 @@ active_subscription(request.user)   # Subscription | None
           ["STRIPE_WEBHOOK_SECRET", "None", "whsec_... of the webhook endpoint."],
           ["CURRENCY", '"usd"', "Shown by Pricing."],
           ["TRIAL_DAYS", "0", "Free days on new subscriptions."],
+          ["EVENT_RETENTION_DAYS", "30", "Webhook events kept for deduplication, then deleted by a TTL index."],
           ["PLANS", "[]", "The plans, see above."],
         ]}
       />
@@ -142,6 +143,8 @@ active_subscription(request.user)   # Subscription | None
           ["invalid_plan", "400", "Unknown plan, free plan or missing interval price."],
           ["billing_not_configured", "503", "No Stripe key."],
           ["already_subscribed", "409", "Use the portal to change plan."],
+          ["checkout_in_progress", "409", "Another checkout for the same user is starting (double click)."],
+          ["event_in_progress", "409", "Webhook redelivered while the first delivery runs; Stripe retries later."],
           ["billing_error", "502", "Stripe refused or failed."],
           ["no_customer", "400", "Portal requested before any checkout."],
           ["invalid_signature", "400", "Webhook signature check failed."],

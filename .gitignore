@@ -4,6 +4,7 @@ dist
 out
 *.tsbuildinfo
 .env*
+!.env.example
 .DS_Store
 next-env.d.ts
 .venv
@@ -12,3 +13,6 @@ __pycache__
 .pytest_cache
 .ruff_cache
 *.sqlite3
+*.egg-info
+coverage
+apps/backend-demo/static

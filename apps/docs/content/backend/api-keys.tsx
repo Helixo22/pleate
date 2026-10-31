@@ -52,7 +52,9 @@ const page = await plate.list("/catalog/products", { search: "oat", page_size: 1
       <H2>Endpoints</H2>
       <P>
         Mounted at <C>/api/api-keys</C>. Managing keys needs a session: a request made with an API key gets{" "}
-        <C>api_key_not_allowed</C>, so a leaked key cannot mint more keys.
+        <C>api_key_not_allowed</C>, so a leaked key cannot mint more keys. The same goes for every account security
+        endpoint: password and email change, session revocation, account update and deletion, the data export, 2FA
+        setup and removal, and linking or unlinking social accounts. Changing or resetting the password revokes every key.
       </P>
       <Endpoints
         rows={[

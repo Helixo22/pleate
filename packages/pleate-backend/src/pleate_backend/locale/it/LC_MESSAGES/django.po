@@ -963,3 +963,19 @@ msgstr "Puoi avere al massimo %(count)s endpoint."
 #: webhooks/views.py:153
 msgid "Turn the endpoint on before sending again."
 msgstr "Attiva l'endpoint prima di inviare di nuovo."
+
+#: rbac/services.py
+msgid "You can only grant permissions you have yourself."
+msgstr "Puoi concedere solo i permessi che hai tu stesso."
+
+#: rbac/serializers.py
+msgid "Only a superuser can change the default roles."
+msgstr "Solo un superutente può modificare i ruoli predefiniti."
+
+#: rbac/views.py staff/views.py
+msgid "You cannot change your own roles."
+msgstr "Non puoi modificare i tuoi ruoli."
+
+#: staff/views.py
+msgid "Only a superuser can change another staff account."
+msgstr "Solo un superutente può modificare un altro account staff."

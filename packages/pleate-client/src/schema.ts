@@ -1177,7 +1177,11 @@ export interface paths {
         /** @description POST joins (anyone), GET lists the entries (staff). */
         get: operations["marketing_waitlist_list"];
         put?: never;
-        /** @description Idempotent: an email already on the list gets its current status back. */
+        /**
+         * @description Idempotent. A new entry gets its status and referral code; an email already
+         *     on the list gets the same shape with every field null, so nobody can read
+         *     another person's code or position by typing their email.
+         */
         post: operations["marketing_waitlist_create"];
         delete?: never;
         options?: never;
@@ -2861,12 +2865,13 @@ export interface components {
             position: number;
             referrals: number;
         };
+        /** @description Every field is null when the email was already on the list. */
         WaitlistStatus: {
             /** @description 1 is next in line, 0 once invited. */
-            position: number;
-            referral_code: string;
-            referrals: number;
-            invited: boolean;
+            position: number | null;
+            referral_code: string | null;
+            referrals: number | null;
+            invited: boolean | null;
         };
         /**
          * @description * `pending` - Pending

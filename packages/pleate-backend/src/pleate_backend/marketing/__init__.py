@@ -19,7 +19,7 @@ Public endpoints (anonymous allowed, CSRF enforced, throttle scope ``contact``):
         CONTACT_RECIPIENTS (or every active staff user when empty) get the
         ``contact_message`` email with Reply-To set to the sender.
     POST waitlist                 {email, ref?}                {position, referral_code, referrals, invited}
-        Idempotent: an email already on the list gets its current status.
+        Idempotent: an email already on the list gets every field null.
     GET  waitlist/<referral_code>                              {position, referrals}
 
 Staff endpoints (``is_staff``):

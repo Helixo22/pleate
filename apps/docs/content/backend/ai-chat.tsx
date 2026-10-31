@@ -191,7 +191,7 @@ const suggestions = useSuggestions((prompt) => chat.send({ text: prompt }));
       <Settings
         rows={[
           ["PROVIDER", "EchoProvider", "Dotted path of the provider class."],
-          ["PROVIDER_OPTIONS", "{}", "Passed to the provider constructor."],
+          ["PROVIDER_OPTIONS", "{}", <>Passed to the provider constructor. <C>timeout</C> defaults to 120 seconds.</>],
           ["MODELS", "[echo]", <>Models offered in the picker, see above.</>],
           ["DEFAULT_MODEL", '"echo"', "Used when the conversation and the request name none."],
           ["SYSTEM_PROMPT", '"You are a helpful assistant."', <>A conversation&apos;s <C>system_prompt</C> wins.</>],
@@ -200,6 +200,12 @@ const suggestions = useSuggestions((prompt) => chat.send({ text: prompt }));
           ["SUGGESTIONS", "[]", <><C>{"{title, description, prompt}"}</C> entries for PromptSuggestions.</>],
           ["MAX_MESSAGE_CHARS", "32000", "Longest message."],
           ["MAX_ATTACHMENTS", "10", "Files per message."],
+          ["MAX_CONCURRENT_GENERATIONS", "2", <>Answers a user can generate at once. <C>None</C> for no limit.</>],
+          [
+            "HISTORY_ATTACHMENT_BYTES",
+            "20 MB",
+            "File bytes sent with the history, newest first. Older files are sent as their name only.",
+          ],
         ]}
       />
 
@@ -212,6 +218,7 @@ const suggestions = useSuggestions((prompt) => chat.send({ text: prompt }));
           ["attachment_not_found", "400", "A file id that does not exist or belongs to someone else."],
           ["invalid_model", "400", "Not one of MODELS."],
           ["quota_exceeded", "429", "Daily token limit reached."],
+          ["too_many_generations", "429", <>Over <C>MAX_CONCURRENT_GENERATIONS</C> answers at once.</>],
           ["cannot_regenerate", "409", "Not the last assistant message."],
           ["message_streaming", "409", "An answer is still streaming in this conversation."],
           ["throttled", "429", <>Scope <C>ai</C>, 30 per minute by default.</>],

@@ -7,14 +7,18 @@ deployment. Every value can be changed with environment variables.
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 from pleate_backend.settings import *  # noqa: F403
 from pleate_backend.settings import INSTALLED_APPS, database, redis
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = os.environ.get
 
-SECRET_KEY = env("SECRET_KEY", "dev-only-secret-key-change-me-0123456789abcdef")
-DEBUG = env("DEBUG", "1") == "1"
+DEBUG = env("DEBUG", "0") == "1"
+SECRET_KEY = env("SECRET_KEY") or ("dev-only-secret-key-change-me-0123456789abcdef" if DEBUG else None)
+if not SECRET_KEY:
+    raise ImproperlyConfigured("Set SECRET_KEY (or DEBUG=1 for local development).")
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS", "http://localhost:3000").split(",")
 
@@ -38,8 +42,16 @@ MAILERS = {
 }
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", "Plate <hello@plate.test>")
 
+# The base settings make the cookies secure; local development runs over http.
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
+if not DEBUG:
+    if env("SECURE_PROXY_SSL_HEADER", "1") == "1":  # TLS ends at the proxy
+        SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT", "1") == "1"
+    SECURE_HSTS_SECONDS = int(env("SECURE_HSTS_SECONDS", "0"))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = env("SECURE_HSTS_INCLUDE_SUBDOMAINS", "0") == "1"
+    SECURE_HSTS_PRELOAD = env("SECURE_HSTS_PRELOAD", "0") == "1"
 
 AI_PROVIDER = (
     {

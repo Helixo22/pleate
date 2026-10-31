@@ -746,3 +746,21 @@ def test_password_login_still_works_for_linked_users(api, user):
     SocialAccount.objects.create(user=user, provider="google", uid="1")
     res = api.post("/api/auth/login", {"email": user.email, "password": PASSWORD})
     assert res.json()["mfa_required"] is False
+
+
+def test_callback_respects_auth_signup_enabled(api, router):
+    with override_settings(PLEATE={**pleate(), "AUTH": {"SIGNUP_ENABLED": False}}):
+        result = google_flow(api, router)
+    assert result["code"] == "signup_disabled"
+    assert not User.objects.exists()
+
+
+def test_start_link_refuses_api_keys(user):
+    from pleate_backend.apikeys.services import create_key
+
+    _key, raw = create_key(user, "k", ["read", "write"])
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION=f"Bearer {raw}")
+    res = client.get("/api/auth/oauth/google/start", {"mode": "link"})
+    assert res.status_code == 403
+    assert res.json()["error"]["code"] == "api_key_not_allowed"

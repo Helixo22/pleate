@@ -10,6 +10,7 @@ chat). Two brokers:
     broker().publish("user:42", {"type": "notification", "data": {...}})
 """
 
+import asyncio
 import json
 import queue
 import threading
@@ -19,6 +20,7 @@ from collections.abc import Iterator
 
 from django.http import StreamingHttpResponse
 from django.utils.module_loading import import_string
+from rest_framework.renderers import BaseRenderer
 
 from .conf import pleate_settings
 
@@ -48,6 +50,8 @@ class MemoryBroker:
         finally:
             with self._lock:
                 self._subs[channel].remove(q)
+                if not self._subs[channel]:
+                    del self._subs[channel]
 
 
 class RedisBroker:
@@ -114,13 +118,20 @@ def _async_iter(stream: Iterator[str]):
             return done
 
     async def gen():
+        pending = None
         try:
             while True:
-                chunk = await sync_to_async(step, thread_sensitive=False)()
+                pending = asyncio.ensure_future(sync_to_async(step, thread_sensitive=False)())
+                # Shielded: on disconnect the worker thread keeps running next(stream).
+                chunk = await asyncio.shield(pending)
+                pending = None
                 if chunk is done:
                     return
                 yield chunk
         finally:
+            if pending is not None:
+                # close() while next() runs raises "generator already executing".
+                await asyncio.wait([pending])
             close = getattr(stream, "close", None)
             if close:
                 await sync_to_async(close, thread_sensitive=False)()
@@ -144,14 +155,31 @@ def sse_response(stream: Iterator[str], request=None) -> StreamingHttpResponse:
     return response
 
 
+class EventStreamRenderer(BaseRenderer):
+    """Lets DRF accept ``Accept: text/event-stream``. Errors are still written as JSON."""
+
+    media_type = "text/event-stream"
+    format = "sse"
+    charset = "utf-8"
+
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        return b"" if data is None else json.dumps(data, default=str).encode()
+
+
 def channel_stream(channel: str, *, initial: list[dict] | None = None, max_seconds: float | None = None):
-    """SSE body for a channel. ``max_seconds`` bounds the stream (tests, proxies)."""
+    """
+    SSE body for a channel. It ends after ``max_seconds`` (default
+    ``REALTIME["MAX_STREAM_SECONDS"]``, 0 for never) so workers are not held
+    forever; clients reconnect after the ``retry`` delay.
+    """
     heartbeat = pleate_settings.REALTIME["HEARTBEAT_SECONDS"]
+    if max_seconds is None:
+        max_seconds = pleate_settings.REALTIME.get("MAX_STREAM_SECONDS")
     started = time.monotonic()
     yield "retry: 3000\n\n"
     for event in initial or ():
         yield sse_format(event)
-    for event in broker().listen(channel, timeout=heartbeat if max_seconds is None else min(heartbeat, 0.2)):
+    for event in broker().listen(channel, timeout=min(heartbeat, max_seconds) if max_seconds else heartbeat):
         yield sse_format(event)
-        if max_seconds is not None and time.monotonic() - started > max_seconds:
+        if max_seconds and time.monotonic() - started > max_seconds:
             return

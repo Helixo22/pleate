@@ -49,7 +49,7 @@ export default function LoginDemo() {
     </AuthCard>
   ) : (
     <AuthCard title="Sign in to Plate" description="Your recipes, orders and stock in one place.">
-      <LoginForm {...login.loginFormProps} defaultEmail="ada@plate.dev" forgotPasswordHref="#forgot-password" />
+      <LoginForm {...login.loginFormProps} defaultEmail="ada@plate.dev" forgotPasswordHref="#demo-forgot-password" />
     </AuthCard>
   );
 }

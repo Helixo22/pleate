@@ -5,7 +5,7 @@
 // never the page.
 "use client";
 
-import { type KeyboardEvent, type ReactNode } from "react";
+import { useState, type KeyboardEvent, type ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";
 import { Checkbox } from "../checkbox/checkbox.tsx";
 import { EmptyState } from "../empty-state/empty-state.tsx";
@@ -121,6 +121,7 @@ export function DataTable<T>({
   ...aria
 }: DataTableProps<T>) {
   const l = { ...L, ...labels };
+  const [query, setQuery] = useState(search);
   const selectable = Boolean(onSelectionChange);
   const selected = new Set(selectedIds ?? []);
   const pageIds = rows.map(getRowId);
@@ -171,8 +172,11 @@ export function DataTable<T>({
             <>
               {onSearchChange && (
                 <SearchBar
-                  defaultValue={search}
-                  onValueChange={onSearchChange}
+                  defaultValue={query}
+                  onValueChange={(q) => {
+                    setQuery(q);
+                    onSearchChange(q);
+                  }}
                   debounce={debounceMs}
                   label={l.search}
                   placeholder={l.searchPlaceholder}
@@ -244,8 +248,8 @@ export function DataTable<T>({
                 <EmptyState
                   size="sm"
                   icon={empty?.icon}
-                  title={empty?.title ?? (search ? l.noResultsTitle : l.emptyTitle)}
-                  description={empty?.description ?? (search ? l.noResultsDescription(search) : l.emptyDescription)}
+                  title={empty?.title ?? (query ? l.noResultsTitle : l.emptyTitle)}
+                  description={empty?.description ?? (query ? l.noResultsDescription(query) : l.emptyDescription)}
                   actions={empty?.actions}
                 />
               </TableCell>

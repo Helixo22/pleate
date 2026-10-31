@@ -1,4 +1,4 @@
-// Button: iOS-style capsule with five looks (filled, tinted, gray, surface, outline, plain) in four tones, five
+// Button: a squared control (pill on request) with six looks (filled, tinted, gray, surface, outline, plain) in four tones, five
 // sizes and an icon-only mode (see IconButton). Presses scale down slightly; `loading` keeps the width and shows a
 // spinner. `asChild` renders the styles on your own element (a Next <Link>, an <a>…).
 import { cva, type VariantProps } from "class-variance-authority";
@@ -9,19 +9,19 @@ import { Spinner } from "../spinner/spinner.tsx";
 
 export const buttonVariants = cva(
   [
-    "pl-touch pl-focus-ring relative inline-flex shrink-0 cursor-pointer items-center justify-center whitespace-nowrap font-semibold",
-    "transition-[background-color,color,box-shadow,opacity,scale] duration-(--pl-duration-fast) ease-ios",
-    "motion-safe:active:scale-[0.97] disabled:pointer-events-none disabled:opacity-40 aria-disabled:pointer-events-none aria-disabled:opacity-40",
-    "[&_svg]:pointer-events-none [&_svg]:shrink-0",
+    "pl-touch pl-focus-ring pl-hit relative inline-flex shrink-0 cursor-pointer items-center justify-center whitespace-nowrap font-medium",
+    "transition-[background-color,color,box-shadow,opacity,scale] duration-(--pl-duration-fast) ease-out",
+    "motion-safe:active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50",
+    "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-85",
   ],
   {
     variants: {
       variant: {
-        filled: "",
+        filled: "pl-lift",
         tinted: "",
         gray: "bg-fill-2 hover:bg-fill",
-        surface: "bg-surface shadow-sm hover:bg-surface-2",
-        outline: "bg-transparent shadow-[inset_0_0_0_1px_var(--pl-border)] hover:bg-fill-3",
+        surface: "pl-field bg-surface hover:bg-surface-2",
+        outline: "pl-field bg-transparent hover:bg-fill-3",
         plain: "bg-transparent hover:bg-fill-3",
       },
       tone: {
@@ -31,11 +31,11 @@ export const buttonVariants = cva(
         success: "",
       },
       size: {
-        xs: "h-7 gap-1 px-2.5 text-footnote [&_svg]:size-3.5",
-        sm: "h-8 gap-1.5 px-3.5 text-subhead [&_svg]:size-4",
-        md: "h-11 gap-2 px-5 text-headline [&_svg]:size-[1.125rem]",
-        lg: "h-13 gap-2 px-7 text-headline [&_svg]:size-5",
-        xl: "h-15 gap-2.5 px-8 text-title3 [&_svg]:size-6",
+        xs: "h-7 gap-1 px-2 text-footnote [&_svg]:size-3.5",
+        sm: "h-8 gap-1.5 px-3 text-footnote [&_svg]:size-4",
+        md: "h-9 gap-2 px-3.5 text-subhead [&_svg]:size-4",
+        lg: "h-11 gap-2 px-5 text-callout [&_svg]:size-[1.125rem]",
+        xl: "h-12 gap-2.5 px-6 text-headline [&_svg]:size-5",
       },
       shape: {
         pill: "rounded-full",
@@ -52,7 +52,7 @@ export const buttonVariants = cva(
     },
     compoundVariants: [
       { variant: "filled", tone: "accent", className: "bg-accent text-on-accent hover:bg-accent-hover active:bg-accent-active" },
-      { variant: "filled", tone: "neutral", className: "bg-fg text-bg hover:opacity-85" },
+      { variant: "filled", tone: "neutral", className: "bg-fg text-bg hover:bg-[color-mix(in_oklab,var(--pl-fg)_88%,var(--pl-bg))]" },
       { variant: "filled", tone: "danger", className: "bg-danger text-on-status hover:bg-[color-mix(in_oklab,var(--pl-danger)_88%,var(--pl-mix))]" },
       { variant: "filled", tone: "success", className: "bg-success text-on-status hover:bg-[color-mix(in_oklab,var(--pl-success)_88%,var(--pl-mix))]" },
       { variant: "tinted", tone: "accent", className: "bg-accent-soft text-accent-ink hover:bg-accent-soft-hover" },
@@ -63,22 +63,20 @@ export const buttonVariants = cva(
       { variant: ["gray", "surface", "outline", "plain"], tone: "neutral", className: "text-fg" },
       { variant: ["gray", "surface", "outline", "plain"], tone: "danger", className: "text-danger-ink" },
       { variant: ["gray", "surface", "outline", "plain"], tone: "success", className: "text-success-ink" },
-      { shape: "rounded", size: "xs", className: "rounded-sm" },
-      { shape: "rounded", size: "sm", className: "rounded-md" },
-      { shape: "rounded", size: "md", className: "rounded-lg" },
-      { shape: "rounded", size: "lg", className: "rounded-xl" },
-      { shape: "rounded", size: "xl", className: "rounded-2xl" },
+      { shape: "rounded", size: ["xs", "sm"], className: "rounded-sm" },
+      { shape: "rounded", size: ["md", "lg"], className: "rounded-md" },
+      { shape: "rounded", size: "xl", className: "rounded-lg" },
       { iconOnly: true, size: "xs", className: "w-7" },
       { iconOnly: true, size: "sm", className: "w-8" },
-      { iconOnly: true, size: "md", className: "w-11 [&_svg]:size-5" },
-      { iconOnly: true, size: "lg", className: "w-13 [&_svg]:size-6" },
-      { iconOnly: true, size: "xl", className: "w-15 [&_svg]:size-7" },
+      { iconOnly: true, size: "md", className: "w-9" },
+      { iconOnly: true, size: "lg", className: "w-11 [&_svg]:size-5" },
+      { iconOnly: true, size: "xl", className: "w-12 [&_svg]:size-5" },
     ],
     defaultVariants: {
       variant: "filled",
       tone: "accent",
       size: "md",
-      shape: "pill",
+      shape: "rounded",
       iconOnly: false,
       fullWidth: false,
     },

@@ -1,22 +1,23 @@
 import io
 
-from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, logout, update_session_auth_hash
+from django.db import IntegrityError
 from django.http import FileResponse, Http404
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 from drf_spectacular.utils import OpenApiResponse, extend_schema
+from rest_framework.generics import get_object_or_404
 from rest_framework.parsers import MultiPartParser
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from pleate_backend.apikeys.permissions import DenyAPIKey
 from pleate_backend.core.conf import frontend_url, pleate_settings
 from pleate_backend.core.csrf import CsrfProtectedMixin
 from pleate_backend.core.exceptions import ApiError
-from pleate_backend.core.utils import client_ip
+from pleate_backend.core.utils import client_ip, random_token
 from pleate_backend.emails import send_email
 from pleate_backend.ratelimit import limits
 from pleate_backend.ratelimit.throttles import StrictScopedRateThrottle
@@ -29,9 +30,11 @@ from .services import (
     describe_user_agent,
     login_challenges,
     public_session_id,
+    revoke_credentials,
     revoke_sessions,
+    send_password_reset,
 )
-from .tokens import make_reset_token, make_signed, read_reset_token, read_signed
+from .tokens import make_signed, read_reset_token, read_signed
 
 User = get_user_model()
 
@@ -60,6 +63,10 @@ def send_security_notice(user, message: str, to: str | None = None):
     )
 
 
+def _email_taken():
+    return ApiError("email_taken", _("An account with this email already exists."), 409)
+
+
 def me_payload(user):
     return s.MeSerializer(user).data
 
@@ -80,12 +87,15 @@ class SignupView(AuthView):
         ser = s.SignupSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         data = ser.validated_data
-        user = User.objects.create_user(
-            email=data["email"],
-            password=data["password"],
-            name=data.get("name", ""),
-            locale=data.get("locale") or get_language() or "",
-        )
+        try:
+            user = User.objects.create_user(
+                email=data["email"],
+                password=data["password"],
+                name=data.get("name", ""),
+                locale=data.get("locale") or get_language() or "",
+            )
+        except IntegrityError as exc:  # same email signed up concurrently
+            raise _email_taken() from exc
         signals.user_signed_up.send(sender=User, user=user, request=request)
         send_verification(user)
         required = pleate_settings.AUTH["REQUIRE_EMAIL_VERIFICATION"]
@@ -105,8 +115,9 @@ class LoginView(AuthView):
         acct_key = f"login:acct:{email}"
         ip_key = f"login:ip:{client_ip(request)}"
 
+        # Count first: a check then a count would let parallel guesses all pass.
         for key, limit in ((acct_key, conf["LOGIN_MAX_ATTEMPTS"]), (ip_key, conf["LOGIN_IP_MAX_ATTEMPTS"])):
-            allowed, retry = limits.peek(key, limit, window, fail_closed=True)
+            allowed, retry = limits.hit(key, limit, window, fail_closed=True)
             if not allowed:
                 raise ApiError(
                     "too_many_attempts",
@@ -117,11 +128,11 @@ class LoginView(AuthView):
 
         user = authenticate(request, email=email, password=ser.validated_data["password"])
         if user is None:
-            limits.hit(acct_key, conf["LOGIN_MAX_ATTEMPTS"], window, fail_closed=True)
-            limits.hit(ip_key, conf["LOGIN_IP_MAX_ATTEMPTS"], window, fail_closed=True)
             raise ApiError("invalid_credentials", _("Email or password is wrong."), 400)
 
         limits.reset(acct_key, window)
+        # Successful logins do not count, so many users behind one NAT are not locked out.
+        limits.refund(ip_key, window)
         if conf["REQUIRE_EMAIL_VERIFICATION"] and not user.email_verified:
             raise ApiError("email_not_verified", _("Confirm your email before signing in."), 403)
 
@@ -145,6 +156,11 @@ class LogoutView(CsrfProtectedMixin, APIView):
 
 
 class MeView(APIView):
+    def get_permissions(self):
+        # Reading works with an API key, changing or deleting the account does not.
+        perms = super().get_permissions()
+        return perms if self.request.method in SAFE_METHODS else [*perms, DenyAPIKey()]
+
     @extend_schema(responses=s.MeSerializer, tags=["account"])
     def get(self, request):
         return Response(me_payload(request.user))
@@ -184,6 +200,7 @@ class MeView(APIView):
 
 
 class ExportView(APIView):
+    permission_classes = [IsAuthenticated, DenyAPIKey]
     throttle_classes = [StrictScopedRateThrottle]
     throttle_scope = "auth"
 
@@ -204,6 +221,7 @@ class ExportView(APIView):
 
 
 class PasswordChangeView(CsrfProtectedMixin, APIView):
+    permission_classes = [IsAuthenticated, DenyAPIKey]
     throttle_classes = [StrictScopedRateThrottle]
     throttle_scope = "auth"
 
@@ -216,6 +234,7 @@ class PasswordChangeView(CsrfProtectedMixin, APIView):
         user.save()
         update_session_auth_hash(request, user)
         revoke_sessions(user, keep=request.session.session_key)
+        revoke_credentials(user)
         signals.password_changed.send(sender=User, user=user, request=request)
         send_security_notice(user, _("The password of your account was changed."))
         return Response(status=204)
@@ -231,17 +250,7 @@ class PasswordResetView(AuthView):
         allowed, _retry = limits.hit(f"reset:{email}", 3, 3600)
         user = User.objects.filter(email=email, is_active=True).first()
         if user and allowed:
-            send_email(
-                "password_reset",
-                user.email,
-                {
-                    "name": user.display_name,
-                    "action_url": frontend_url("RESET_PASSWORD", token=make_reset_token(user)),
-                    "action_label": _("Choose a new password"),
-                    "minutes": settings.PASSWORD_RESET_TIMEOUT // 60,
-                },
-                _language(user),
-            )
+            send_password_reset(user, _language(user))
         return Response(status=202)
 
 
@@ -265,11 +274,14 @@ class PasswordResetConfirmView(AuthView):
             s._validate_new_password(ser.validated_data["new_password"], user)
         except Exception as exc:
             raise s.serializers.ValidationError({"new_password": exc.detail}) from exc
+        was_verified = user.email_verified
         user.set_password(ser.validated_data["new_password"])
         # The link proves the inbox belongs to the user.
         user.email_verified = True
         user.save()
         revoke_sessions(user)
+        # Whoever signed up with this email before the owner may have attached ways back in.
+        revoke_credentials(user, unverified=not was_verified)
         limits.reset(f"login:acct:{user.email}", pleate_settings.AUTH["LOGIN_LOCKOUT_SECONDS"])
         signals.password_reset.send(sender=User, user=user, request=request)
         send_security_notice(user, _("The password of your account was reset."))
@@ -304,6 +316,7 @@ class EmailVerifyResendView(CsrfProtectedMixin, APIView):
 
 
 class EmailChangeView(CsrfProtectedMixin, APIView):
+    permission_classes = [IsAuthenticated, DenyAPIKey]
     throttle_classes = [StrictScopedRateThrottle]
     throttle_scope = "auth"
 
@@ -313,7 +326,11 @@ class EmailChangeView(CsrfProtectedMixin, APIView):
         ser.is_valid(raise_exception=True)
         user = request.user
         new_email = ser.validated_data["new_email"]
-        token = make_signed("email_change", {"uid": str(user.pk), "old": user.email, "new": new_email})
+        # "pw" ties the link to the current password: a reset or change voids links asked for before it.
+        token = make_signed(
+            "email_change",
+            {"uid": str(user.pk), "old": user.email, "new": new_email, "pw": _password_stamp(user)},
+        )
         send_email(
             "email_change",
             new_email,
@@ -328,21 +345,32 @@ class EmailChangeView(CsrfProtectedMixin, APIView):
         return Response(status=202)
 
 
+def _password_stamp(user):
+    # Milliseconds: what Mongo keeps, so the in-memory and the stored value agree.
+    changed = user.password_changed_at
+    return changed.replace(microsecond=changed.microsecond // 1000 * 1000).isoformat() if changed else None
+
+
 class EmailChangeConfirmView(AuthView):
+    permission_classes = [AllowAny, DenyAPIKey]
+
     @extend_schema(request=s.TokenSerializer, responses=s.MeSerializer, tags=["account"])
     def post(self, request):
         ser = s.TokenSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         payload = read_signed("email_change", ser.validated_data["token"])
         user = payload and User.objects.filter(pk=payload["uid"], email=payload["old"]).first()
-        if not user:
+        if not user or payload.get("pw") != _password_stamp(user):
             raise ApiError("invalid_token", _("This link is not valid anymore. Ask for a new one."), 400)
         if User.objects.filter(email=payload["new"]).exists():
-            raise ApiError("email_taken", _("An account with this email already exists."), 409)
+            raise _email_taken()
         old = user.email
         user.email = payload["new"]
         user.email_verified = True
-        user.save(update_fields=["email", "email_verified"])
+        try:
+            user.save(update_fields=["email", "email_verified"])
+        except IntegrityError as exc:  # taken concurrently
+            raise _email_taken() from exc
         signals.email_changed.send(sender=User, user=user, request=request, old_email=old)
         send_security_notice(
             user, _("The email of your account was changed to %(email)s.") % {"email": user.email}, to=old
@@ -375,6 +403,8 @@ class SessionListView(APIView):
 
 
 class SessionDetailView(CsrfProtectedMixin, APIView):
+    permission_classes = [IsAuthenticated, DenyAPIKey]
+
     @extend_schema(responses={204: None}, tags=["account"])
     def delete(self, request, session_id):
         for row in UserSession.objects.filter(user=request.user).only("session_key"):
@@ -389,6 +419,8 @@ class SessionDetailView(CsrfProtectedMixin, APIView):
 
 
 class SessionRevokeOthersView(CsrfProtectedMixin, APIView):
+    permission_classes = [IsAuthenticated, DenyAPIKey]
+
     @extend_schema(request=None, responses=s.CountSerializer, tags=["account"])
     def post(self, request):
         count = revoke_sessions(request.user, keep=request.session.session_key)
@@ -431,7 +463,7 @@ class AvatarView(CsrfProtectedMixin, APIView):
         storage = get_storage()
         user = request.user
         old = user.avatar
-        user.avatar = storage.save(f"avatars/{user.pk}.webp", buffer)
+        user.avatar = storage.save(f"avatars/{user.pk}-{random_token(6)}.webp", buffer)
         user.save(update_fields=["avatar"])
         if old and old != user.avatar:
             storage.delete(old)

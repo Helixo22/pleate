@@ -16,7 +16,7 @@ from pleate_backend.notifications.services import notify
 
 pytestmark = pytest.mark.django_db
 
-ENDPOINT = "https://push.example.com/send/abc"
+ENDPOINT = "https://fcm.googleapis.com/fcm/send/abc"
 
 
 def notifications_conf(**overrides):
@@ -143,7 +143,7 @@ def test_push_skipped_without_vapid(user, monkeypatch):
 def test_push_sends_and_removes_gone_subscriptions(user, monkeypatch):
     import pywebpush
 
-    gone = "https://push.example.com/send/gone"
+    gone = "https://updates.push.services.mozilla.com/wpush/v2/gone"
     calls = []
 
     def fake_webpush(**kw):
@@ -216,12 +216,109 @@ def test_push_subscribe_and_unsubscribe(auth_api, user, make_user):
 def test_push_subscription_requires_https(auth_api):
     res = auth_api.post(
         "/api/notifications/push/subscriptions",
-        {"endpoint": "http://push.example.com/x", "keys": {"p256dh": "p", "auth": "a"}},
+        {"endpoint": "http://fcm.googleapis.com/x", "keys": {"p256dh": "p", "auth": "a"}},
     )
     assert res.status_code == 400
     assert res.json()["error"]["fields"]["endpoint"][0]["code"] == "insecure_endpoint"
     res = auth_api.post("/api/notifications/push/subscriptions", {"endpoint": ENDPOINT})
     assert res.json()["error"]["fields"]["keys"][0]["code"] == "required"
+
+
+def test_push_endpoint_must_be_a_known_service(auth_api):
+    for url in (
+        "https://push.example.com/x",
+        "https://fcm.googleapis.com.evil.test/x",
+        "https://fcm.googleapis.com@127.0.0.1/x",
+    ):
+        res = auth_api.post(
+            "/api/notifications/push/subscriptions", {"endpoint": url, "keys": {"p256dh": "p", "auth": "a"}}
+        )
+        assert res.status_code == 400, url
+        assert res.json()["error"]["fields"]["endpoint"][0]["code"] == "unknown_push_service"
+    ok = "https://wns2-par02p.notify.windows.com/w/?token=x"
+    payload = {"endpoint": ok, "keys": {"p256dh": "p", "auth": "a"}}
+    assert auth_api.post("/api/notifications/push/subscriptions", payload).status_code == 201
+    with notifications_conf(PUSH_ALLOWED_HOSTS=["push.example.com"]):
+        payload["endpoint"] = "https://push.example.com/x"
+        assert auth_api.post("/api/notifications/push/subscriptions", payload).status_code == 201
+
+
+def test_push_not_sent_to_disallowed_stored_endpoint(user, monkeypatch):
+    import pywebpush
+
+    calls = []
+    monkeypatch.setattr(pywebpush, "webpush", lambda **kw: calls.append(kw))
+    _sub(user, "https://127.0.0.1/internal")
+    with vapid():
+        notify(user, "x", "Hi", channels=["push"])
+    assert calls == []
+
+
+def test_push_endpoint_cannot_be_taken_without_its_keys(auth_api, user, make_user):
+    _sub(user)
+    other = APIClient()
+    other.force_authenticate(make_user())
+    res = other.post(
+        "/api/notifications/push/subscriptions", {"endpoint": ENDPOINT, "keys": {"p256dh": "p", "auth": "a"}}
+    )
+    assert res.status_code == 409
+    assert res.json()["error"]["code"] == "push_subscription_taken"
+    assert PushSubscription.objects.get().user_id == user.pk
+    # Same browser (same keys) signing in with another account moves it.
+    res = other.post(
+        "/api/notifications/push/subscriptions",
+        {"endpoint": ENDPOINT, "keys": {"p256dh": "key", "auth": "secret"}},
+    )
+    assert res.status_code == 201
+    assert PushSubscription.objects.get().user_id != user.pk
+
+
+def test_push_subscribe_rereads_after_concurrent_create(auth_api, user, monkeypatch):
+    from django.db import IntegrityError
+
+    real_create = PushSubscription.objects.create
+
+    def racing_create(**kw):
+        real_create(**kw)  # the other request wins
+        raise IntegrityError("duplicate key")
+
+    monkeypatch.setattr(PushSubscription.objects, "create", racing_create)
+    payload = {"endpoint": ENDPOINT, "keys": {"p256dh": "p", "auth": "a"}}
+    assert auth_api.post("/api/notifications/push/subscriptions", payload).status_code == 201
+    assert PushSubscription.objects.count() == 1
+
+
+def test_push_subscriptions_refuse_api_keys(user):
+    from pleate_backend.apikeys.services import create_key
+
+    _key, raw = create_key(user, "CI", ["read", "write"])
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION=f"Bearer {raw}")
+    payload = {"endpoint": ENDPOINT, "keys": {"p256dh": "p", "auth": "a"}}
+    assert client.post("/api/notifications/push/subscriptions", payload).status_code == 403
+    assert client.delete("/api/notifications/push/subscriptions", {"endpoint": ENDPOINT}).status_code == 403
+
+
+def test_push_goes_through_the_task_queue(user, monkeypatch):
+    from pleate_backend.notifications import tasks
+
+    queued, sent = [], []
+    monkeypatch.setattr(tasks.send_push_task, "delay", lambda *a: queued.append(a))
+    monkeypatch.setattr(services, "send_push", lambda u, p: sent.append(p))
+    with notifications_conf(VAPID_PUBLIC_KEY="k", VAPID_PRIVATE_KEY="p", ASYNC=True):
+        notify(user, "x", "Hi", channels=["push"])
+    assert queued == [
+        (str(user.pk), {"id": None, "kind": "x", "title": "Hi", "body": "", "url": "", "data": {}})
+    ]
+    assert sent == []
+
+    def down(*a):
+        raise OSError("broker down")
+
+    monkeypatch.setattr(tasks.send_push_task, "delay", down)
+    with notifications_conf(VAPID_PUBLIC_KEY="k", VAPID_PRIVATE_KEY="p", ASYNC=True):
+        notify(user, "x", "Hi", channels=["push"])
+    assert len(sent) == 1
 
 
 # Endpoints
@@ -351,6 +448,21 @@ def test_stream_does_not_leak_other_users(auth_api, user, make_user):
         notify(make_user(), "x", "Not for Ada")
         assert next(chunks) == b": ping\n\n"
         res.close()
+
+
+def test_stream_closes_after_max_seconds(auth_api, user):
+    with override_settings(
+        PLEATE={**settings.PLEATE, "REALTIME": {**DEFAULTS["REALTIME"], "MAX_STREAM_SECONDS": 0.1}}
+    ):
+        res = auth_api.get("/api/notifications/stream")
+        chunks = list(res.streaming_content)
+    assert chunks[0] == b"retry: 3000\n\n"
+    assert chunks[-1] == b": ping\n\n"
+
+
+def test_unread_index():
+    indexes = collection(Notification).index_information().values()
+    assert any([k for k, _ in i["key"]] == ["user_id", "read_at"] for i in indexes)
 
 
 # Storage and lifecycle

@@ -4,11 +4,14 @@ import json
 import sys
 import time
 import types
+from datetime import timedelta
 from types import SimpleNamespace
 
 import pytest
 import stripe
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
+from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.test import APIClient, APIRequestFactory, force_authenticate
 from rest_framework.views import APIView
@@ -92,13 +95,7 @@ class FakeStripe:
         record = self._record
         self.v1 = SimpleNamespace(
             customers=SimpleNamespace(create=lambda params: record("customers.create", params, id="cus_new")),
-            checkout=SimpleNamespace(
-                sessions=SimpleNamespace(
-                    create=lambda params: record(
-                        "checkout.create", params, url="https://checkout.stripe.test/s1"
-                    )
-                )
-            ),
+            checkout=SimpleNamespace(sessions=SimpleNamespace(create=self._checkout)),
             billing_portal=SimpleNamespace(
                 sessions=SimpleNamespace(
                     create=lambda params: record(
@@ -112,6 +109,10 @@ class FakeStripe:
     def _record(self, name, params, **result):
         self.calls.append((name, params))
         return SimpleNamespace(**result)
+
+    def _checkout(self, params, options=None):
+        self.calls.append(("checkout.options", options))
+        return self._record("checkout.create", params, url="https://checkout.stripe.test/s1")
 
     def _cancel(self, sub_id, params=None):
         self.calls.append(("subscriptions.cancel", sub_id))
@@ -185,7 +186,8 @@ def event(type_, obj, event_id=None, created=None):
         "id": event_id or f"evt_{_counter['n']}",
         "object": "event",
         "type": type_,
-        "created": created or int(time.time()),
+        # One second apart: same second events are resynced from Stripe.
+        "created": created or int(time.time()) + _counter["n"],
         "data": {"object": obj},
     }
 
@@ -375,13 +377,35 @@ def test_checkout_already_subscribed(auth_api, user, fake_stripe):
 
 
 def test_checkout_stripe_error(auth_api, fake_stripe):
-    def boom(params):
+    def boom(params, options=None):
         raise stripe.APIConnectionError("down")
 
     fake_stripe.v1.checkout.sessions.create = boom
     res = auth_api.post("/api/billing/checkout", {"plan": "pro"})
     assert res.status_code == 502
     assert res.json()["error"]["code"] == "billing_error"
+
+
+def test_checkout_idempotency_key_and_lock(auth_api, user, fake_stripe, monkeypatch):
+    clock = SimpleNamespace(time=lambda: 6000)
+    monkeypatch.setattr(services, "time", clock)
+    auth_api.post("/api/billing/checkout", {"plan": "pro", "interval": "year"})
+    clock.time = lambda: 6059
+    auth_api.post("/api/billing/checkout", {"plan": "pro", "interval": "year"})
+    clock.time = lambda: 6060
+    auth_api.post("/api/billing/checkout", {"plan": "pro", "interval": "year"})
+    keys = [o["idempotency_key"] for o in fake_stripe.named("checkout.options")]
+    # Clicks within the window reuse the same Stripe session.
+    assert keys == [f"checkout-{user.pk}-pro-year-100"] * 2 + [f"checkout-{user.pk}-pro-year-101"]
+
+    cache.add(f"pleate:billing:checkout:{user.pk}", 1, 30)
+    try:
+        res = auth_api.post("/api/billing/checkout", {"plan": "pro"})
+    finally:
+        cache.delete(f"pleate:billing:checkout:{user.pk}")
+    assert res.status_code == 409
+    assert res.json()["error"]["code"] == "checkout_in_progress"
+    assert len(fake_stripe.named("checkout.create")) == 3
 
 
 def test_checkout_requires_auth_and_csrf(api, user, fake_stripe):
@@ -499,12 +523,54 @@ def test_failed_event_is_retried(api, user, monkeypatch):
         raise RuntimeError("database hiccup")
 
     monkeypatch.setitem(services.HANDLERS, "customer.subscription.created", boom)
-    with pytest.raises(RuntimeError):
-        post_event(api, evt)
+    assert post_event(api, evt).status_code == 500
     assert StripeEvent.objects.get().processed_at is None
     monkeypatch.undo()
     assert post_event(api, evt).json()["duplicate"] is False
     assert Subscription.objects.count() == 1
+
+
+def test_redelivery_while_processing_waits(api, user):
+    evt = event("customer.subscription.created", sub_object(user), event_id="evt_busy")
+    StripeEvent.objects.create(event_id="evt_busy", type=evt["type"], started_at=timezone.now())
+    res = post_event(api, evt)
+    assert res.status_code == 409
+    assert res.json()["error"]["code"] == "event_in_progress"
+    assert Subscription.objects.count() == 0
+    # A claim older than the lease belongs to a crashed worker: the next delivery takes over.
+    StripeEvent.objects.update(started_at=timezone.now() - services.EVENT_LEASE - timedelta(seconds=1))
+    assert post_event(api, evt).json() == {"received": True, "duplicate": False}
+    assert Subscription.objects.count() == 1
+    assert post_event(api, evt).json() == {"received": True, "duplicate": True}
+
+
+def test_same_second_events_resync_from_stripe(api, user, fake_stripe):
+    now = int(time.time())
+    post_event(api, event("customer.subscription.updated", sub_object(user, status="canceled"), created=now))
+    fake_stripe.remote_subscriptions["sub_1"] = sub_object(user, status="canceled")
+    post_event(api, event("customer.subscription.updated", sub_object(user, status="active"), created=now))
+    assert Subscription.objects.get().status == "canceled"
+    assert fake_stripe.named("subscriptions.retrieve") == ["sub_1"]
+
+
+def test_invoice_paid_respects_event_order(api, user):
+    now = int(time.time())
+    sub = make_sub(user, status="past_due", sub_id="sub_1")
+    Subscription.objects.update(last_event_at=services._ts(now))
+    post_event(api, event("invoice.paid", {"id": "in_1", "subscription": "sub_1"}, created=now - 60))
+    sub.refresh_from_db()
+    assert sub.status == "past_due"
+    post_event(api, event("invoice.paid", {"id": "in_2", "subscription": "sub_1"}, created=now + 5))
+    sub.refresh_from_db()
+    assert (sub.status, sub.last_event_at) == ("active", services._ts(now + 5))
+
+
+def test_stripe_events_expire():
+    from pleate_backend.core.mongo import collection
+
+    indexes = collection(StripeEvent).index_information().values()
+    ttl = [i for i in indexes if i.get("key") == [("received_at", 1)]]
+    assert ttl and ttl[0]["expireAfterSeconds"] == 30 * 24 * 60 * 60
 
 
 def test_late_older_event_does_not_roll_back(api, user):

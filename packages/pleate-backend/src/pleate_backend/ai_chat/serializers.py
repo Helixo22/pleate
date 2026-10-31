@@ -1,10 +1,11 @@
+from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from pleate_backend.core.conf import pleate_settings
 
-from .models import Conversation, DailyUsage, Message
+from .models import Conversation, Message
 
 DEFAULT_MAX_MESSAGE_CHARS = 32_000
 DEFAULT_MAX_ATTACHMENTS = 10
@@ -27,15 +28,17 @@ class AttachmentSerializer(serializers.Serializer):
     size = serializers.IntegerField()
 
 
-def attachment_details(ids: list[str]) -> list[dict]:
-    """Name, type and size of the attached files, in order. Missing files keep their id only."""
-    if not ids:
-        return []
+def attachment_map(ids: list[str]) -> dict:
+    """``{id: {id, name, content_type, size}}`` of the files that still exist, in one query."""
     found: dict = {}
+    if not ids:
+        return found
     try:
         from pleate_backend.files.models import File
 
-        for f in File.objects.filter(pk__in=ids).only("id", "name", "content_type", "size"):
+        for f in File.objects.filter(pk__in=[i for i in ids if ObjectId.is_valid(i)]).only(
+            "id", "name", "content_type", "size"
+        ):
             found[str(f.pk)] = {
                 "id": str(f.pk),
                 "name": f.name,
@@ -44,7 +47,24 @@ def attachment_details(ids: list[str]) -> list[dict]:
             }
     except Exception:  # files app missing or ids not valid any more
         pass
+    return found
+
+
+def attachment_details(ids: list[str], found: dict | None = None) -> list[dict]:
+    """Name, type and size of the attached files, in order. Missing files keep their id only."""
+    if not ids:
+        return []
+    if found is None:
+        found = attachment_map(ids)
     return [found.get(i) or {"id": i, "name": "", "content_type": "", "size": 0} for i in ids]
+
+
+class MessageListSerializer(serializers.ListSerializer):
+    def to_representation(self, data):
+        messages = list(data.all() if hasattr(data, "all") else data)
+        ids = list({i for m in messages for i in m.attachments or []})
+        self.child.context["attachments_map"] = attachment_map(ids)
+        return [self.child.to_representation(m) for m in messages]
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -73,10 +93,11 @@ class MessageSerializer(serializers.ModelSerializer):
             "created_at",
         ]
         read_only_fields = fields
+        list_serializer_class = MessageListSerializer
 
     @extend_schema_field(AttachmentSerializer(many=True))
     def get_attachments(self, message):
-        return attachment_details(message.attachments or [])
+        return attachment_details(message.attachments or [], self.context.get("attachments_map"))
 
 
 class ConversationSerializer(serializers.ModelSerializer):
@@ -165,9 +186,3 @@ class UsageDaySerializer(serializers.Serializer):
 
 class UsageSerializer(serializers.Serializer):
     today = UsageDaySerializer()
-
-
-class DailyUsageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DailyUsage
-        fields = ["day", "input_tokens", "output_tokens"]

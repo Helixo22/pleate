@@ -2,14 +2,21 @@
 Mount everything with ``path("api/", include("pleate_backend.urls"))``.
 
 Each installed pleate app contributes its routes under its own prefix. The
-OpenAPI schema is served at ``schema`` and a Swagger UI at ``docs``.
+OpenAPI schema is served at ``schema`` and a Swagger UI at ``docs``: open in
+DEBUG, otherwise limited by ``SPECTACULAR_SETTINGS["SERVE_PERMISSIONS"]``
+(staff by default).
 """
 
 from importlib import import_module
 
 from django.apps import apps
+from django.conf import settings
 from django.urls import URLPattern, include, path
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from drf_spectacular.utils import extend_schema
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from rest_framework.permissions import AllowAny
 
 PREFIXES = {
     "pleate_backend.core": "",
@@ -28,9 +35,20 @@ PREFIXES = {
     "pleate_backend.staff": "staff/",
 }
 
+
+class SchemaView(SpectacularAPIView):
+    # Decorating get (not dispatch) caches only after DRF checked the permissions.
+    @extend_schema(exclude=True)
+    @method_decorator(cache_page(60 * 10))
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+
+docs_access = {"permission_classes": [AllowAny]} if settings.DEBUG else {}
+
 urlpatterns = [
-    path("schema", SpectacularAPIView.as_view(), name="schema"),
-    path("docs", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger"),
+    path("schema", SchemaView.as_view(**docs_access), name="schema"),
+    path("docs", SpectacularSwaggerView.as_view(url_name="schema", **docs_access), name="swagger"),
 ]
 
 for module, prefix in PREFIXES.items():

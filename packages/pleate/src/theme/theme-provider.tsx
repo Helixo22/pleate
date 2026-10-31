@@ -46,8 +46,11 @@ function createStore(config: ReturnType<typeof resolveConfig>) {
     motion: "system",
   };
   let cache: { key: string; state: ThemeState } | null = null;
+  // Used when localStorage throws (Safari private mode, full quota), so changes still apply for this page.
+  let memory: StoredTheme | null = null;
 
   const readStored = (): StoredTheme => {
+    if (memory) return memory;
     try {
       return JSON.parse(localStorage.getItem(config.storageKey) ?? "{}") ?? {};
     } catch {
@@ -99,7 +102,10 @@ function createStore(config: ReturnType<typeof resolveConfig>) {
     const next = { ...readStored(), ...patch };
     try {
       localStorage.setItem(config.storageKey, JSON.stringify(next));
-    } catch {}
+      memory = null;
+    } catch {
+      memory = next;
+    }
     const run = () => {
       applyToDocument(next);
       notify();

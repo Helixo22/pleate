@@ -101,7 +101,12 @@ const { hasPermission, hasRole, hasFeature } = useMe();
       <H2>Endpoints</H2>
       <P>
         Mounted at <C>/api/rbac</C>. Role and permission endpoints need <C>is_staff</C> or <C>auth.change_group</C>; flag
-        management needs <C>is_staff</C> or the matching <C>pleate_rbac.*_feature</C> permission.
+        management needs <C>is_staff</C> or the matching <C>pleate_rbac.*_feature</C> permission. All of them except{" "}
+        <C>features/me</C> need a signed in session: an API key gets <C>api_key_not_allowed</C>.
+      </P>
+      <P>
+        Without superuser rights you can only put permissions you hold yourself in a role, edit, delete, give or take
+        roles whose permissions you hold, never change your own roles, and never set or unset <C>is_default</C>.
       </P>
       <Endpoints
         rows={[
@@ -133,6 +138,10 @@ const { hasPermission, hasRole, hasFeature } = useMe();
           ["unknown_user", "400 field", "No user with this id."],
           ["feature_taken", "400 field", "A flag with this key exists."],
           ["feature_disabled", "403", <>Raised by <C>HasFeature</C> when the flag is off.</>],
+          ["permission_not_held", "403", "A permission (or a role holding one) you do not have yourself."],
+          ["permission_denied", "403", <>Setting or unsetting <C>is_default</C> without superuser rights.</>],
+          ["cannot_modify_self", "403", "Giving or taking one of your own roles."],
+          ["api_key_not_allowed", "403", "The request used an API key."],
         ]}
       />
       <P>

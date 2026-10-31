@@ -118,7 +118,16 @@ export function Shell({ children }: { children: ReactNode }) {
     }
   }, [area, pathname]);
   useEffect(() => {
-    document.body.style.overflow = menu ? "hidden" : "";
+    if (!menu) return;
+    document.body.style.overflow = "hidden";
+    // The menu is lg:hidden: widening the window must not leave the page locked.
+    const wide = matchMedia("(min-width: 64rem)");
+    const close = () => wide.matches && setMenu(false);
+    wide.addEventListener("change", close);
+    return () => {
+      wide.removeEventListener("change", close);
+      document.body.style.overflow = "";
+    };
   }, [menu]);
 
   if (bare) return <>{children}</>;

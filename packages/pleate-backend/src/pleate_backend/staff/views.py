@@ -1,8 +1,8 @@
 from datetime import UTC, datetime, time, timedelta
 
 import django_filters
-from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.utils import timezone
 from django.utils.translation import get_language
 from django.utils.translation import gettext as _
@@ -14,15 +14,13 @@ from rest_framework.views import APIView
 from pleate_backend.accounts import signals as account_signals
 from pleate_backend.accounts.models import UserSession
 from pleate_backend.accounts.serializers import CountSerializer
-from pleate_backend.accounts.services import revoke_sessions
-from pleate_backend.accounts.tokens import make_reset_token
-from pleate_backend.core.conf import frontend_url
+from pleate_backend.accounts.services import revoke_sessions, send_password_reset
+from pleate_backend.apikeys.permissions import DenyAPIKey
 from pleate_backend.core.exceptions import ApiError
 from pleate_backend.core.permissions import IsStaff
 from pleate_backend.core.utils import client_ip
-from pleate_backend.emails import send_email
 from pleate_backend.rbac.permissions import HasPerm, ModelPerm
-from pleate_backend.rbac.services import set_roles
+from pleate_backend.rbac.services import ensure_can_assign, role_names, set_roles
 
 from . import serializers as s
 from .models import Ban
@@ -49,11 +47,13 @@ class UserFilter(django_filters.FilterSet):
 def _guard_target(request, target):
     if target.is_superuser and not request.user.is_superuser:
         raise ApiError("cannot_modify_superuser", _("Only a superuser can change a superuser."), 403)
+    if target.is_staff and target.pk != request.user.pk and not request.user.is_superuser:
+        raise ApiError("cannot_modify_staff", _("Only a superuser can change another staff account."), 403)
 
 
 @extend_schema_view(get=extend_schema(summary="List users", tags=["staff"]))
 class UserListView(generics.ListAPIView):
-    permission_classes = [CanManageUsers]
+    permission_classes = [DenyAPIKey, CanManageUsers]
     serializer_class = s.StaffUserSerializer
     filterset_class = UserFilter
     search_fields = ["email", "name"]
@@ -65,7 +65,7 @@ class UserListView(generics.ListAPIView):
 
 
 class UserDetailView(generics.GenericAPIView):
-    permission_classes = [CanManageUsers]
+    permission_classes = [DenyAPIKey, CanManageUsers]
     serializer_class = s.StaffUserDetailSerializer
 
     def get_queryset(self):
@@ -95,6 +95,11 @@ class UserDetailView(generics.GenericAPIView):
             raise ApiError("permission_denied", _("Only staff can change staff access."), 403)
         if "roles" in data and not (request.user.is_staff or request.user.has_perm("auth.change_group")):
             raise ApiError("permission_denied", _("You cannot change roles."), 403)
+        if "roles" in data and not request.user.is_superuser:
+            changed = set(role_names(user)) ^ set(data["roles"])
+            if changed and user.pk == request.user.pk:
+                raise ApiError("cannot_modify_self", _("You cannot change your own roles."), 403)
+            ensure_can_assign(request.user, Group.objects.filter(name__in=changed))
 
         deactivated = data.get("is_active") is False and user.is_active
         fields = [f for f in ("name", "is_active", "is_staff", "email_verified") if f in data]
@@ -127,7 +132,7 @@ class UserDetailView(generics.GenericAPIView):
 
 
 class _UserAction(generics.GenericAPIView):
-    permission_classes = [CanChangeUsers]
+    permission_classes = [DenyAPIKey, CanChangeUsers]
     queryset = User.objects.all()
 
 
@@ -151,17 +156,7 @@ class UserPasswordResetView(_UserAction):
         user = self.get_object()
         if not user.is_active:
             raise ApiError("user_inactive", _("This account is deactivated."), 400)
-        send_email(
-            "password_reset",
-            user.email,
-            {
-                "name": user.display_name,
-                "action_url": frontend_url("RESET_PASSWORD", token=make_reset_token(user)),
-                "action_label": _("Choose a new password"),
-                "minutes": settings.PASSWORD_RESET_TIMEOUT // 60,
-            },
-            user.locale or get_language(),
-        )
+        send_password_reset(user, user.locale or get_language())
         return Response(status=202)
 
 
@@ -170,7 +165,7 @@ class UserPasswordResetView(_UserAction):
     post=extend_schema(summary="Ban an IP address or network", tags=["staff"]),
 )
 class BanListView(generics.ListCreateAPIView):
-    permission_classes = [CanManageBans]
+    permission_classes = [DenyAPIKey, CanManageBans]
     serializer_class = s.BanSerializer
     search_fields = ["network", "reason"]
     ordering_fields = ["created_at", "expires_at", "network"]
@@ -190,7 +185,7 @@ class BanListView(generics.ListCreateAPIView):
     delete=extend_schema(summary="Lift an IP ban", tags=["staff"]),
 )
 class BanDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [CanManageBans]
+    permission_classes = [DenyAPIKey, CanManageBans]
     serializer_class = s.BanSerializer
     http_method_names = ["get", "patch", "delete", "head", "options"]
 
@@ -214,7 +209,7 @@ def _refuse_self_ban(request, network: str):
 
 
 class StatsView(APIView):
-    permission_classes = [CanViewStats]
+    permission_classes = [DenyAPIKey, CanViewStats]
 
     @extend_schema(responses=s.StatsSerializer, summary="User and session numbers", tags=["staff"])
     def get(self, request):

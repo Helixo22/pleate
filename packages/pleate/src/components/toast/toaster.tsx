@@ -67,7 +67,7 @@ function ToastItem({ data, position, duration, closeLabel }: { data: ToastData; 
       window.clearTimeout(timer);
       remaining.current -= Date.now() - started.current;
     };
-  }, [paused, tone, data.id, data.title, data.tone]);
+  }, [paused, tone, data.id, data.title, data.tone, data.duration, duration]);
 
   const enter = reduced ? { opacity: 0 } : horizontal ? { opacity: 0, x: 40 } : { opacity: 0, y: top ? -32 : 32, scale: 0.96 };
   const onDragEnd = (_: unknown, info: PanInfo) => {

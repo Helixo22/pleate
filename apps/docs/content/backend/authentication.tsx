@@ -105,6 +105,12 @@ register_me_field("household", lambda user: user.household_id and str(user.house
         on, login answers <C>email_not_verified</C> until the link is opened. The page behind the link calls{" "}
         <C>useVerifyEmail(token)</C>.
       </P>
+      <P>
+        Leaving verification optional has a cost: anyone can sign up with an address they do not own, then attach a
+        social login, 2FA, API keys or webhooks before the real owner shows up. When the owner resets the password of an
+        account that was never verified, all of that is removed (API keys are revoked, social links, 2FA and webhook
+        endpoints deleted). Turn <C>REQUIRE_EMAIL_VERIFICATION</C> on if unverified accounts should not be usable at all.
+      </P>
 
       <H2>Passwords</H2>
       <LiveDemo
@@ -134,14 +140,15 @@ export default function ResetPassword() {
 }
 `}</Code>
       <P>
-        A successful reset or password change signs out every other session and emails a security notice.
+        A successful reset or password change signs out every other session, revokes every API key and emails a
+        security notice. A reset also marks the email as verified, since the link proves the inbox.
       </P>
 
       <H2>Login protection</H2>
       <P>
-        Failed logins are counted per account and per IP address in a sliding window. Past the limit the endpoint answers
-        429 <C>too_many_attempts</C> with <C>retry_after</C>, even for the right password. A successful login or reset
-        clears the account counter. The counters fail closed: if the cache is down, logins are refused rather than left
+        Login attempts are counted per account and per IP address in a sliding window, before the password is checked, so
+        parallel guesses cannot slip past the limit. Past the limit the endpoint answers 429 <C>too_many_attempts</C> with{" "}
+        <C>retry_after</C>, even for the right password. A successful login or reset clears the account counter and gives back its IP attempt. The counters fail closed: if the cache is down, logins are refused rather than left
         unprotected.
       </P>
 
@@ -189,9 +196,9 @@ def export_orders(sender, user, request, **kwargs):
         rows={[
           ["SIGNUP_ENABLED", "True", <>False closes signup (<C>signup_disabled</C>).</>],
           ["REQUIRE_EMAIL_VERIFICATION", "False", "Refuse logins until the email is confirmed."],
-          ["LOGIN_MAX_ATTEMPTS", "5", "Failed attempts per account in the window."],
+          ["LOGIN_MAX_ATTEMPTS", "5", "Failed attempts per account in the window (a success clears it)."],
           ["LOGIN_LOCKOUT_SECONDS", "900", "Length of the window."],
-          ["LOGIN_IP_MAX_ATTEMPTS", "30", "Failed attempts per IP in the window."],
+          ["LOGIN_IP_MAX_ATTEMPTS", "30", "Failed attempts per IP in the window; a successful login gives its attempt back."],
           ["REMEMBER_ME_AGE", "31536000", <>Session age in seconds with <C>remember</C> (one year).</>],
           ["EMAIL_TOKEN_MAX_AGE", "259200", "Validity of verification and email change links (three days)."],
           ["DELETE_ACCOUNT_REQUIRES_PASSWORD", "True", "Ask for the password before deleting."],

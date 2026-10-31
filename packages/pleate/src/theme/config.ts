@@ -41,6 +41,6 @@ export function resolveConfig(config: ThemeConfig = {}) {
 // The boot script: tiny, dependency-free, safe to inline. It must mirror applyToDocument in store.ts.
 export function bootScript(config: ThemeConfig = {}) {
   const c = resolveConfig(config);
-  const args = [c.storageKey, c.defaultTheme, c.defaultPalette, CUSTOM_STYLE_ID, c.palettes].map((v) => JSON.stringify(v)).join(",");
+  const args = [c.storageKey, c.defaultTheme, c.defaultPalette, CUSTOM_STYLE_ID, c.palettes].map((v) => JSON.stringify(v).replace(/</g, "\\u003c")).join(",");
   return `(function(k,t,p,id,a){try{var s={};try{s=JSON.parse(localStorage.getItem(k)||"{}")||{}}catch(e){}var d=document.documentElement,m=s.theme||t,r=m==="system"?(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):m;d.setAttribute("data-theme",r);d.style.colorScheme=r;var n=s.palette&&a.indexOf(s.palette)>=0?s.palette:p;d.setAttribute("data-palette",n);if(n==="custom"&&s.css){var e=document.createElement("style");e.id=id;e.textContent=s.css;document.head.appendChild(e)}if(s.motion==="off")d.setAttribute("data-motion","off")}catch(e){}})(${args})`;
 }

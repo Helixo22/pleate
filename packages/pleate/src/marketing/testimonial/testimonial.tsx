@@ -56,6 +56,7 @@ export function Testimonials({ items, layout = "grid", label = "Testimonials", c
   const track = useRef<HTMLUListElement>(null);
   if (layout === "featured") {
     const t = items[0];
+    if (!t) return null;
     return (
       <figure className={cn("mx-auto flex max-w-3xl flex-col items-center gap-8 text-center", className)}>
         <svg viewBox="0 0 32 24" className="h-8 text-accent-ink" fill="currentColor" aria-hidden="true">

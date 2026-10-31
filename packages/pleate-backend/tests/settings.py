@@ -25,3 +25,5 @@ PLEATE = {
     "FRONTEND_URL": "http://app.test",
     "EMAILS": {"ASYNC": False},
 }
+# Tests run with DEBUG off on the in-memory broker on purpose.
+SILENCED_SYSTEM_CHECKS = ["pleate_core.W001", "pleate_ratelimit.W001"]

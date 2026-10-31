@@ -30,11 +30,10 @@ def _as_fernet_key(value: str) -> bytes:
 
 def _fernet() -> MultiFernet:
     configured = (pleate_settings.MFA or {}).get("ENCRYPTION_KEY")
-    if configured:
-        keys = [_as_fernet_key(configured)]
-    else:
-        keys = [_derive(settings.SECRET_KEY)]
-        keys += [_derive(old) for old in getattr(settings, "SECRET_KEY_FALLBACKS", [])]
+    # The SECRET_KEY keys stay as fallbacks so secrets enrolled before ENCRYPTION_KEY was set still decrypt.
+    keys = [_as_fernet_key(configured)] if configured else []
+    keys.append(_derive(settings.SECRET_KEY))
+    keys += [_derive(old) for old in getattr(settings, "SECRET_KEY_FALLBACKS", [])]
     return MultiFernet([Fernet(k) for k in keys])
 
 
