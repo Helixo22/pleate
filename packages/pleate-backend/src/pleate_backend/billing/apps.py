@@ -8,7 +8,7 @@ class BillingConfig(AppConfig):
 
     def ready(self):
         from django.conf import settings
-        from django.db.models.signals import pre_delete
+        from django.db.models.signals import post_migrate, pre_delete
 
         from pleate_backend.accounts.me import register_me_field
         from pleate_backend.accounts.signals import collect_user_data
@@ -20,3 +20,4 @@ class BillingConfig(AppConfig):
         pre_delete.connect(
             handlers.cancel_on_delete, sender=settings.AUTH_USER_MODEL, dispatch_uid="pleate_billing_cancel"
         )
+        post_migrate.connect(handlers.ensure_indexes, sender=self)

@@ -30,7 +30,9 @@ from .serializers import MessageSerializer
 logger = logging.getLogger(__name__)
 
 SAVE_INTERVAL = 1.0
+STOP_CHECK_INTERVAL = 0.5
 STOP_TTL = 60 * 15
+SLOT_TTL = 60 * 15
 TITLE_LENGTH = 60
 
 
@@ -80,6 +82,46 @@ def check_quota(user) -> None:
         raise ApiError("quota_exceeded", _("You reached the daily limit. Try again tomorrow."), 429)
 
 
+def slot_key(user_id) -> str:
+    return f"pleate:ai:running:{user_id}"
+
+
+def acquire_slot(user) -> None:
+    """Counts a running generation of ``user``. ``too_many_generations`` (429) past the limit."""
+    limit = pleate_settings.AI["MAX_CONCURRENT_GENERATIONS"]
+    if not limit:
+        return
+    key = slot_key(user.pk)
+    try:
+        cache.add(key, 0, SLOT_TTL)
+        try:
+            running = cache.incr(key)
+        except ValueError:  # expired between add and incr
+            cache.add(key, 1, SLOT_TTL)
+            running = 1
+        cache.touch(key, SLOT_TTL)
+    except Exception:
+        logger.warning("ai_chat: generation counter unavailable", exc_info=True)
+        return
+    if running > limit:
+        release_slot(user.pk)
+        raise ApiError(
+            "too_many_generations", _("Wait for the current answer to finish before asking again."), 429
+        )
+
+
+def release_slot(user_id) -> None:
+    if not pleate_settings.AI["MAX_CONCURRENT_GENERATIONS"]:
+        return
+    try:
+        if cache.decr(slot_key(user_id)) <= 0:
+            cache.delete(slot_key(user_id))
+    except ValueError:  # expired: the TTL already freed it
+        pass
+    except Exception:
+        logger.warning("ai_chat: generation counter unavailable", exc_info=True)
+
+
 def record_usage(user_id, input_tokens: int, output_tokens: int) -> None:
     if not input_tokens and not output_tokens:
         return
@@ -111,40 +153,35 @@ def validate_attachments(user, ids: list[str]) -> list[str]:
         raise error
     from pleate_backend.files.models import File
 
-    if File.objects.filter(pk__in=ids, owner=user).count() != len(set(ids)):
+    if File.objects.ready().filter(pk__in=ids, owner=user).count() != len(set(ids)):
         raise error
     return ids
 
 
-def load_attachments(user_id, ids: list[str]) -> list[dict]:
-    """``[{name, content_type, data}]`` for the provider. Files deleted since are skipped."""
+def ready_files(user_id, ids: list[str]) -> dict:
+    """``{id: File}`` of the ready files of ``user_id`` among ``ids``, in one query."""
     if not ids or not apps.is_installed("pleate_backend.files"):
-        return []
+        return {}
     from pleate_backend.files.models import File
+
+    valid = [i for i in set(ids) if ObjectId.is_valid(i)]
+    return {str(f.pk): f for f in File.objects.ready().filter(pk__in=valid, owner_id=user_id)}
+
+
+def read_file(f) -> bytes | None:
     from pleate_backend.files.services import open_file
 
-    files = {
-        str(f.pk): f
-        for f in File.objects.filter(pk__in=[i for i in ids if ObjectId.is_valid(i)], owner_id=user_id)
-    }
-    out = []
-    for i in ids:
-        f = files.get(i)
-        if f is None:
-            continue
+    try:
+        handle = open_file(f)
         try:
-            handle = open_file(f)
-            try:
-                data = handle.read()
-            finally:
-                close = getattr(handle, "close", None)
-                if close:
-                    close()
-        except Exception:
-            logger.warning("ai_chat: could not read attachment %s", i, exc_info=True)
-            continue
-        out.append({"name": f.name, "content_type": f.content_type, "data": data})
-    return out
+            return handle.read()
+        finally:
+            close = getattr(handle, "close", None)
+            if close:
+                close()
+    except Exception:
+        logger.warning("ai_chat: could not read attachment %s", f.pk, exc_info=True)
+        return None
 
 
 # History
@@ -159,18 +196,28 @@ def build_history(conversation: Conversation, before: Message) -> list[dict]:
         .exclude(status__in=[Message.Status.ERROR, Message.Status.STREAMING])
         .order_by("-created_at", "-id")[:limit]
     )
-    rows.reverse()
+    files = ready_files(conversation.user_id, [i for m in rows for i in m.attachments or []])
+    budget = pleate_settings.AI["HISTORY_ATTACHMENT_BYTES"]
+    used = 0
     history = []
+    # Newest first so the latest files get the byte budget, older ones become a note.
     for m in rows:
         if m.role == Message.Role.ASSISTANT and not m.content:
             continue
-        history.append(
-            {
-                "role": m.role,
-                "content": m.content,
-                "attachments": load_attachments(conversation.user_id, m.attachments) if m.attachments else [],
-            }
-        )
+        content, attachments = m.content, []
+        for f in (files.get(i) for i in m.attachments or []):
+            if f is None:  # deleted since
+                continue
+            data = None
+            if budget is None or not used or used + (f.size or 0) <= budget:
+                data = read_file(f)
+            if data is None:
+                content += f"\n[attachment: {f.name}]"
+                continue
+            used += len(data)
+            attachments.append({"name": f.name, "content_type": f.content_type, "data": data})
+        history.append({"role": m.role, "content": content, "attachments": attachments})
+    history.reverse()
     return history
 
 
@@ -199,7 +246,17 @@ def stop_key(message_id) -> str:
 
 
 def request_stop(message_id) -> None:
-    cache.set(stop_key(message_id), True, STOP_TTL)
+    try:
+        cache.set(stop_key(message_id), True, STOP_TTL)
+    except Exception:
+        logger.warning("ai_chat: could not set the stop flag", exc_info=True)
+
+
+def clear_stop(message_id) -> None:
+    try:
+        cache.delete(stop_key(message_id))
+    except Exception:
+        logger.warning("ai_chat: could not clear the stop flag", exc_info=True)
 
 
 def stop_requested(message_id) -> bool:
@@ -223,7 +280,9 @@ def message_data(message: Message) -> dict:
 def _merge_sources(current: list[dict], new: list) -> list[dict]:
     seen = {s.get("url") for s in current}
     for src in new or []:
-        if not isinstance(src, dict) or not src.get("url") or src["url"] in seen:
+        if not isinstance(src, dict) or not isinstance(src.get("url"), str) or src["url"] in seen:
+            continue
+        if not src["url"].lower().startswith(("http://", "https://")):
             continue
         seen.add(src["url"])
         current.append(
@@ -248,14 +307,14 @@ def generate(
     *,
     user_message: Message | None = None,
 ) -> Iterator[dict]:
-    cache.delete(stop_key(assistant.pk))
+    clear_stop(assistant.pk)
     content: list[str] = []
     reasoning: list[str] = []
     sources: list[dict] = []
     usage: dict | None = None
     status = Message.Status.COMPLETE
     error: tuple[str, str] | None = None
-    last_save = time.monotonic()
+    last_save = last_stop_check = time.monotonic()
     system = system_prompt(conversation)
 
     try:
@@ -271,9 +330,11 @@ def generate(
         )
         try:
             for chunk in chunks:
-                if stop_requested(assistant.pk):
-                    status = Message.Status.STOPPED
-                    break
+                if time.monotonic() - last_stop_check >= STOP_CHECK_INTERVAL:
+                    last_stop_check = time.monotonic()
+                    if stop_requested(assistant.pk):
+                        status = Message.Status.STOPPED
+                        break
                 kind = chunk.get("type")
                 if kind == "delta" and chunk.get("text"):
                     content.append(chunk["text"])
@@ -326,6 +387,7 @@ def generate(
             )
         except Exception:
             logger.exception("ai_chat: could not save the assistant message")
+        release_slot(conversation.user_id)
 
     if error:
         yield event("error", {"code": error[0], "message": error[1], "message_id": str(assistant.pk)})
@@ -336,7 +398,10 @@ def _finish(
     conversation, assistant, history, system, content, reasoning, sources, usage, status, error, user_message
 ):
     text = "".join(content)
-    if usage is None:
+    if usage is None and status == Message.Status.ERROR and not text and not reasoning:
+        # Nothing was generated: a failed request does not count against the quota.
+        usage = {"input_tokens": 0, "output_tokens": 0}
+    elif usage is None:
         usage = {
             "input_tokens": _estimate_tokens(system) + sum(_estimate_tokens(m["content"]) for m in history),
             "output_tokens": _estimate_tokens(text) + _estimate_tokens("".join(reasoning)),
@@ -367,4 +432,4 @@ def _finish(
     for key, value in fields.items():
         setattr(conversation, key, value)
     Conversation.objects.filter(pk=conversation.pk).update(updated_at=timezone.now(), **fields)
-    cache.delete(stop_key(assistant.pk))
+    clear_stop(assistant.pk)

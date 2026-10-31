@@ -20,21 +20,6 @@ def avatar_url(user, request=None) -> str | None:
     return request.build_absolute_uri(path) if request else path
 
 
-class PublicUserSerializer(serializers.ModelSerializer):
-    """What other users may see (authors, chat participants...)."""
-
-    id = serializers.CharField(read_only=True)
-    display_name = serializers.CharField(read_only=True)
-    avatar_url = serializers.SerializerMethodField()
-
-    class Meta:
-        model = User
-        fields = ["id", "name", "display_name", "avatar_url"]
-
-    def get_avatar_url(self, user) -> str | None:
-        return avatar_url(user)
-
-
 class MeSerializer(serializers.ModelSerializer):
     id = serializers.CharField(read_only=True)
     display_name = serializers.CharField(read_only=True)
@@ -71,7 +56,8 @@ class MeSerializer(serializers.ModelSerializer):
         return extra_fields(user)
 
     def validate_preferences(self, value):
-        if not isinstance(value, dict) or len(str(value)) > 4000:
+        current = (self.instance.preferences if self.instance else None) or {}
+        if not isinstance(value, dict) or len(str({**current, **value})) > 4000:
             raise serializers.ValidationError(_("Preferences must be a small object."), code="invalid")
         return value
 

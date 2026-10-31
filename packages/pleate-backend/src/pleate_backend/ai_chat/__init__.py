@@ -59,7 +59,8 @@ client disconnects.
 
 Error codes: ``empty_message``, ``message_too_long`` (field ``content``),
 ``too_many_attachments``, ``attachment_not_found`` (files must belong to the
-user), ``invalid_model``, ``quota_exceeded`` (429), ``cannot_regenerate``
+user), ``invalid_model``, ``quota_exceeded`` (429), ``too_many_generations``
+(429), ``cannot_regenerate``
 (409), ``message_streaming`` (409), ``throttled`` (429, scope ``ai``). In the
 ``error`` event: ``provider_error``, ``provider_rate_limited``,
 ``provider_unavailable``, ``provider_not_configured``.
@@ -81,6 +82,8 @@ Settings
         "SUGGESTIONS": [{"title": "Plan a trip", "description": "...", "prompt": "..."}],
         "MAX_MESSAGE_CHARS": 32_000,         # optional
         "MAX_ATTACHMENTS": 10,               # optional
+        "MAX_CONCURRENT_GENERATIONS": 2,     # answers per user at once, None for no limit
+        "HISTORY_ATTACHMENT_BYTES": 20 * 1024 * 1024,  # file bytes in the history, older files as a note
     }
 
 A ``MODELS`` entry can also carry ``"provider"`` and ``"options"`` (it then

@@ -7,12 +7,17 @@ Uniform error format for every endpoint:
 ``code`` values are stable and meant to be translated by the client.
 """
 
+import logging
+
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, status
 from rest_framework.response import Response
 from rest_framework.views import exception_handler as drf_exception_handler
+from rest_framework.views import set_rollback
+
+logger = logging.getLogger("pleate")
 
 
 class ApiError(exceptions.APIException):
@@ -62,7 +67,16 @@ def exception_handler(exc, context):
 
     response = drf_exception_handler(exc, context)
     if response is None:
-        return None
+        # Not an API error: keep the traceback in the logs, answer with the same JSON envelope.
+        logger.error("Unhandled error in %s", type(context.get("view")).__name__, exc_info=exc)
+        set_rollback()
+        request = context.get("request")
+        return error_response(
+            "server_error",
+            ApiError.default_detail,
+            500,
+            request_id=getattr(request, "request_id", None),
+        )
 
     body: dict = {"status": response.status_code}
     if isinstance(exc, ApiError):

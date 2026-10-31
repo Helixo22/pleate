@@ -7,4 +7,4 @@ class CoreConfig(AppConfig):
     verbose_name = "pleate core"
 
     def ready(self):
-        from . import schema  # noqa: F401
+        from . import checks, schema  # noqa: F401

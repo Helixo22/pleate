@@ -1,5 +1,5 @@
 """
-DRF throttles backed by ``limits.hit``. They also publish the standard
+DRF throttles backed by ``limits.consume``. They also publish the standard
 ``RateLimit-Limit``, ``RateLimit-Remaining`` and ``RateLimit-Reset`` headers
 through ``RateLimitHeadersMiddleware``.
 
@@ -40,10 +40,10 @@ class _Throttle(BaseThrottle):
             return True
         limit, window = parse_rate(rate)
         key = f"{scope}:{ident}"
-        allowed, self.wait_seconds = limits.hit(key, limit, window, fail_closed=self.fail_closed)
-        info = {"limit": limit, "remaining": limits.remaining(key, limit, window), "reset": window}
-        if not allowed:
-            info.update(remaining=0, reset=self.wait_seconds)
+        allowed, self.wait_seconds, left, reset_in = limits.consume(
+            key, limit, window, fail_closed=self.fail_closed
+        )
+        info = {"limit": limit, "remaining": left, "reset": reset_in}
         holder = getattr(request, "_request", request)
         previous = getattr(holder, "_pleate_ratelimit", None)
         if previous is None or info["remaining"] < previous["remaining"]:

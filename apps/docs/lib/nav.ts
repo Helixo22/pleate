@@ -67,10 +67,6 @@ export const NAV: NavSection[] = [
   { title: "Examples", items: [{ name: "Landing page", href: "/examples/landing", ready: true }] },
 ];
 
-export const READY_COMPONENTS = NAV.flatMap((section) => section.items).filter(
-  (item) => item.ready && item.href.startsWith("/components/"),
-);
-
 // The Backend docs are a separate area of the site (header toggle), with their own sidebar.
 const BACKEND_GROUPS: { title: string; slugs: string[] }[] = [
   { title: "Getting started", slugs: ["overview", "installation", "conventions", "client-and-hooks"] },

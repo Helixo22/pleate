@@ -83,11 +83,6 @@ export const PhoneIcon = (p: IconProps) => (
     <path d="M11 18h2" />
   </Icon>
 );
-export const ShieldIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <path d="M12 3.5 5 6v5.5c0 4.2 3 7.6 7 9 4-1.4 7-4.8 7-9V6l-7-2.5Z" />
-  </Icon>
-);
 export const MailIcon = (p: IconProps) => (
   <Icon {...p}>
     <rect x="3" y="5.5" width="18" height="13" rx="2.5" />

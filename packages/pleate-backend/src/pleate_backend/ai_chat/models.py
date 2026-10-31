@@ -52,6 +52,8 @@ class Message(models.Model):
     # Previous assistant answers, oldest first, kept when the answer is regenerated.
     variants = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(default=timezone.now, db_index=True)
+    # When the current (or last) generation started: regenerated answers keep created_at.
+    stream_started_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["created_at", "id"]

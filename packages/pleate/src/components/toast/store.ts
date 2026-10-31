@@ -66,9 +66,11 @@ export const toast = Object.assign((title: ReactNode, options?: ToastOptions) =>
   promise<T>(promise: Promise<T>, messages: { loading: ReactNode; success: Message<T>; error: Message<unknown> }, options?: ToastOptions) {
     const id = upsert(messages.loading, { ...options, tone: "loading" });
     const resolve = <V,>(m: Message<V>, v: V) => (typeof m === "function" ? (m as (value: V) => ReactNode)(v) : m);
+    // Dismissed while loading: don't bring it back.
+    const settle = (title: () => ReactNode, tone: ToastTone) => toasts.some((t) => t.id === id) && upsert(title(), { ...options, id, tone });
     promise.then(
-      (value) => upsert(resolve(messages.success, value), { ...options, id, tone: "success" }),
-      (error) => upsert(resolve(messages.error, error), { ...options, id, tone: "error" }),
+      (value) => settle(() => resolve(messages.success, value), "success"),
+      (error) => settle(() => resolve(messages.error, error), "error"),
     );
     return promise;
   },

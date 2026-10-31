@@ -10,6 +10,7 @@ kind, else their ``"*"`` preference, else ``PLEATE["NOTIFICATIONS"]["DEFAULT_CHA
 
 import json
 import logging
+from urllib.parse import urlsplit
 
 from django.utils import translation
 from django.utils.translation import gettext as _
@@ -101,6 +102,19 @@ def push_configured() -> bool:
     return bool(conf["VAPID_PUBLIC_KEY"] and conf["VAPID_PRIVATE_KEY"])
 
 
+def push_endpoint_allowed(endpoint: str) -> bool:
+    """True for https endpoints on a ``PUSH_ALLOWED_HOSTS`` host or one of its subdomains."""
+    try:
+        parts = urlsplit(endpoint)
+        host = (parts.hostname or "").lower()
+        parts.port  # noqa: B018 raises on a bad port
+    except ValueError:
+        return False
+    if parts.scheme != "https" or parts.username or parts.password or not host:
+        return False
+    return any(host == h or host.endswith("." + h) for h in _conf()["PUSH_ALLOWED_HOSTS"])
+
+
 def send_push(user, payload: dict) -> int:
     """Sends to every browser of the user. Silent when VAPID keys or pywebpush are missing."""
     if not push_configured():
@@ -113,6 +127,8 @@ def send_push(user, payload: dict) -> int:
     conf = _conf()
     sent = 0
     for sub in PushSubscription.objects.filter(user=user):
+        if not push_endpoint_allowed(sub.endpoint):
+            continue
         try:
             pywebpush.webpush(
                 subscription_info={
@@ -184,6 +200,25 @@ def notify(
             "url": url,
             "data": data or {},
         }
-        send_push(user, payload)
+        queue_push(user, payload)
 
     return notification
+
+
+def queue_push(user, payload: dict) -> None:
+    """Push from a Celery task when ``NOTIFICATIONS["ASYNC"]``, else inline (also if the queue is down)."""
+    if not push_configured():
+        return
+    payload = json.loads(json.dumps(payload, default=str))
+    if _conf()["ASYNC"]:
+        from .tasks import send_push_task
+
+        try:
+            send_push_task.delay(str(user.pk), payload)
+            return
+        except Exception:  # noqa: BLE001
+            logger.warning("task queue unavailable, sending push inline", exc_info=True)
+    try:
+        send_push(user, payload)
+    except Exception:  # noqa: BLE001
+        logger.exception("push notification failed")

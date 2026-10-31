@@ -4,6 +4,9 @@ counters are shared by every worker).
 
     allowed, retry_after = hit("login:ip:1.2.3.4", limit=30, window=900)
 
+Count first, then do the slow check: ``hit`` is atomic, ``peek`` then ``hit``
+is not (parallel requests all pass the peek).
+
 The window is approximated with two fixed buckets weighted by overlap, which
 is accurate enough for abuse protection and needs only two cache keys.
 
@@ -46,21 +49,32 @@ def peek(key: str, limit: int, window: int, *, fail_closed: bool = False) -> tup
     return True, 0
 
 
-def hit(key: str, limit: int, window: int, *, fail_closed: bool = False) -> tuple[bool, int]:
-    """Count one event. Returns ``(allowed, retry_after_seconds)``."""
+def consume(key: str, limit: int, window: int, *, fail_closed: bool = False) -> tuple[bool, int, int, int]:
+    """
+    Count one event, atomically: the bucket is incremented first and the
+    returned value compared, so parallel requests cannot all pass a check.
+    A refused event is not counted. Returns ``(allowed, retry_after,
+    remaining, reset)``, ``reset`` being the seconds left in the current window.
+    """
     now = time.time()
+    cur_key, prev_key, current = _buckets(key, window, now)
+    reset_in = max(1, math.ceil((current + 1) * window - now))
     try:
-        count, current = _estimate(key, window, now)
-        if count >= limit:
-            return False, max(1, math.ceil((current + 1) * window - now))
-        cur_key = f"pl:rl:{key}:{current}"
-        if cache.add(cur_key, 1, timeout=window * 2):
-            return True, 0
-        cache.incr(cur_key)
-        return True, 0
+        prev = cache.get_many([prev_key]).get(prev_key, 0)
+        count = 1 if cache.add(cur_key, 1, timeout=window * 2) else cache.incr(cur_key)
+        estimate = count + prev * (window - (now - current * window)) / window
+        if estimate > limit:
+            cache.decr(cur_key)
+            return False, reset_in, 0, reset_in
+        return True, 0, max(0, limit - math.ceil(estimate)), reset_in
     except Exception:  # noqa: BLE001
         logger.warning("rate limit cache unavailable", exc_info=True)
-        return (not fail_closed), (window if fail_closed else 0)
+        return (not fail_closed), (window if fail_closed else 0), (0 if fail_closed else limit), window
+
+
+def hit(key: str, limit: int, window: int, *, fail_closed: bool = False) -> tuple[bool, int]:
+    """Count one event. Returns ``(allowed, retry_after_seconds)``."""
+    return consume(key, limit, window, fail_closed=fail_closed)[:2]
 
 
 def remaining(key: str, limit: int, window: int) -> int:
@@ -69,6 +83,15 @@ def remaining(key: str, limit: int, window: int) -> int:
     except Exception:  # noqa: BLE001
         return limit
     return max(0, limit - math.ceil(count))
+
+
+def refund(key: str, window: int) -> None:
+    """Give back one event counted by ``consume`` in the current window."""
+    cur_key, _, _ = _buckets(key, window, time.time())
+    try:
+        cache.decr(cur_key)
+    except Exception:  # noqa: BLE001
+        pass  # the window rolled over or the cache is down: nothing to give back
 
 
 def reset(key: str, window: int) -> None:

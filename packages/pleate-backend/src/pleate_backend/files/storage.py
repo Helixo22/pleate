@@ -7,7 +7,6 @@ project needs nothing else to start. For larger volumes switch
 (``pip install pleate-backend[s3]``) and configure django-storages.
 """
 
-import io
 import os
 import uuid
 
@@ -39,8 +38,7 @@ class GridFSStorage(Storage):
         doc = self._find(name)
         if doc is None:
             raise FileNotFoundError(name)
-        stream = self._bucket.open_download_stream(doc._id)
-        return File(io.BytesIO(stream.read()), name=name)
+        return File(self._bucket.open_download_stream(doc._id), name=name)
 
     def _save(self, name, content):
         content.seek(0)

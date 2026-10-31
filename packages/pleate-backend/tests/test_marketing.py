@@ -206,7 +206,8 @@ def test_waitlist_join_is_idempotent(api):
     assert first["referrals"] == 0
     assert first["invited"] is False
     assert len(first["referral_code"]) == 8
-    assert _join(api, "W1@example.com") == first
+    # Already on the list: same shape, nothing about the entry (no code to steal).
+    assert _join(api, "W1@example.com") == dict.fromkeys(first)
     assert WaitlistEntry.objects.count() == 1
 
 

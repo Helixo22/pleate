@@ -36,8 +36,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(_("name"), max_length=150, blank=True)
     email_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    date_joined = models.DateTimeField(default=timezone.now)
+    is_staff = models.BooleanField(default=False, db_index=True)
+    date_joined = models.DateTimeField(default=timezone.now, db_index=True)
     locale = models.CharField(max_length=10, blank=True)
     timezone = models.CharField(max_length=64, blank=True)
     # Free form UI preferences: {"theme": "dark", "palette": "blue", "reduced_motion": false}
@@ -59,6 +59,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+    def clean(self):
+        super().clean()
+        self.email = self.email.strip().lower()
+
     @property
     def display_name(self):
         return self.name or self.email.split("@")[0]
@@ -66,8 +70,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def set_password(self, raw_password):
         super().set_password(raw_password)
         self.password_changed_at = timezone.now()
-        if raw_password is not None:
-            self.has_password = True
+        self.has_password = raw_password is not None
 
 
 class UserSession(AbstractBaseSession):

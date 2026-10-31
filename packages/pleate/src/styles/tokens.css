@@ -1,97 +1,106 @@
 /* ---------------------------------------------------------------------------------------------------------------
    pleate/styles/tokens.css, design tokens as CSS variables (prefix --pl-).
-   Neutral surfaces follow iOS system colors; all surfaces are solid (no translucency, no blur).
+   Graphite neutrals, one accent, solid surfaces (no translucency, no blur).
    Light values live on :root and [data-theme="light"], dark ones on [data-theme="dark"], so a subtree can pin its own
    theme. The accent comes from palettes.css; hover/pressed/soft/ring shades are derived below from whatever accent is
    in effect, so they follow presets, custom palettes and theme islands alike.
    --------------------------------------------------------------------------------------------------------------- */
 
+/* Neutral ramp: graphite, untinted, so the content carries the color. Surfaces are solid; depth comes from hairlines
+   and surface steps, and shadows are kept for things that float (menus, dialogs, toasts). */
 :root,
 [data-theme="light"] {
   color-scheme: light;
 
-  /* Surfaces: page → card → raised (sheets, popovers). Fills are neutral wells (fields, gray buttons, tracks). */
-  --pl-bg: #f2f2f7;
+  /* Surfaces: page → card → raised (sheets, popovers). Fills are neutral wells (fields, quiet buttons, tracks). */
+  --pl-bg: #fafafa;
   --pl-surface: #ffffff;
-  --pl-surface-2: #f7f7fa;
+  --pl-surface-2: #f4f4f5;
   --pl-elevated: #ffffff;
-  /* Fills are tints of gray over whatever solid surface they sit on (the iOS system fills), so a field reads the
-     same on the page, on a card and inside a sheet. They are never layered over content: no glass effect. */
-  --pl-fill: rgb(120 120 128 / 0.2);
-  --pl-fill-2: rgb(118 118 128 / 0.12);
-  --pl-fill-3: rgb(118 118 128 / 0.07);
-  --pl-overlay: rgb(0 0 0 / 0.36);
+  /* Fills are graphite tints over whatever solid surface they sit on, so a field reads the same on the page, on a
+     card and inside a dialog. They are never layered over content. */
+  --pl-fill: rgb(23 23 23 / 0.12);
+  --pl-fill-2: rgb(23 23 23 / 0.07);
+  --pl-fill-3: rgb(23 23 23 / 0.04);
+  --pl-overlay: rgb(10 10 11 / 0.4);
 
-  /* Content */
-  --pl-fg: #000000;
-  --pl-fg-muted: #6c6c72;
-  --pl-fg-subtle: #8e8e93;
-  --pl-separator: #d8d8dd;
-  --pl-border: #c7c7cc;
+  /* Content: primary, secondary, muted (muted stays ≥ 4.5:1 on bg and surface) */
+  --pl-fg: #171717;
+  --pl-fg-muted: #525252;
+  --pl-fg-subtle: #6b6b6b;
+  --pl-separator: #e7e7e9;
+  --pl-border: #d4d4d8;
 
   /* Status: fill (white text on top, AA) · ink (text and icons on the page, AA) · soft (tinted wells) */
-  --pl-success: #1f7a35;
-  --pl-success-ink: #1f7a35;
-  --pl-warning: #b25000;
-  --pl-warning-ink: #a34a00;
-  --pl-danger: #d70015;
-  --pl-danger-ink: #c4001a;
-  --pl-info: #0a63c9;
-  --pl-info-ink: #0a63c9;
+  --pl-success: #15803d;
+  --pl-success-ink: #15803d;
+  --pl-warning: #b45309;
+  --pl-warning-ink: #a14a07;
+  --pl-danger: #dc2626;
+  --pl-danger-ink: #c81e1e;
+  --pl-info: #1d4ed8;
+  --pl-info-ink: #1d4ed8;
   --pl-on-status: #ffffff;
-  --pl-success-vivid: #34c759; /* iOS system green: switches and live dots, never behind text */
+  --pl-success-vivid: #16a34a; /* live dots and "on" states that carry no text */
 
-  /* Elevation: soft, diffuse, never heavy */
-  --pl-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.05);
-  --pl-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.04), 0 2px 8px rgb(0 0 0 / 0.04);
-  --pl-shadow-md: 0 2px 4px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.07);
-  --pl-shadow-lg: 0 4px 10px rgb(0 0 0 / 0.04), 0 16px 40px -8px rgb(0 0 0 / 0.14);
-  --pl-shadow-xl: 0 8px 16px rgb(0 0 0 / 0.05), 0 28px 64px -16px rgb(0 0 0 / 0.22);
-  --pl-edge: 0 0 0 0 transparent; /* hairline added to raised surfaces in dark mode */
+  /* Elevation: small and neutral. xs/sm are for controls, md+ for floating layers only. */
+  --pl-shadow-xs: 0 1px 1px rgb(0 0 0 / 0.04);
+  --pl-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.05);
+  --pl-shadow-md: 0 1px 2px rgb(0 0 0 / 0.04), 0 6px 16px rgb(0 0 0 / 0.06);
+  --pl-shadow-lg: 0 2px 4px rgb(0 0 0 / 0.04), 0 12px 32px -4px rgb(0 0 0 / 0.1);
+  --pl-shadow-xl: 0 4px 8px rgb(0 0 0 / 0.04), 0 24px 56px -12px rgb(0 0 0 / 0.18);
+  --pl-edge: inset 0 0 0 1px rgb(23 23 23 / 0.08); /* hairline on raised surfaces */
 
   --pl-mix: #000000; /* what hover and pressed states mix the accent with */
+  /* Bordered controls (fields, outline buttons, checkboxes) sit on a 1px lip below; filled ones get a top highlight. */
+  --pl-lip: 0 1px 0 rgb(0 0 0 / 0.04);
+  --pl-highlight: inset 0 1px 0 rgb(255 255 255 / 0.16);
 
-  /* Knobs (switch and slider thumbs): white in both themes, as on iOS */
+  /* Knobs (switch and slider thumbs) */
   --pl-knob: #ffffff;
-  --pl-knob-shadow: 0 3px 8px rgb(0 0 0 / 0.15), 0 3px 1px rgb(0 0 0 / 0.06), 0 0 0 0.5px rgb(0 0 0 / 0.04);
+  --pl-knob-shadow: 0 0 0 1px rgb(23 23 23 / 0.12), 0 1px 2px rgb(0 0 0 / 0.08);
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --pl-bg: #000000;
-  --pl-surface: #1c1c1e;
-  --pl-surface-2: #242426;
-  --pl-elevated: #2c2c2e;
-  --pl-fill: rgb(120 120 128 / 0.36);
-  --pl-fill-2: rgb(118 118 128 / 0.24);
-  --pl-fill-3: rgb(118 118 128 / 0.14);
+  --pl-bg: #141415;
+  --pl-surface: #19191b;
+  --pl-surface-2: #1f1f21;
+  --pl-elevated: #232325;
+  --pl-fill: rgb(237 237 237 / 0.16);
+  --pl-fill-2: rgb(237 237 237 / 0.1);
+  --pl-fill-3: rgb(237 237 237 / 0.06);
   --pl-overlay: rgb(0 0 0 / 0.6);
 
-  --pl-fg: #ffffff;
-  --pl-fg-muted: #98989f;
-  --pl-fg-subtle: #6e6e73;
-  --pl-separator: #38383a;
-  --pl-border: #48484a;
+  --pl-fg: #ededed;
+  --pl-fg-muted: #a1a1a6;
+  --pl-fg-subtle: #8b8b91;
+  --pl-separator: #2a2a2d;
+  --pl-border: #3a3a3e;
 
-  --pl-success: #23803a;
-  --pl-success-ink: #30d158;
-  --pl-warning: #b35a00;
-  --pl-warning-ink: #ffb340;
-  --pl-danger: #e0262f;
-  --pl-danger-ink: #ff6961;
-  --pl-info: #1f6fd1;
-  --pl-info-ink: #64a8ff;
-  --pl-success-vivid: #30d158;
+  --pl-success: #1d7a3f;
+  --pl-success-ink: #4cc38a;
+  --pl-warning: #a85a0c;
+  --pl-warning-ink: #f0a54a;
+  --pl-danger: #d13438;
+  --pl-danger-ink: #f07175;
+  --pl-info: #2a5bd7;
+  --pl-info-ink: #7ea2ff;
+  --pl-success-vivid: #4cc38a;
 
-  --pl-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.5);
-  --pl-shadow-sm: 0 1px 3px rgb(0 0 0 / 0.5);
-  --pl-shadow-md: 0 4px 16px rgb(0 0 0 / 0.5);
-  --pl-shadow-lg: 0 12px 36px -6px rgb(0 0 0 / 0.65);
-  --pl-shadow-xl: 0 24px 64px -12px rgb(0 0 0 / 0.75);
-  --pl-edge: inset 0 0 0 0.5px rgb(255 255 255 / 0.1);
+  --pl-shadow-xs: 0 1px 1px rgb(0 0 0 / 0.4);
+  --pl-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --pl-shadow-md: 0 8px 20px rgb(0 0 0 / 0.4);
+  --pl-shadow-lg: 0 12px 32px -6px rgb(0 0 0 / 0.55);
+  --pl-shadow-xl: 0 24px 56px -12px rgb(0 0 0 / 0.65);
+  --pl-edge: inset 0 0 0 1px rgb(237 237 237 / 0.08);
 
   --pl-mix: #ffffff;
+  --pl-lip: inset 0 1px 0 rgb(255 255 255 / 0.05);
+  --pl-highlight: inset 0 1px 0 rgb(255 255 255 / 0.12);
+  --pl-knob: #ededed;
+  --pl-knob-shadow: 0 0 0 1px rgb(0 0 0 / 0.3), 0 1px 2px rgb(0 0 0 / 0.4);
 }
 
 /* Derived shades, recomputed wherever the theme or the palette changes. */
@@ -115,21 +124,24 @@
   /* One knob for the whole library's corner radius: 1 = pleate default, 0.75 = tighter, 1.25 = rounder. */
   --pl-roundness: 1;
 
-  --pl-font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", var(--font-inter, system-ui),
-    system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --pl-font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", var(--font-inter, system-ui), system-ui,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --pl-font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  /* Geist for the interface, Geist Mono for figures, counts, keys and meta. Load them with next/font as --font-geist
+     and --font-geist-mono; the system stacks are the fallback. */
+  --pl-font-sans: var(--font-geist, ui-sans-serif), ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  --pl-font-display: var(--pl-font-sans);
+  --pl-font-mono: var(--font-geist-mono, ui-monospace), ui-monospace, SFMono-Regular, Menlo, Consolas,
+    "Liberation Mono", monospace;
 
   /* Motion. JS twins in src/motion/tokens.ts. */
   --pl-duration-instant: 100ms;
   --pl-duration-fast: 160ms;
   --pl-duration-base: 240ms;
   --pl-duration-slow: 400ms;
-  --pl-ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  /* One curve for nearly everything. ease-ios and ease-spring stay as names for compatibility, without overshoot. */
   --pl-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --pl-ease-ios: var(--pl-ease-out);
   --pl-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --pl-ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --pl-ease-spring: var(--pl-ease-out);
 
   /* Layers */
   --pl-z-sticky: 40;

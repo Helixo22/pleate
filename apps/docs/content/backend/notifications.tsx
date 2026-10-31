@@ -50,8 +50,9 @@ notify(
           <C>action_label</C>), in the user&apos;s language.
         </LI>
         <LI>
-          <strong>push</strong>: Web Push through pywebpush with the VAPID keys (<C>pleate-backend[push]</C>). Skipped
-          when the keys are not set; subscriptions that answer 404 or 410 are deleted.
+          <strong>push</strong>: Web Push through pywebpush with the VAPID keys (<C>pleate-backend[push]</C>), sent from
+          a Celery task so <C>notify()</C> does not wait for it. Skipped when the keys are not set; subscriptions that
+          answer 404 or 410 are deleted. Only endpoints on <C>PUSH_ALLOWED_HOSTS</C> are accepted and contacted.
         </LI>
       </UL>
 
@@ -73,12 +74,20 @@ notify(
           ["DELETE", "/notifications/push/subscriptions", <><C>{"{endpoint}"}</C></>],
         ]}
       />
+      <P>
+        The push subscription routes need a signed in session (403 <C>api_key_not_allowed</C> with an API key). The
+        endpoint must be on a known Web Push service (400 <C>unknown_push_service</C>). Posting an endpoint that another
+        account holds answers 409 <C>push_subscription_taken</C>, unless the keys are the same: that is the same browser
+        signed in with another account, and the subscription moves to it.
+      </P>
 
       <H2>The stream</H2>
       <P>
         <C>/notifications/stream</C> sends the unread count on connect, then a <C>notification</C> and an{" "}
         <C>unread_count</C> whenever something changes. A comment line (<C>: ping</C>) keeps idle connections open every{" "}
-        <C>HEARTBEAT_SECONDS</C>, and <C>retry: 3000</C> tells browsers how fast to reconnect.
+        <C>HEARTBEAT_SECONDS</C>. The server ends the stream after <C>MAX_STREAM_SECONDS</C> (300) so a worker is not
+        held forever, and <C>retry: 3000</C> tells clients how fast to reconnect (<C>useNotifications</C> does it on its
+        own).
       </P>
       <Code lang="text" title="text/event-stream">{`
 retry: 3000
@@ -134,11 +143,13 @@ push.mutate(registration);   // asks permission, subscribes with the backend's V
           ["VAPID_PUBLIC_KEY", "None", "Web Push public key."],
           ["VAPID_PRIVATE_KEY", "None", "Web Push private key."],
           ["VAPID_SUBJECT", '"mailto:admin@localhost"', "Contact for push services."],
+          ["ASYNC", "True", "Send push from a Celery task. False, or a queue that is down, sends inside the request."],
+          ["PUSH_ALLOWED_HOSTS", "FCM, Mozilla, Apple, Windows", <>Hosts (and their subdomains) push endpoints may use. Setting it replaces the list: <C>fcm.googleapis.com</C>, <C>push.services.mozilla.com</C>, <C>push.apple.com</C>, <C>notify.windows.com</C> and the more specific defaults.</>],
         ]}
       />
       <P>
-        Realtime: <C>{`PLEATE["REALTIME"]`}</C> with <C>BACKEND</C> (<C>MemoryBroker</C>) and <C>HEARTBEAT_SECONDS</C>{" "}
-        (20). Notifications, preferences and push subscriptions are part of the account export.
+        Realtime: <C>{`PLEATE["REALTIME"]`}</C> with <C>BACKEND</C> (<C>MemoryBroker</C>), <C>HEARTBEAT_SECONDS</C>{" "}
+        (20) and <C>MAX_STREAM_SECONDS</C> (300, 0 keeps streams open). Notifications, preferences and push subscriptions are part of the account export.
       </P>
       <H3>Your own realtime channels</H3>
       <Code lang="python">{`

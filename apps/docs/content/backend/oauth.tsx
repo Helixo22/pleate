@@ -58,7 +58,7 @@ PLEATE["OAUTH"] = {
       <H2>What the callback does</H2>
       <UL>
         <LI><strong>Known identity:</strong> signs in. If the user has 2FA the pending login is stored and the redirect carries <C>status=mfa_required</C>.</LI>
-        <LI><strong>New identity:</strong> the provider must report a verified email. If an account already uses it, the result is <C>oauth_email_exists</C>: accounts are never linked automatically, the user signs in with the password and links from the settings. Otherwise a user is created, without a password and with the email verified, when <C>ALLOW_SIGNUP</C> is on.</LI>
+        <LI><strong>New identity:</strong> the provider must report a verified email. If an account already uses it, the result is <C>oauth_email_exists</C>: accounts are never linked automatically, the user signs in with the password and links from the settings. Otherwise a user is created, without a password and with the email verified, when <C>ALLOW_SIGNUP</C> and <C>{`AUTH["SIGNUP_ENABLED"]`}</C> are on.</LI>
         <LI><strong><C>mode=link</C>:</strong> attaches the identity to the signed in user.</LI>
       </UL>
       <P>
@@ -121,6 +121,7 @@ const accounts = useSocialAccounts();   // accounts.data, accounts.unlink.mutate
           ["oauth_email_unverified", "redirect", "The provider did not report a verified email."],
           ["oauth_email_exists", "redirect", "Another account already uses this email."],
           ["oauth_signup_disabled", "redirect", <>New identity and <C>ALLOW_SIGNUP</C> is off.</>],
+          ["signup_disabled", "redirect", <>New identity and <C>{`AUTH["SIGNUP_ENABLED"]`}</C> is off.</>],
           ["oauth_already_linked", "redirect", "The identity belongs to another user."],
           ["account_inactive", "redirect", "The account is deactivated."],
           ["last_login_method", "400", "Unlinking would leave the user with no way to sign in."],

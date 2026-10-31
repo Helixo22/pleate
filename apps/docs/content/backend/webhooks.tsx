@@ -116,8 +116,9 @@ def plate_hook(request):
 
       <H2>Endpoints</H2>
       <P>
-        Mounted at <C>/api/webhooks</C>, scoped to the signed in user (session or API key), so customers can manage their
-        endpoints from your settings page or from a script.
+        Mounted at <C>/api/webhooks</C>, scoped to the signed in user, so customers can manage their endpoints from your
+        settings page. Listing, creating, changing, deleting endpoints and rotating secrets need a signed in session: an
+        API key gets 403 <C>api_key_not_allowed</C>. The other routes also accept API keys.
       </P>
       <Endpoints
         rows={[
@@ -127,7 +128,7 @@ def plate_hook(request):
           ["PATCH", "/webhooks/endpoints/<id>", "url, description, events, active. Turning it back on resets the failure counter."],
           ["DELETE", "/webhooks/endpoints/<id>", "204."],
           ["POST", "/webhooks/endpoints/<id>/rotate-secret", <>→ <C>{"{secret}"}</C></>],
-          ["POST", "/webhooks/endpoints/<id>/test", <>Sends a <C>ping</C> now → <C>{"{delivery, status, status_code, duration_ms, error}"}</C>.</>],
+          ["POST", "/webhooks/endpoints/<id>/test", <>Sends a <C>ping</C> now (5 second timeout) → <C>{"{delivery, status, status_code, duration_ms, error}"}</C>.</>],
           ["GET", "/webhooks/endpoints/<id>/deliveries", <>Page list. Filters <C>status</C>, <C>event</C>.</>],
           ["GET", "/webhooks/deliveries/<id>", <>Delivery with <C>payload</C> and <C>response_excerpt</C>.</>],
           ["POST", "/webhooks/deliveries/<id>/redeliver", "202 with the new delivery (same event id and payload)."],
@@ -142,8 +143,10 @@ def plate_hook(request):
       <H2>SSRF guard</H2>
       <P>
         Endpoint URLs must use https and resolve only to public addresses: no loopback, private, link local, reserved or
-        multicast ranges. The check runs on create, on update and again before every attempt, so a DNS change cannot
-        sneak a delivery into your network. <C>ALLOW_PRIVATE_URLS</C> lifts it for local development.
+        multicast ranges. The check runs on create, on update and again before every attempt. The attempt then connects
+        to the exact address that was checked (the Host header and the TLS certificate still use the hostname), so a DNS
+        change between the check and the connection cannot sneak a delivery into your network. Redirects are not followed
+        and proxy environment variables are ignored. <C>ALLOW_PRIVATE_URLS</C> lifts the guard for local development.
       </P>
 
       <H2>Settings</H2>

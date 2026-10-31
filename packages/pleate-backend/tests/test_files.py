@@ -145,6 +145,17 @@ def test_quota_exceeded(auth_api, user):
     assert File.objects.filter(owner=user).count() == 1
 
 
+def test_parallel_uploads_cannot_exceed_quota(auth_api, user, monkeypatch):
+    # Both requests passed check_quota before either File existed.
+    monkeypatch.setattr(services, "check_quota", lambda *args, **kwargs: None)
+    with files_conf(USER_QUOTA=1000):
+        assert upload(auth_api, _bytes(b"a" * 600, "one.txt")).status_code == 201
+        res = upload(auth_api, _bytes(b"b" * 600, "two.txt"))
+    assert res.status_code == 413
+    assert (res.json()["error"]["code"], res.json()["error"]["used"]) == ("quota_exceeded", 600)
+    assert list(File.objects.values_list("name", flat=True)) == ["one.txt"]
+
+
 def test_names_are_sanitized(auth_api):
     res = upload(auth_api, _bytes(b"hello", "../../etc/pass<wd>\x07.txt"))
     assert res.status_code == 201
@@ -163,6 +174,19 @@ def test_storage_key_does_not_use_client_name(auth_api, user):
 
 
 # Images
+
+
+def test_huge_animation_is_rejected(auth_api):
+    buf = io.BytesIO()
+    frames = [Image.new("RGB", (100, 100), c) for c in ((255, 0, 0), (0, 255, 0), (0, 0, 255))]
+    frames[0].save(buf, "GIF", save_all=True, append_images=frames[1:], duration=100, loop=0)
+    buf.seek(0)
+    buf.name = "anim.gif"
+    with files_conf(ANIMATION_MAX_PIXELS=29_999):
+        res = upload(auth_api, buf)
+    assert res.status_code == 400
+    assert res.json()["error"]["code"] == "invalid_image"
+    assert File.objects.count() == 0
 
 
 def test_image_is_downscaled(auth_api):
@@ -464,6 +488,22 @@ def test_complete_rejects_disguised_file(auth_api, s3):
     assert res.status_code == 415
     assert not File.objects.filter(pk=body["file_id"]).exists()
     assert FakeS3Storage.deleted == [body["fields"]["key"]]
+
+
+def test_parallel_presigns_cannot_exceed_quota(auth_api, s3, user, monkeypatch):
+    monkeypatch.setattr(services, "check_quota", lambda *args, **kwargs: None)
+    data = {"name": "a.pdf", "size": 600, "content_type": "application/pdf"}
+    with files_conf(STORAGE="tests.test_files.FakeS3Storage", PRESIGNED_UPLOADS=True, USER_QUOTA=1000):
+        first = auth_api.post("/api/files/presign", data)
+        second = auth_api.post("/api/files/presign", data)
+        assert (first.status_code, second.status_code) == (201, 413)
+        assert File.objects.count() == 1
+        # Completion checks again: another upload landed meanwhile.
+        File.objects.create(owner=user, name="b.txt", key="k", size=950, content_type="text/plain")
+        _stored(s3, PDF)
+        res = auth_api.post(f"/api/files/{first.json()['file_id']}/complete")
+    assert res.json()["error"]["code"] == "quota_exceeded"
+    assert list(File.objects.values_list("name", flat=True)) == ["b.txt"]
 
 
 def test_complete_rejects_larger_than_announced(auth_api, s3):
