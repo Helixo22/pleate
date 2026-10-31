@@ -16,7 +16,7 @@ export default function Home() {
     <div className="mx-auto max-w-6xl">
       <section className="grid items-center gap-10 pt-2 pb-16 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:pt-6">
         <div>
-          <p className="mb-4 font-mono text-caption1 text-fg-subtle">pleate 0.1 · 100+ components</p>
+          <p className="mb-4 font-mono text-caption1 text-fg-subtle">pleate 0.2 · 100+ components</p>
           <h1 className="text-display">React components for Next.js, with a backend to match</h1>
           <p className="mt-5 max-w-xl text-[1.0625rem] leading-7 text-fg-muted">
             Tokens, themes and accessible components on Radix and Tailwind v4, plus a Django and MongoDB backend
