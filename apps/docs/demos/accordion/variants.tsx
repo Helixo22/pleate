@@ -9,10 +9,10 @@ const FAQ = [
 
 export default function Demo() {
   return (
-    <div className="grid w-full gap-10 rounded-3xl bg-bg p-4 md:p-6">
+    <div className="grid w-full gap-10 rounded-xl bg-bg p-4 md:p-6">
       {(["inset", "separated", "plain"] as const).map((variant) => (
         <div key={variant} className="grid gap-2">
-          <p className="px-1 text-footnote font-semibold text-fg-muted capitalize">{variant}</p>
+          <p className="px-1 text-footnote font-medium text-fg-muted capitalize">{variant}</p>
           <Accordion type="single" collapsible variant={variant} defaultValue={variant === "inset" ? "bags" : undefined}>
             {FAQ.map((f) => (
               <AccordionItem key={f.id} value={f.id}>

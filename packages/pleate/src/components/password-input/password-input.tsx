@@ -96,7 +96,7 @@ export function PasswordInput({
       disabled={disabled}
       onClick={() => setVisible((v) => !v)}
       className={cn(
-        "pl-focus-ring pl-touch -me-1.5 grid shrink-0 cursor-pointer place-items-center rounded-full text-fg-muted transition-colors hover:bg-fill-2 hover:text-fg disabled:cursor-not-allowed",
+        "pl-focus-ring pl-touch pl-hit relative -me-1.5 grid shrink-0 cursor-pointer place-items-center rounded-sm text-fg-muted transition-colors hover:bg-fill-2 hover:text-fg disabled:cursor-not-allowed",
         size === "sm" ? "size-7" : "size-8",
       )}
     >

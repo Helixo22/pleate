@@ -27,6 +27,41 @@ import AnimatedTextHeadline from "./animated-text/headline";
 import AnimatedTextNumbers from "./animated-text/numbers";
 import AnimatedTextScroll from "./animated-text/scroll";
 import HoverEffectsBasic from "./hover-effects/basic";
+import SnippetBasic from "./snippet/basic";
+import SnippetScroll from "./snippet/scroll";
+import BannerBasic from "./banner/basic";
+import BannerTones from "./banner/tones";
+import UsageMeterBasic from "./usage-meter/basic";
+import UsageMeterLive from "./usage-meter/live";
+import CountdownBasic from "./countdown/basic";
+import CountdownComplete from "./countdown/complete";
+import KbdBasic from "./kbd/basic";
+import CommandPaletteBasic from "./command-palette/basic";
+import DrawerSides from "./drawer/sides";
+import HoverCardBasic from "./hover-card/basic";
+import ToggleGroupBasic from "./toggle-group/basic";
+import ToggleGroupToggle from "./toggle-group/toggle";
+import ActionBarBookings from "./action-bar/bookings";
+import FabSpeedDial from "./fab/speed-dial";
+import StepperBooking from "./stepper/booking";
+import StepperVertical from "./stepper/vertical";
+import NumberFieldBasic from "./number-field/basic";
+import NumberFieldSizes from "./number-field/sizes";
+import RatingBasic from "./rating/basic";
+import MotionGraphicsFlow from "./motion-graphics/flow";
+import MotionGraphicsDraw from "./motion-graphics/draw";
+import MotionGraphicsOrbit from "./motion-graphics/orbit";
+import MotionGraphicsOdometer from "./motion-graphics/odometer";
+import MotionGraphicsVoice from "./motion-graphics/voice";
+import ThreeDFlip from "./3d-effects/flip";
+import ScrollEffectsSticky from "./scroll-effects/sticky";
+import ScrollEffectsHorizontal from "./scroll-effects/horizontal";
+import ScrollEffectsZoom from "./scroll-effects/zoom";
+import ScrollEffectsSmooth from "./scroll-effects/smooth";
+import ThreeDCarousel from "./3d-effects/carousel";
+import ThreeDStack from "./3d-effects/stack";
+import ThreeDWall from "./3d-effects/wall";
+import ThreeDGlobe from "./3d-effects/globe";
 import PageTransitionBasic from "./page-transition/basic";
 import RevealBasic from "./reveal/basic";
 import RevealProgress from "./reveal/progress";
@@ -79,6 +114,7 @@ import SectionTones from "./section/tones";
 import SidebarBasic from "./sidebar/basic";
 import StackBasic from "./stack/basic";
 import TabBarVariants from "./tab-bar/variants";
+import TabBarSearch from "./tab-bar/search";
 import AvatarBasic from "./avatar/basic";
 import BadgeVariants from "./badge/variants";
 import ButtonFullWidth from "./button/full-width";
@@ -221,6 +257,351 @@ export const DOCS: Record<string, ComponentDoc> = {
     ],
     a11y: ["Split text is aria-hidden with the full sentence in a visually hidden copy.", "Reduced motion shows the final state immediately."],
   },
+
+  "action-bar": {
+    name: "Action Bar",
+    description: "A contextual bar for a selection. It slides up from the bottom with a rolling count and the actions that apply; edge to edge on phones, centered on wider screens.",
+    importName: "ActionBar",
+    importPath: "pleate/action-bar",
+    demos: [{ id: "bookings", title: "Selecting bookings", align: "stretch", Component: ActionBarBookings }],
+    props: [
+      { name: "open", type: "boolean", description: "Shows the bar." },
+      { name: "count", type: "number", description: "Selected items; the number rolls when it changes." },
+      { name: "countLabel", type: "string", default: '"selected"', description: "Text after the count." },
+      { name: "actions", type: "ReactNode", description: "Usually a few small Buttons." },
+      { name: "onClear", type: "() => void", description: "Adds a clear button that ends the selection." },
+      { name: "label", type: "string", default: '"Selection"', description: "Accessible name of the toolbar." },
+      { name: "offset", type: "number", default: "0", description: "Extra px above the bottom edge, e.g. to clear a TabBar." },
+      { name: "position", type: '"fixed" | "static"', default: '"fixed"', description: "Pinned to the viewport bottom or in flow." },
+    ],
+    a11y: ["role=\"toolbar\" with an aria-label.", "The count is a polite live region, so changes are announced.", "The clear button has an accessible name (clearLabel).", "Respects the home-indicator safe area."],
+  },
+  fab: {
+    name: "Fab",
+    description: "A floating action button for phone layouts. With actions it opens a speed dial: labelled actions rise above it one after another.",
+    importName: "Fab",
+    importPath: "pleate/fab",
+    demos: [{ id: "speed-dial", title: "Speed dial", Component: FabSpeedDial }],
+    props: [
+      { name: "label", type: "string", description: "Accessible name of the main button (required)." },
+      { name: "icon", type: "ReactNode", default: "plus", description: "Main glyph; the default plus turns into a close mark while open." },
+      { name: "onClick", type: "() => void", description: "Plain button mode, without actions." },
+      { name: "actions", type: "{ id, label, icon, onSelect }[]", description: "Speed-dial actions, nearest the button first." },
+      { name: "position", type: '"fixed" | "static"', default: '"fixed"', description: "Pinned bottom-end or in flow." },
+      { name: "hideFrom", type: '"never" | "md" | "lg"', default: '"never"', description: "Hide on wider screens." },
+      { name: "offset", type: "number", default: "0", description: "Extra px above the bottom edge, e.g. to clear a TabBar." },
+    ],
+    a11y: ["The main button has aria-expanded and aria-controls pointing at the action list.", "Escape closes the dial and returns focus to the button; a press outside closes it.", "Respects the home-indicator safe area."],
+  },
+  stepper: {
+    name: "Stepper",
+    description: "Progress through a multi-step flow. Done steps draw a check, the current one has an accent ring, and the line between steps fills as you advance.",
+    importName: "Stepper",
+    importPath: "pleate/stepper",
+    demos: [
+      { id: "booking", title: "Booking flow", description: "Done steps are buttons when onStepClick is set.", align: "stretch", Component: StepperBooking },
+      { id: "vertical", title: "Vertical with descriptions", align: "start", Component: StepperVertical },
+    ],
+    props: [
+      { name: "steps", type: "{ id, label, description? }[]", description: "The steps in order." },
+      { name: "current", type: "number", description: "Index of the current step; use steps.length when all are done." },
+      { name: "orientation", type: '"horizontal" | "vertical"', default: '"horizontal"', description: "Layout." },
+      { name: "onStepClick", type: "(index, step) => void", description: "Makes done steps buttons." },
+    ],
+    a11y: ["An ordered list; the current step has aria-current=\"step\".", "Done steps say \"done\" to screen readers; the markers are hidden from them.", "The connector animation is skipped with reduced motion."],
+  },
+  "number-field": {
+    name: "Number Field",
+    description: "A number between minus and plus buttons, for guests, nights or amounts. It formats with Intl (currency, units, percent) and the number rolls when the buttons change it.",
+    importName: "NumberField",
+    importPath: "pleate/number-field",
+    demos: [
+      { id: "basic", title: "Count and currency", align: "start", Component: NumberFieldBasic },
+      { id: "sizes", title: "Sizes and states", align: "start", Component: NumberFieldSizes },
+    ],
+    props: [
+      { name: "value / defaultValue / onValueChange", type: "number", default: "0", description: "The number." },
+      { name: "min / max", type: "number", description: "Bounds; the buttons switch off at them." },
+      { name: "step", type: "number", default: "1", description: "Increment; its decimals set the rounding." },
+      { name: "format", type: "Intl.NumberFormatOptions", description: "How the number is shown." },
+      SIZE('"sm" | "md" | "lg"'),
+      { name: "variant", type: '"outline" | "filled" | "surface"', default: '"outline"', description: "Field look." },
+      { name: "disabled / invalid", type: "boolean", description: "States." },
+    ],
+    a11y: ["The input has role=\"spinbutton\" with aria-valuenow/min/max and a formatted aria-valuetext.", "ArrowUp/Down step, PageUp/Down take ten steps, Home/End jump to the bounds.", "The buttons are named Decrease and Increase and are left out of the tab order (the keys cover them).", "Name it with aria-label or aria-labelledby."],
+  },
+  rating: {
+    name: "Rating",
+    description: "Star rating. Interactive it is a radio group with a hover preview; read-only it shows averages down to half stars.",
+    importName: "Rating",
+    importPath: "pleate/rating",
+    demos: [{ id: "basic", title: "Rate and display", align: "start", Component: RatingBasic }],
+    props: [
+      { name: "value / defaultValue / onValueChange", type: "number", default: "0", description: "Score; 0 means not rated." },
+      { name: "max", type: "number", default: "5", description: "Number of stars." },
+      { name: "readOnly", type: "boolean", default: "false", description: "Display only; fractional values allowed." },
+      { name: "allowHalf", type: "boolean", default: "false", description: "Read-only values round to halves instead of whole stars." },
+      { name: "size", type: '"sm" | "md"', default: '"md"', description: "Star size." },
+      { name: "showValue", type: "boolean", default: "false", description: "The number in mono next to the stars." },
+    ],
+    a11y: ["Interactive: a radio group (Radix); arrow keys move and select, and each star is named \"n of max\".", "Read-only: a single role=\"img\" with a label like \"Rating: 4.6 out of 5\"."],
+  },
+
+  kbd: {
+    name: "Kbd",
+    description: "Keycaps for shortcuts. \"mod\" reads ⌘ on Apple devices and Ctrl elsewhere.",
+    importName: "Kbd",
+    importPath: "pleate/kbd",
+    demos: [{ id: "basic", title: "Combinations and inline use", Component: KbdBasic }],
+    props: [
+      { name: "keys", type: "string | string[]", description: "\"mod+k\", \"shift+?\" or a list of keys. Names like esc, enter, up and shift become symbols." },
+      { name: "size", type: '"sm" | "md"', default: '"sm"', description: "Keycap height." },
+    ],
+    a11y: ["Nested <kbd> elements, read as text.", "The server renders Ctrl and switches to ⌘ after mount, so hydration never mismatches."],
+  },
+  "command-palette": {
+    name: "Command Palette",
+    description: "A search-first dialog on ⌘K / Ctrl+K. Type to filter grouped commands, then run one with Enter.",
+    importName: "CommandPalette",
+    importPath: "pleate/command-palette",
+    demos: [{ id: "basic", title: "Trips and actions", description: "Try \"portugal\" or \"booking\" to match keywords.", Component: CommandPaletteBasic }],
+    props: [
+      { name: "open / defaultOpen / onOpenChange", type: "boolean", description: "Controlled or uncontrolled state." },
+      { name: "shortcut", type: "string | false", default: '"mod+k"', description: "Global shortcut that toggles the palette." },
+      { name: "groups", type: "{ heading, items: { id, label, icon?, shortcut?, keywords?, onSelect }[] }[]", description: "Commands. Item shortcuts are display only." },
+      { name: "placeholder / emptyLabel", type: "string / ReactNode", default: '"Search" / "No results"', description: "Field placeholder and the empty state." },
+      { name: "label", type: "string", default: '"Command palette"', description: "Accessible name of the dialog." },
+    ],
+    a11y: [
+      "The input is a combobox; the active option is set with aria-activedescendant, so focus stays in the field.",
+      "Arrow keys move, Enter runs and closes, Escape closes and returns focus.",
+      "listbox / option / group roles, with groups labelled by their heading.",
+    ],
+  },
+  drawer: {
+    name: "Drawer",
+    description: "A panel that slides in from an edge: details, filters or a short sheet from the bottom. Same parts as Modal.",
+    importName: "Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerBody, DrawerFooter, DrawerClose",
+    importPath: "pleate/drawer",
+    demos: [{ id: "sides", title: "End, start and bottom", Component: DrawerSides }],
+    props: [
+      { name: "Drawer", type: "open, defaultOpen, onOpenChange", description: "Radix Dialog root." },
+      { name: "DrawerContent side", type: '"start" | "end" | "bottom"', default: '"end"', description: "Edge it slides from. Start and end follow the text direction." },
+      { name: "DrawerContent size", type: '"sm" | "md" | "lg"', default: '"md"', description: "Width for side panels, max height for bottom." },
+      { name: "showClose / closeLabel", type: "boolean / string", default: "true", description: "Corner close button." },
+    ],
+    a11y: ["Focus is trapped inside and returns to the trigger.", "Escape and backdrop click close it; the page behind can't scroll.", "Labelled by DrawerTitle, described by DrawerDescription."],
+  },
+  "hover-card": {
+    name: "Hover Card",
+    description: "A preview shown while the pointer rests on a link, such as a traveller or a place. Looks like Popover.",
+    importName: "HoverCard, HoverCardTrigger, HoverCardContent",
+    importPath: "pleate/hover-card",
+    demos: [{ id: "basic", title: "Traveller preview", Component: HoverCardBasic }],
+    props: [
+      { name: "HoverCard", type: "openDelay, closeDelay, open, onOpenChange", default: "400 / 150", description: "Radix HoverCard root." },
+      { name: "HoverCardContent", type: "side, align, sideOffset", default: '"center", 8', description: "Placement." },
+      { name: "arrow", type: "boolean", default: "false", description: "Small arrow toward the trigger." },
+    ],
+    a11y: ["Opens on hover and on keyboard focus, never on touch: the trigger must work without it.", "Content is supplementary; don't put the only copy of information there."],
+  },
+  "toggle-group": {
+    name: "Toggle Group",
+    description: "Pressable options on a bordered rail, one at a time or several. Toggle is a single pressable button.",
+    importName: "ToggleGroup, ToggleGroupItem, Toggle",
+    importPath: "pleate/toggle-group",
+    demos: [
+      { id: "basic", title: "Single and multiple", Component: ToggleGroupBasic },
+      { id: "toggle", title: "Toggle", Component: ToggleGroupToggle },
+    ],
+    props: [
+      { name: "type", type: '"single" | "multiple"', description: "Required. Single can be cleared unless you ignore empty values." },
+      { name: "value / defaultValue / onValueChange", type: "string | string[]", description: "Pressed item(s)." },
+      { name: "size", type: '"sm" | "md"', default: '"md"', description: "Rail and item height (also on Toggle)." },
+      { name: "ToggleGroupItem", type: "value, icon, disabled, aria-label", description: "With no label it renders square; give it an aria-label." },
+      { name: "Toggle", type: "pressed, defaultPressed, onPressedChange, icon", description: "Standalone pressable button." },
+    ],
+    a11y: ["Arrow keys move between items, Space and Enter press.", "Items expose aria-pressed (single type uses radio semantics).", "Icon-only items need an aria-label."],
+  },
+
+  snippet: {
+    name: "Snippet",
+    description: "A code or command block with a copy button, a language label and optional variants.",
+    importName: "Snippet",
+    importPath: "pleate/snippet",
+    demos: [
+      { id: "basic", title: "Install commands", description: "Package manager variants in a tab rail, and a long shell line that scrolls.", align: "stretch", Component: SnippetBasic },
+      { id: "scroll", title: "Max height and wrap", align: "stretch", Component: SnippetScroll },
+    ],
+    props: [
+      { name: "code", type: "string", description: "The code. Ignored when tabs is set." },
+      { name: "tabs", type: "{ label: string; code: string }[]", description: "Variants of the same snippet, shown as a tab rail in the header." },
+      { name: "language", type: "string", description: "Mono label in the header, e.g. \"bash\"." },
+      { name: "prompt", type: "string", description: "Drawn before every line, never copied, e.g. \"$\"." },
+      { name: "maxHeight", type: "number | string", description: "Height after which the code scrolls." },
+      { name: "wrap", type: "boolean", default: "false", description: "Wrap long lines instead of scrolling sideways." },
+      { name: "copyLabel / copiedLabel", type: "string / string", default: "\"Copy\" / \"Copied\"", description: "Copy button name and its confirmation." },
+    ],
+    a11y: [
+      "The copy button sits in the header, so code never scrolls under it.",
+      "Copied is shown and announced only after the clipboard write succeeds.",
+      "The code block takes keyboard focus so it can be scrolled with the arrow keys.",
+      "Variants use a tab list with arrow key navigation.",
+    ],
+  },
+  banner: {
+    name: "Banner",
+    description: "A full-width announcement bar for the top of a page or app.",
+    importName: "Banner",
+    importPath: "pleate/banner",
+    demos: [
+      { id: "basic", title: "Dismissible", description: "Dismissing collapses the bar's height.", align: "stretch", Component: BannerBasic },
+      { id: "tones", title: "Tones", align: "stretch", Component: BannerTones },
+    ],
+    props: [
+      { name: "tone", type: '"neutral" | "accent" | "warning" | "danger"', default: '"neutral"', description: "Background tint and icon color." },
+      { name: "icon", type: "ReactNode", description: "Leading icon, sized to 16px." },
+      { name: "action", type: "ReactNode", description: "A link or small button after the text." },
+      { name: "dismissible / onDismiss / dismissLabel", type: "boolean / () => void / string", default: 'false / none / "Dismiss"', description: "Close button. onDismiss runs once the bar has collapsed." },
+      { name: "sticky", type: "boolean", default: "false", description: "Stick to the top of the scroll container." },
+      { name: "aria-label", type: "string", default: '"Announcement"', description: "Names the region." },
+    ],
+    a11y: [
+      "A labelled region, not an alert: it is there on load and is not announced.",
+      "With reduced motion the bar is removed immediately, without the collapse.",
+      "While it collapses the bar is inert, so focus cannot land in it.",
+    ],
+  },
+  "usage-meter": {
+    name: "Usage Meter",
+    description: "Plan usage as one stacked bar against a limit, with a legend and a total.",
+    importName: "UsageMeter",
+    importPath: "pleate/usage-meter",
+    demos: [
+      { id: "basic", title: "Normal, warning and danger", align: "stretch", Component: UsageMeterBasic },
+      { id: "live", title: "Changing usage", description: "Figures roll to the new value.", align: "stretch", Component: UsageMeterLive },
+    ],
+    props: [
+      { name: "segments", type: '{ label: string; value: number; tone?: "accent" | "neutral" }[]', description: "Parts of the usage. The first carries the accent, the rest use neutral steps." },
+      { name: "max", type: "number", description: "The plan limit." },
+      { name: "label", type: "ReactNode", description: "Heading. It also names the meter." },
+      { name: "unit", type: "string", description: "Unit after the figures, e.g. \"GB\"." },
+      { name: "warnAt / dangerAt", type: "number / number", default: "0.8 / 0.95", description: "Share of max where the lead segment and the total turn warning or danger." },
+      { name: "format / locale", type: "Intl.NumberFormatOptions / string", default: "{ maximumFractionDigits: 1 }", description: "Number formatting." },
+    ],
+    a11y: [
+      'role="meter" with aria-valuenow, min, max and a valuetext like "7.2 of 10 GB used, 72%".',
+      "The legend is a list, and each segment's figure is read as text.",
+      "Reduced motion shows the bar at full size without the grow.",
+    ],
+  },
+  countdown: {
+    name: "Countdown",
+    description: "Time left until a target, with rolling digits.",
+    importName: "Countdown",
+    importPath: "pleate/countdown",
+    demos: [
+      { id: "basic", title: "Formats and sizes", align: "start", Component: CountdownBasic },
+      { id: "complete", title: "On complete", description: "A 10 second hold that calls onComplete.", align: "start", Component: CountdownComplete },
+    ],
+    props: [
+      { name: "to", type: "Date | number", description: "Target moment, as a Date or epoch milliseconds." },
+      { name: "format", type: '"mm:ss" | "hh:mm:ss" | "d h m"', default: '"mm:ss"', description: "How the remaining time is split." },
+      { name: "onComplete", type: "() => void", description: "Called once when the time runs out." },
+      { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', description: "Digit size." },
+      { name: "label", type: "ReactNode", description: "Visible text before the digits." },
+      { name: "announce", type: "boolean", default: "false", description: "Announce the minute-level text politely as it changes." },
+    ],
+    a11y: [
+      "The rolling digits are hidden from screen readers. A text such as \"14 minutes left\" changes at most once a minute.",
+      "That text is only announced when announce is set.",
+      "Shows a placeholder until mounted, so server and client markup match.",
+      "Ticking pauses while the tab is hidden and resyncs when it comes back.",
+    ],
+  },
+  "motion-graphics": {
+    name: "Motion Graphics",
+    description: "Animated pieces that explain something: paths that draw themselves, pulses moving between services, items orbiting a center, rolling digits, a live voice level and status marks that draw in.",
+    importName: "DrawPath, FlowLine, Orbit, OrbitRing, Odometer, Waveform, StatusMark",
+    importPath: "pleate/effects/motion-graphics",
+    demos: [
+      { id: "flow", title: "Data flow", description: "FlowLine between services, with an Odometer on the live figure. Pause stops both.", align: "stretch", Component: MotionGraphicsFlow },
+      { id: "draw", title: "Drawn route", description: "DrawPath strokes the route when it scrolls into view.", Component: MotionGraphicsDraw },
+      { id: "orbit", title: "Orbit", description: "Two rings turning in opposite directions; hover to stop them.", Component: MotionGraphicsOrbit },
+      { id: "odometer", title: "Odometer", description: "Each digit rolls to its new value, formatted with Intl.", Component: MotionGraphicsOdometer },
+      { id: "voice", title: "Waveform and status", description: "A recording level and a status mark that draws itself.", align: "stretch", Component: MotionGraphicsVoice },
+    ],
+    props: [
+      { name: "DrawPath", type: "d, viewBox, duration, delay, stagger, strokeWidth, once, label", description: "Strokes one or more paths on view." },
+      { name: "FlowLine", type: "d, viewBox, duration, length, reverse, paused, label", description: "A pulse travelling along a path over a hairline track." },
+      { name: "Orbit / OrbitRing", type: "size, center, pauseOnHover / radius, duration, reverse, track", description: "Items placed evenly on rings that stay upright while turning." },
+      { name: "Odometer", type: "value, format (Intl), locale, duration", description: "Rolling digits; the ones column stays put as the number grows." },
+      { name: "Waveform", type: "active, levels, bars, height, label", description: "Idle speech-like animation, or real levels from 0 to 1." },
+      { name: "StatusMark", type: '"pending" | "success" | "warning" | "error", size, label', description: "Spinner while pending, then a drawn mark." },
+    ],
+    a11y: [
+      "Drawings are decorative unless you pass label, then they are named images.",
+      "Odometer animates an aria-hidden copy and exposes the plain value to screen readers.",
+      "StatusMark is a status region: the change is announced (\"Done\", \"Failed\"…).",
+      "Reduced motion: paths appear drawn, pulses and orbits stop, digits jump to the value.",
+    ],
+  },
+  "scroll-effects": {
+    name: "Scroll Effects",
+    description: "Motion driven by the page scroll: steps with a pinned visual, a row that moves sideways while you scroll down, media that opens to full width, and opt-in smooth wheel scrolling.",
+    importName: "StickyScroll, HorizontalScroll, ScrollZoom, SmoothScroll",
+    importPath: "pleate/effects/scroll",
+    demos: [
+      { id: "sticky", title: "Sticky steps", description: "Four steps of a trip plan. The visual for the step in the middle of the screen stays pinned beside it.", align: "stretch", Component: ScrollEffectsSticky },
+      { id: "horizontal", title: "Horizontal row", description: "Scrolling down moves the destinations sideways. On phones it is a swipeable row.", align: "stretch", Component: ScrollEffectsHorizontal },
+      { id: "zoom", title: "Scroll zoom", description: "The frame opens to full width and squares its corners as it reaches the middle.", align: "stretch", Component: ScrollEffectsZoom },
+      { id: "smooth", title: "Smooth scrolling", description: "Turn it on, then scroll this page with a mouse wheel.", Component: ScrollEffectsSmooth },
+    ],
+    props: [
+      { name: "StickyScroll", type: "steps: { id, title, body, visual }[], offset, className", description: "Steps on the left, the active step's visual pinned on the right. Below md each visual sits under its step." },
+      { name: "HorizontalScroll", type: "children, gap (16), offset, label, className", description: "Pins the section and moves its items sideways. Its height comes from the width of the row." },
+      { name: "ScrollZoom", type: "children, caption, className", description: "Scales and unclips the media from a rounded frame to full width. The caption fades in at the end." },
+      { name: "SmoothScroll", type: "lerp (0.1), wheelMultiplier (1), children", description: "Eases mouse-wheel scrolling of the window while it is mounted." },
+      { name: "offset", type: "number (px)", description: "Height of a sticky header above, so pinned content sits below it." },
+    ],
+    a11y: [
+      "The active step has aria-current=\"step\". All step text stays in the reading order.",
+      "HorizontalScroll is a named region. Focusing an item that is off to the side scrolls the page to it. The swipeable row can be focused and scrolled with the arrow keys.",
+      "SmoothScroll handles only the mouse wheel. Keyboard, scrollbar dragging, zoom, touch and panels that can scroll themselves stay native.",
+      "Reduced motion: SmoothScroll is off, the sticky visuals swap without movement, the row becomes a native scrolling row and ScrollZoom shows the media at full size.",
+    ],
+  },
+  "3d-effects": {
+    name: "3D Effects",
+    description: "Depth without WebGL: a card that turns over, a ring of slides, cards that pile up as you scroll, a tilted wall of drifting tiles and a globe of dots you can turn.",
+    importName: "FlipCard, Carousel3D, CardStack, TiltWall, DotGlobe",
+    importPath: "pleate/effects/depth",
+    demos: [
+      { id: "flip", title: "Flip card", description: "Click or press Enter on the boarding pass; the second card flips on hover and on focus.", align: "stretch", Component: ThreeDFlip },
+      { id: "carousel", title: "Ring carousel", description: "Buttons, arrow keys or a horizontal swipe turn the ring the short way round.", align: "stretch", Component: ThreeDCarousel },
+      { id: "stack", title: "Card stack", description: "Scroll the page: each day sticks on top of the last, which tips back into the pile.", Component: ThreeDStack },
+      { id: "wall", title: "Tilt wall", description: "Columns drift in opposite directions on a tilted plane; hover to stop them.", align: "stretch", Component: ThreeDWall },
+      { id: "globe", title: "Dot globe", description: "A canvas sphere of dots with labelled markers. It only animates while on screen.", Component: ThreeDGlobe },
+    ],
+    props: [
+      { name: "FlipCard front / back", type: "ReactNode", description: "The two faces; the card takes the height of the taller one." },
+      { name: "flipped / defaultFlipped / onFlippedChange", type: "boolean", description: "Controlled or uncontrolled side." },
+      { name: "trigger / axis", type: '"click" | "hover" | "manual" / "x" | "y"', default: '"click" / "y"', description: "How it turns, and around which axis." },
+      { name: "Carousel3D items", type: "ReactNode[]", description: "Slides; three or more make a ring." },
+      { name: "index / defaultIndex / onIndexChange", type: "number", description: "Front slide, controlled or not." },
+      { name: "itemWidth / itemHeight / gap", type: "number (px)", default: "220 / 280 / 24", description: "Slide size; the ring radius follows." },
+      { name: "CardStack children / top / step", type: "ReactNode / number / number", default: "96 / 14", description: "Cards, where they stick and how far each edge shows." },
+      { name: "TiltWall items / columns / duration / height", type: "ReactNode[] / number / number / number", default: "4 / 40 / 480", description: "Tiles spread over drifting columns." },
+      { name: "DotGlobe size / dots / markers / speed / tilt", type: "number / number / { lat, lon, label? }[] / number / number", default: "360 / 1400 / [] / 8 / 18", description: "Canvas globe; speed in degrees per second." },
+    ],
+    a11y: [
+      "FlipCard with trigger=\"click\" is a toggle button (aria-pressed); the hidden face is inert, so focus never lands on it.",
+      "Carousel3D is a labelled carousel region; only the front slide is reachable, and the position is announced politely.",
+      "Reduced motion swaps the turn for an instant change, keeps the stack flat, stops the wall and the globe.",
+      "TiltWall reads each tile once: the loop copy is hidden and inert.",
+      "DotGlobe is a named image listing its markers; drag or arrow keys turn it.",
+    ],
+  },
   reveal: {
     name: "Reveal",
     description: "Content that enters as it scrolls into view, alone or in sequence, plus a reading progress bar and parallax.",
@@ -241,7 +622,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   "page-transition": {
     name: "Page Transition",
-    description: "Animated page entrances for the App Router, used in app/template.tsx. \"slide\" mimics an iOS push and reverses on Back. This docs site uses it.",
+    description: "Animated page entrances for the App Router, used in app/template.tsx. \"slide\" pushes from the trailing side and reverses on Back. This docs site uses it.",
     importName: "PageTransition, useNavigationDirection",
     importPath: "pleate/effects/page-transition",
     demos: [{ id: "basic", title: "Variants", description: "Switch pages between the docs to see fade-up in action.", Component: PageTransitionBasic }],
@@ -411,14 +792,14 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   "search-bar": {
     name: "Search Bar",
-    description: "The iOS search field: clear button, a Cancel that slides in while focused, debounced input, loading state and a focus shortcut.",
+    description: "Search field: clear button, an optional Cancel that slides in while focused, debounced input, loading state and a focus shortcut.",
     importName: "SearchBar",
     demos: [{ id: "basic", title: "Filter, shortcut, loading", description: "Press / to focus the first one.", align: "stretch", Component: SearchBarBasic }],
     props: [
       { name: "value / defaultValue / onValueChange", type: "string", description: "Text." },
       { name: "debounce", type: "number", default: "0", description: "ms before onValueChange while typing." },
       { name: "onSearch", type: "(value) => void", description: "Enter." },
-      { name: "cancelable / loading", type: "boolean", description: "iOS Cancel button; spinner instead of clear." },
+      { name: "cancelable / loading", type: "boolean", description: "Cancel button while focused; spinner instead of clear." },
       { name: "shortcut", type: '"/" | "mod+k"', description: "Global focus shortcut with a hint." },
       { name: "size / variant", type: '"sm" | "md" / "filled" | "surface"', description: "Look." },
     ],
@@ -495,7 +876,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   list: {
     name: "List",
-    description: "The iOS Settings list: grouped sections, icon tiles, values, controls, checkmarks, chevrons and swipe actions.",
+    description: "Grouped rows: sections, icon tiles, values, controls, checkmarks, chevrons and swipe actions.",
     importName: "List, ListSection, ListItem",
     demos: [{ id: "settings", title: "Settings screen", description: "Try the switch, the language rows and swiping a trip.", Component: ListSettings }],
     props: [
@@ -510,7 +891,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   accordion: {
     name: "Accordion",
-    description: "Sections that expand in place: grouped like an iOS list, as separate cards, or with hairlines only.",
+    description: "Sections that expand in place: on one bordered panel, as separate cards, or with hairlines only.",
     importName: "Accordion, AccordionItem, AccordionTrigger, AccordionContent",
     demos: [{ id: "variants", title: "Inset, separated, plain", align: "stretch", Component: AccordionVariants }],
     props: [
@@ -561,7 +942,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   "bottom-sheet": {
     name: "Bottom Sheet",
-    description: "The iOS sheet: drag between snap points, flick down to close. The footer stays on the visible edge at every height.",
+    description: "A bottom sheet: drag between snap points, flick down to close. The footer stays on the visible edge at every height.",
     importName: "BottomSheet",
     demos: [{ id: "basic", title: "Snap points and simple sheet", Component: BottomSheetBasic }],
     props: [
@@ -575,7 +956,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   "action-sheet": {
     name: "Action Sheet",
-    description: "A short list of choices from the bottom with a separate Cancel, as on iOS. A centered card on wide screens.",
+    description: "A short list of choices from the bottom, Cancel on its own row. A centered panel on wide screens.",
     importName: "ActionSheet",
     demos: [{ id: "basic", title: "Photo actions", Component: ActionSheetBasic }],
     props: [
@@ -587,7 +968,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   "alert-dialog": {
     name: "Alert Dialog",
-    description: "The iOS alert for decisions that need an answer. Two buttons sit side by side, more stack; the cancel action is bold and focused first.",
+    description: "A dialog for decisions that need an answer. Buttons sit on a footer strip, stacked on phones; the cancel action is focused first.",
     importName: "AlertDialog",
     demos: [{ id: "basic", title: "Destructive and three-way", Component: AlertDialogBasic }],
     props: [
@@ -622,7 +1003,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   toast: {
     name: "Toast",
-    description: "Brief notifications from anywhere with toast(). They drop in from the top like iOS banners, pause on hover and can be swiped away.",
+    description: "Brief notifications from anywhere with toast(). They drop in from the top, pause on hover and can be swiped away.",
     importName: "Toaster, toast",
     demos: [{ id: "basic", title: "Tones, action, promise", Component: ToastBasic }],
     props: [
@@ -648,7 +1029,7 @@ export const DOCS: Record<string, ComponentDoc> = {
 
   tabs: {
     name: "Tabs",
-    description: "Switch between views of the same content. Underline with a sliding bar, pill with a sliding capsule, or soft chips.",
+    description: "Switch between views of the same content. Underline with a sliding bar, pill with a sliding thumb, or soft chips.",
     importName: "Tabs, TabsList, TabsTrigger, TabsContent",
     demos: [{ id: "variants", title: "Underline, pill, soft", align: "stretch", Component: TabsVariants }],
     props: [
@@ -661,7 +1042,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   "segmented-control": {
     name: "Segmented Control",
-    description: "The iOS segmented picker: a thumb slides under the selected segment. Text, icons, or both.",
+    description: "A single-choice picker on a bordered rail: a thumb slides under the selected segment. Text, icons, or both.",
     importName: "SegmentedControl",
     demos: [{ id: "basic", title: "Text, icons, sizes", align: "stretch", Component: SegmentedControlBasic }],
     props: [
@@ -686,7 +1067,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   pagination: {
     name: "Pagination",
-    description: "Move through pages: numbered with ellipses (fewer on phones), compact \"3 of 12\", or the iOS page-control dots.",
+    description: "Move through pages: numbered with ellipses (fewer on phones), compact \"3 of 12\", or page dots.",
     importName: "Pagination",
     demos: [
       { id: "variants", title: "Pages, compact, dots", Component: PaginationVariants },
@@ -704,7 +1085,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   menu: {
     name: "Menu",
-    description: "Action menus with the iOS look: trailing icons, shortcuts, destructive rows, checkmarks, submenus. ContextMenu opens the same menu on right click or long press.",
+    description: "Compact action menus: leading icons, shortcuts, destructive rows, checkmarks, submenus. ContextMenu opens the same menu on right click or long press.",
     importName: "Menu, MenuTrigger, MenuContent, MenuItem, …",
     demos: [
       { id: "basic", title: "Everything in one menu", Component: MenuBasic },
@@ -766,7 +1147,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   card: {
     name: "Card",
-    description: "Solid rounded surface for grouped content, composed of media, header, content and footer. Interactive cards lift and press in.",
+    description: "Bordered surface for grouped content, composed of media, header, content and footer. Interactive cards sharpen their border on hover and press in.",
     importName: "Card, CardMedia, CardHeader, CardTitle, CardDescription, CardContent, CardFooter",
     demos: [
       { id: "variants", title: "Variants", align: "stretch", Component: CardVariants },
@@ -781,7 +1162,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   divider: {
     name: "Divider",
-    description: "Hairline separator: horizontal, vertical, inset like iOS list rows, or with a label.",
+    description: "Hairline separator: horizontal, vertical, inset from the start like list rows, or with a label.",
     importName: "Divider",
     demos: [{ id: "basic", title: "Inset, label, vertical", align: "stretch", Component: DividerBasic }],
     props: [
@@ -820,7 +1201,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   "navigation-bar": {
     name: "Navigation Bar",
-    description: "The iOS app bar: back button, centered title, actions. With largeTitle the title starts big and collapses into the bar as you scroll.",
+    description: "An app bar: back button, title, actions. With largeTitle the title starts big and collapses into the bar as you scroll.",
     importName: "NavigationBar, NavigationBarBack",
     demos: [{ id: "large-title", title: "Large title", description: "Scroll inside the phone.", Component: NavigationBarLargeTitle }],
     props: [
@@ -859,21 +1240,26 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   "tab-bar": {
     name: "Tab Bar",
-    description: "iOS bottom tabs for phone layouts: classic edge-to-edge, or the floating capsule with a sliding pill. Icons swap to their filled version when active.",
+    description: "The bottom bar for phone layouts: classic edge-to-edge with a rule over the active tab, or a floating bar with a sliding highlight and an optional search pane beside it that opens a command palette.",
     importName: "TabBar, TabBarItem, TabBarSpacer",
-    demos: [{ id: "variants", title: "Classic and floating", Component: TabBarVariants }],
+    demos: [
+      { id: "search", title: "Floating with search", description: "Four places in the bar, search in its own pane at the trailing end. Copy this for an app shell.", Component: TabBarSearch },
+      { id: "variants", title: "Classic and floating", Component: TabBarVariants },
+    ],
     props: [
       { name: "value / onValueChange", type: "string", description: "Value-driven tabs (or use active on link items)." },
       { name: "variant", type: '"classic" | "floating"', default: '"classic"', description: "Look." },
       { name: "hideFrom", type: '"never" | "md" | "lg"', default: '"never"', description: "Hide on wider screens." },
       { name: "position", type: '"fixed" | "static"', default: '"fixed"', description: "Pinned to the viewport bottom." },
+      { name: "trailing", type: "ReactNode", description: "A separate pane beside a floating bar, usually a search IconButton." },
+      { name: "TabBarSpacer", type: 'variant, hideFrom', description: "Keeps page content clear of a fixed bar; match the bar's variant." },
       { name: "TabBarItem", type: "icon, activeIcon, label, badge, value, active, asChild", description: "One tab." },
     ],
     a11y: ["Rendered as a nav landmark; the current tab has aria-current=\"page\".", "Respects the home-indicator safe area."],
   },
   button: {
     name: "Button",
-    description: "The primary action. Capsule-shaped like iOS, with six looks, four tones and five sizes. Presses scale down slightly; loading keeps the width.",
+    description: "The primary action. Squared by default (pill on request), with six looks, four tones and five sizes. Presses scale down slightly; loading keeps the width.",
     importName: "Button",
     demos: [
       { id: "variants", title: "Variants", description: "From the strongest (filled) to the quietest (plain).", Component: ButtonVariants },
@@ -886,7 +1272,7 @@ export const DOCS: Record<string, ComponentDoc> = {
       { name: "variant", type: '"filled" | "tinted" | "gray" | "surface" | "outline" | "plain"', default: '"filled"', description: "Visual weight." },
       { name: "tone", type: '"accent" | "neutral" | "danger" | "success"', default: '"accent"', description: "Color role." },
       SIZE('"xs" | "sm" | "md" | "lg" | "xl"'),
-      { name: "shape", type: '"pill" | "rounded"', default: '"pill"', description: "Capsule or rounded rectangle." },
+      { name: "shape", type: '"pill" | "rounded"', default: '"rounded"', description: "Rounded rectangle or capsule." },
       { name: "loading", type: "boolean", default: "false", description: "Spinner in place of the content; the button is disabled and aria-busy." },
       { name: "startIcon / endIcon", type: "ReactNode", description: "Icons sized automatically." },
       { name: "fullWidth", type: "boolean", default: "false", description: "Stretch to the container." },
@@ -896,7 +1282,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   "icon-button": {
     name: "Icon Button",
-    description: "A round or rounded-square button that holds only an icon. aria-label is required by the types.",
+    description: "A square button that holds only an icon (round on request). aria-label is required by the types.",
     importName: "IconButton",
     demos: [{ id: "variants", title: "Variants and sizes", align: "start", Component: IconButtonVariants }],
     props: [
@@ -907,15 +1293,15 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   input: {
     name: "Input",
-    description: "Text field in three looks: filled iOS well, outline, and surface for gray grouped pages. Adornments hold icons, units or buttons.",
+    description: "Text field in three looks: outline (default), a filled well, and surface with a lighter border. Adornments hold icons, units or buttons.",
     importName: "Input",
     demos: [
       { id: "variants", title: "Variants and states", align: "stretch", Component: InputVariants },
       { id: "adornments", title: "Adornments", align: "stretch", Component: InputAdornments },
-      { id: "sizes", title: "Sizes", description: "Small stays at 16px on phones so iOS never zooms in on focus.", align: "stretch", Component: InputSizes },
+      { id: "sizes", title: "Sizes", description: "Text stays at 16px on phones so mobile Safari never zooms in on focus.", align: "stretch", Component: InputSizes },
     ],
     props: [
-      { name: "variant", type: '"filled" | "outline" | "surface"', default: '"filled"', description: "Field look." },
+      { name: "variant", type: '"filled" | "outline" | "surface"', default: '"outline"', description: "Field look." },
       SIZE('"sm" | "md" | "lg"'),
       { name: "startAdornment / endAdornment", type: "ReactNode", description: "Content before and after the text." },
       { name: "invalid", type: "boolean", description: "Red edge and aria-invalid." },
@@ -947,7 +1333,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   checkbox: {
     name: "Checkbox",
-    description: "Round like iOS or square, with a drawn-in checkmark and an indeterminate state. Pass label and description for a clickable row.",
+    description: "Square or round, with a drawn-in checkmark and an indeterminate state. Pass label and description for a clickable row.",
     importName: "Checkbox",
     demos: [
       { id: "basic", title: "Indeterminate parent", align: "start", Component: CheckboxBasic },
@@ -956,7 +1342,7 @@ export const DOCS: Record<string, ComponentDoc> = {
     props: [
       { name: "checked / defaultChecked", type: 'boolean | "indeterminate"', description: "State." },
       { name: "onCheckedChange", type: '(checked: boolean | "indeterminate") => void', description: "Change handler." },
-      { name: "shape", type: '"circle" | "square"', default: '"circle"', description: "iOS circle or rounded square." },
+      { name: "shape", type: '"circle" | "square"', default: '"square"', description: "Square or circle." },
       SIZE('"sm" | "md" | "lg"'),
       { name: "label / description", type: "ReactNode", description: "Builds the labelled row (description is wired with aria-describedby)." },
       { name: "labelPlacement", type: '"end" | "start"', default: '"end"', description: "Text after the box, or before it across the row." },
@@ -974,19 +1360,19 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   switch: {
     name: "Switch",
-    description: "The iOS toggle: the thumb stretches while pressed. Use for settings that apply immediately.",
+    description: "A squared toggle; the thumb stretches while pressed. Use for settings that apply immediately.",
     importName: "Switch",
     demos: [{ id: "basic", title: "Switches and settings rows", align: "start", Component: SwitchBasic }],
     props: [
       { name: "checked / defaultChecked / onCheckedChange", type: "boolean", description: "State." },
-      { name: "tone", type: '"accent" | "success"', default: '"accent"', description: "Accent or iOS green when on." },
+      { name: "tone", type: '"accent" | "success"', default: '"accent"', description: "Accent or green when on." },
       SIZE('"sm" | "md"'),
       { name: "label / description / labelPlacement", type: "", description: "As Checkbox; use \"start\" for settings rows." },
     ],
   },
   slider: {
     name: "Slider",
-    description: "Pick a value or a range. Knob style, or the thick Control Center bar where the fill is the handle.",
+    description: "Pick a value or a range. A thin track with a small knob, or a thick bar where the fill is the handle.",
     importName: "Slider",
     demos: [{ id: "basic", title: "Value, range and bar", align: "stretch", Component: SliderBasic }],
     props: [
@@ -1011,7 +1397,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   avatar: {
     name: "Avatar",
-    description: "A photo with a graceful fallback: initials on a gradient whose hue is stable per name, or an icon. Groups overlap and fold into +N.",
+    description: "A photo with a graceful fallback: initials on a flat tint whose hue is stable per name, or an icon. Groups overlap and fold into +N.",
     importName: "Avatar, AvatarGroup",
     demos: [{ id: "basic", title: "Sizes, fallbacks, status, group", align: "start", Component: AvatarBasic }],
     props: [
@@ -1049,7 +1435,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   spinner: {
     name: "Spinner",
-    description: "The iOS activity indicator in the current text color.",
+    description: "A rotating arc in the current text color.",
     importName: "Spinner",
     demos: [{ id: "basic", title: "Sizes and colors", Component: SpinnerBasic }],
     props: [

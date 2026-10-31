@@ -30,7 +30,7 @@ export default function Demo() {
             <button
               type="button"
               onClick={() => setPage((p) => (p + 1) % PAGES.length)}
-              className="pl-focus-ring mt-3 cursor-pointer rounded-full bg-accent px-4 py-2 text-subhead font-semibold text-on-accent"
+              className="pl-focus-ring mt-3 cursor-pointer rounded-md bg-accent px-4 py-2 text-subhead font-medium text-on-accent"
             >
               Next page →
             </button>

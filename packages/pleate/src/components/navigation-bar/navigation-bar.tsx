@@ -1,5 +1,5 @@
-// NavigationBar: the iOS app bar. A 44pt row (leading · title · trailing) that sticks to the top; with largeTitle the
-// title first sits big under the bar and, as it scrolls under it, the small centered title fades in together with
+// NavigationBar: an app bar. A 44px row (leading · title · trailing) that sticks to the top; with largeTitle the
+// title first sits big under the bar and, as it scrolls under it, the small title fades in together with
 // the hairline. NavigationBarBack is the "‹ Back" button (asChild for links).
 "use client";
 
@@ -71,11 +71,11 @@ export function NavigationBar({
           className,
         )}
       >
-        <div className="grid h-11 grid-cols-[1fr_auto_1fr] items-center gap-2 ps-[max(0.5rem,var(--pl-safe-left))] pe-[max(0.5rem,var(--pl-safe-right))]">
+        <div className="grid h-12 grid-cols-[auto_1fr_auto] items-center gap-2 ps-[max(0.5rem,var(--pl-safe-left))] pe-[max(0.5rem,var(--pl-safe-right))]">
           <div className="flex min-w-0 items-center justify-start gap-1">{leading}</div>
           <div
             className={cn(
-              "max-w-[50vw] truncate text-center text-headline transition-[opacity,translate] duration-(--pl-duration-base) ease-ios",
+              "min-w-0 truncate text-start text-headline transition-[opacity,translate] duration-(--pl-duration-base) ease-ios",
               showSmallTitle ? "opacity-100" : "translate-y-1 opacity-0",
             )}
             aria-hidden={largeTitle ? true : undefined}
@@ -106,12 +106,12 @@ export type NavigationBarBackProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export function NavigationBarBack({ className, asChild, label = "Back", children, ...props }: NavigationBarBackProps) {
   const Comp = asChild ? Slot.Root : "button";
-  const chevron = <ChevronRightIcon className="size-[1.375rem] shrink-0 rotate-180 rtl:rotate-0" strokeWidth={2.5} />;
+  const chevron = <ChevronRightIcon className="size-4 shrink-0 rotate-180 rtl:rotate-0" strokeWidth={2} />;
   return (
     <Comp
       {...(!asChild && { type: "button" as const })}
       className={cn(
-        "pl-focus-ring pl-touch -ms-1 inline-flex h-11 min-w-0 cursor-pointer items-center gap-0.5 rounded-md pe-2 text-body text-accent-ink",
+        "pl-focus-ring pl-touch pl-hit relative inline-flex h-8 min-w-0 cursor-pointer items-center gap-1 rounded-sm ps-1.5 pe-2.5 text-subhead text-fg-muted transition-colors hover:bg-fill-2 hover:text-fg",
         "transition-opacity duration-(--pl-duration-fast) hover:opacity-80 active:opacity-50",
         className,
       )}

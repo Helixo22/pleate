@@ -33,7 +33,7 @@ export default function Demo() {
         <ul className="grid gap-2">
           {[...ROUTES, ...ROUTES].map((route, i) => (
             <li key={i} className="flex items-center gap-3 rounded-xl bg-fill-3 p-3">
-              <span className="grid size-10 place-items-center rounded-full bg-accent-soft text-accent-ink [&_svg]:size-5">{route.icon}</span>
+              <span className="grid size-10 place-items-center rounded-md bg-fill-2 text-fg-muted [&_svg]:size-5">{route.icon}</span>
               <span className="flex-1 text-body">{route.name}</span>
               <span className="text-subhead text-fg-muted">{route.time}</span>
               <span className="w-14 text-end text-subhead font-semibold">{route.price}</span>

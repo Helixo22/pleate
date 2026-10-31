@@ -348,7 +348,7 @@ export function ApiKeyList({
   let content: ReactNode;
   if (loading && keys.length === 0) {
     content = (
-      <div aria-busy="true" className="flex flex-col gap-4 rounded-2xl bg-surface p-4 shadow-xs">
+      <div aria-busy="true" className="flex flex-col gap-4 pl-field [--pl-field-border:var(--pl-separator)] rounded-2xl bg-surface p-4">
         <span className="sr-only">{l.loading}</span>
         {Array.from({ length: 3 }, (_, i) => (
           <div key={i} className="flex items-center gap-4">
@@ -394,7 +394,7 @@ export function ApiKeyList({
               <TableRow key={k.id} className={cn(expired && "opacity-60")}>
                 <TableCell label={l.name}>
                   <span className="flex flex-col">
-                    <span className="font-semibold">{k.name}</span>
+                    <span className="font-medium">{k.name}</span>
                     <span className="text-footnote whitespace-nowrap text-fg-muted" suppressHydrationWarning>
                       {l.created} {formatShortDate(k.createdAt, locale)}
                     </span>

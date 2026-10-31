@@ -1,4 +1,4 @@
-// Slider: iOS track with a white knob, or "bar", the thick Control Center style where the fill is the handle.
+// Slider: a thin track with a small ringed knob, or "bar", a thick track where the fill is the handle.
 // One value or a range (pass two values). Keyboard: arrows, Page Up/Down, Home/End (Radix).
 "use client";
 
@@ -14,9 +14,9 @@ const sliderVariants = cva("relative flex w-full touch-none items-center select-
       bar: "pl-focus-within-ring rounded-(--pl-bar-radius)",
     },
     size: {
-      sm: "[--pl-bar:1.75rem] [--pl-bar-radius:var(--radius-md)] [--pl-knob-size:1.25rem] [--pl-track:0.25rem]",
-      md: "[--pl-bar:2.5rem] [--pl-bar-radius:var(--radius-lg)] [--pl-knob-size:1.75rem] [--pl-track:0.25rem]",
-      lg: "[--pl-bar:3.25rem] [--pl-bar-radius:var(--radius-xl)] [--pl-knob-size:2rem] [--pl-track:0.375rem]",
+      sm: "[--pl-bar:1.75rem] [--pl-bar-radius:var(--radius-md)] [--pl-knob-size:0.875rem] [--pl-track:0.25rem]",
+      md: "[--pl-bar:2.5rem] [--pl-bar-radius:var(--radius-lg)] [--pl-knob-size:1rem] [--pl-track:0.25rem]",
+      lg: "[--pl-bar:3.25rem] [--pl-bar-radius:var(--radius-xl)] [--pl-knob-size:1.25rem] [--pl-track:0.375rem]",
     },
   },
   defaultVariants: { variant: "knob", size: "md" },
@@ -56,7 +56,7 @@ export function Slider({ className, variant, size, thumbLabels, value, defaultVa
               ? "h-(--pl-bar) w-0 outline-none"
               : [
                   "pl-focus-ring size-(--pl-knob-size) rounded-full bg-knob shadow-knob",
-                  "transition-[scale] duration-(--pl-duration-fast) ease-ios motion-safe:active:scale-110",
+                  "transition-[scale] duration-(--pl-duration-fast) ease-ios pl-hit relative motion-safe:active:scale-110",
                 ],
           )}
         />

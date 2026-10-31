@@ -5,7 +5,7 @@ import type { HTMLAttributes, ReactNode, Ref } from "react";
 import { cn } from "../../lib/cn.ts";
 import { XIcon } from "../../lib/icons.tsx";
 
-const alertVariants = cva("relative flex gap-3 rounded-2xl p-4 text-subhead [&>svg]:mt-px [&>svg]:size-5 [&>svg]:shrink-0", {
+const alertVariants = cva("relative flex gap-3 rounded-lg p-4 text-subhead [&>svg]:mt-px [&>svg]:size-5 [&>svg]:shrink-0", {
   variants: {
     tone: {
       info: "[--pl-a-ink:var(--pl-info-ink)] [--pl-a-soft:var(--pl-info-soft)]",
@@ -17,7 +17,7 @@ const alertVariants = cva("relative flex gap-3 rounded-2xl p-4 text-subhead [&>s
     },
     variant: {
       soft: "bg-(--pl-a-soft) text-fg [&>svg]:text-(--pl-a-ink)",
-      surface: "bg-surface text-fg shadow-sm [&>svg]:text-(--pl-a-ink)",
+      surface: "pl-field [--pl-field-border:var(--pl-separator)] bg-surface text-fg [&>svg]:text-(--pl-a-ink)",
       outline: "bg-transparent text-fg shadow-[inset_0_0_0_1px_var(--pl-separator)] [&>svg]:text-(--pl-a-ink)",
     },
   },
@@ -67,7 +67,7 @@ export function Alert({ className, tone = "info", variant, title, icon, actions,
           type="button"
           aria-label={dismissLabel}
           onClick={onDismiss}
-          className="pl-focus-ring absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-full text-fg-muted transition-colors hover:bg-fill-2 hover:text-fg [&_svg]:size-4"
+          className="pl-focus-ring pl-hit absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-sm text-fg-muted transition-colors hover:bg-fill-2 hover:text-fg [&_svg]:size-4"
         >
           <XIcon strokeWidth={2.5} />
         </button>

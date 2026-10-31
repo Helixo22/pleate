@@ -130,7 +130,7 @@ export function BottomSheet({
             >
               <motion.div
                 className={cn(
-                  "fixed inset-x-0 bottom-0 z-(--pl-z-modal) mx-auto flex w-full flex-col rounded-t-[1.75rem] bg-elevated text-fg shadow-xl outline-none md:max-w-xl",
+                  "fixed inset-x-0 bottom-0 z-(--pl-z-modal) mx-auto flex w-full flex-col rounded-t-xl bg-elevated text-fg shadow-xl outline-none md:max-w-xl",
                   className,
                 )}
                 style={{ height: sheetHeight, y }}
@@ -149,7 +149,7 @@ export function BottomSheet({
                 {/* Drag handle area: grabber + header. */}
                 <div className="shrink-0 cursor-grab touch-none select-none active:cursor-grabbing" onPointerDown={(event) => drag.start(event)}>
                   <div className="flex justify-center pt-2 pb-1">
-                    <span aria-hidden="true" className="h-1.5 w-9 rounded-full bg-fill" />
+                    <span aria-hidden="true" className="h-1 w-8 rounded-full bg-fill" />
                   </div>
                   {(title || showClose) && (
                     <div className="flex items-start gap-3 px-5 pt-1 pb-3">

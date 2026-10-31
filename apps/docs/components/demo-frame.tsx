@@ -26,10 +26,10 @@ export function DemoFrame({
     <section id={id} className="scroll-mt-20">
       <div className="mb-3 flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-title3">{title}</h2>
+          <h2 className="text-title3 text-fg">{title}</h2>
           {description && <p className="mt-1 max-w-2xl text-subhead text-fg-muted">{description}</p>}
         </div>
-        <div role="tablist" aria-label={`${title} view`} className="flex shrink-0 rounded-full bg-fill-2 p-0.5">
+        <div role="tablist" aria-label={`${title} view`} className="pl-field flex shrink-0 rounded-md bg-surface-2 p-0.5 [--pl-field-border:var(--pl-separator)]">
           {(["preview", "code"] as const).map((value) => (
             <button
               key={value}
@@ -37,19 +37,19 @@ export function DemoFrame({
               aria-selected={tab === value}
               onClick={() => setTab(value)}
               className={cn(
-                "pl-focus-ring relative h-7 cursor-pointer rounded-full px-3 text-footnote font-semibold capitalize transition-colors",
+                "pl-focus-ring relative h-7 cursor-pointer rounded-[calc(var(--radius-md)-2px)] px-2.5 text-footnote font-medium capitalize transition-colors",
                 tab === value ? "text-fg" : "text-fg-muted hover:text-fg",
               )}
             >
               {tab === value && (
-                <motion.span layoutId={`tab-${id}`} transition={spring.snap} className="absolute inset-0 rounded-full bg-surface shadow-sm" />
+                <motion.span layoutId={`tab-${id}`} transition={spring.snap} className="absolute inset-0 rounded-[calc(var(--radius-md)-2px)] bg-surface shadow-[inset_0_0_0_1px_var(--pl-border),var(--pl-lip)] dark:bg-fill-2" />
               )}
               <span className="relative">{value}</span>
             </button>
           ))}
         </div>
       </div>
-      <div className="overflow-hidden rounded-3xl bg-surface shadow-sm">
+      <div className="pl-field overflow-clip rounded-xl bg-surface [--pl-field-border:var(--pl-separator)]">
         {tab === "preview" ? (
           <div
             role="tabpanel"
@@ -65,8 +65,8 @@ export function DemoFrame({
           </div>
         ) : (
           <div role="tabpanel" className="relative">
-            <CopyButton text={code} variant="gray" className="absolute end-3 top-3" />
-            <pre className="max-h-[32rem] overflow-auto bg-surface-2 p-6 pe-14 font-mono text-[0.8125rem] leading-relaxed text-fg">
+            <CopyButton text={code} variant="surface" className="absolute end-3 top-3" />
+            <pre className="max-h-[32rem] overflow-auto bg-surface-2 p-5 pe-14 font-mono text-[0.8125rem] leading-relaxed text-fg">
               <code>{code}</code>
             </pre>
           </div>

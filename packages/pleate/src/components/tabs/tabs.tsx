@@ -1,5 +1,5 @@
 // Tabs: switch between views of the same context. Three looks, "underline" with a sliding bar, "pill" with a sliding
-// capsule, "soft" with tinted chips, all with Radix keyboard support (arrows, Home/End). Long lists scroll
+// thumb, "soft" with tinted chips, all with Radix keyboard support (arrows, Home/End). Long lists scroll
 // sideways on phones. Panels fade in.
 "use client";
 
@@ -38,8 +38,8 @@ export function TabsList({ className, ...props }: ComponentProps<typeof TabsPrim
       className={cn(
         "pl-no-scrollbar relative flex max-w-full overflow-x-auto",
         variant === "underline" && "gap-1 shadow-[inset_0_-1px_0_var(--pl-separator)]",
-        variant === "pill" && "w-fit gap-0.5 rounded-full bg-fill-2 p-1",
-        variant === "soft" && "gap-1.5",
+        variant === "pill" && "pl-field w-fit gap-0.5 rounded-md bg-surface-2 p-0.5 [--pl-field-border:var(--pl-separator)]",
+        variant === "soft" && "gap-1",
         className,
       )}
       {...props}
@@ -54,14 +54,14 @@ export function TabsTrigger({ className, value, children, ...props }: ComponentP
     <TabsPrimitive.Trigger
       value={value}
       className={cn(
-        "pl-focus-ring pl-touch relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 font-semibold whitespace-nowrap",
+        "pl-focus-ring pl-touch relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 font-medium whitespace-nowrap",
         "transition-colors duration-(--pl-duration-fast) disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-4",
         size === "sm" ? "text-footnote" : "text-subhead",
-        variant === "underline" && [size === "sm" ? "h-9 px-2.5" : "h-11 px-3", active ? "text-fg" : "text-fg-muted hover:text-fg"],
-        variant === "pill" && [size === "sm" ? "h-7 px-3" : "h-9 px-4", "rounded-full", active ? "text-fg" : "text-fg-muted hover:text-fg"],
+        variant === "underline" && [size === "sm" ? "h-9 px-2.5" : "h-10 px-3", active ? "text-fg" : "text-fg-muted hover:text-fg"],
+        variant === "pill" && [size === "sm" ? "h-7 px-2.5" : "h-8 px-3.5", "rounded-[calc(var(--radius-md)-2px)]", active ? "text-fg" : "text-fg-muted hover:text-fg"],
         variant === "soft" && [
-          size === "sm" ? "h-8 px-3" : "h-9 px-4",
-          "rounded-full",
+          size === "sm" ? "h-7 px-2.5" : "h-8 px-3",
+          "rounded-sm",
           active ? "bg-accent-soft text-accent-ink" : "text-fg-muted hover:bg-fill-2 hover:text-fg",
         ],
         className,
@@ -72,7 +72,7 @@ export function TabsTrigger({ className, value, children, ...props }: ComponentP
         <motion.span
           layoutId={`${id}-indicator`}
           transition={spring.snap}
-          className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-accent-ink"
+          className="absolute inset-x-2.5 bottom-0 h-0.5 bg-accent-ink"
           aria-hidden="true"
         />
       )}
@@ -80,7 +80,7 @@ export function TabsTrigger({ className, value, children, ...props }: ComponentP
         <motion.span
           layoutId={`${id}-indicator`}
           transition={spring.snap}
-          className="absolute inset-0 rounded-full bg-surface shadow-sm dark:bg-fill"
+          className="absolute inset-0 rounded-[calc(var(--radius-md)-2px)] bg-surface shadow-[inset_0_0_0_1px_var(--pl-border),var(--pl-lip)] dark:bg-fill-2"
           aria-hidden="true"
         />
       )}

@@ -1,4 +1,4 @@
-// SearchBar: the iOS search field, filled capsule with a magnifier, a clear button once there is text, and an
+// SearchBar: a search field with a magnifier, a clear button once there is text, and an
 // optional "Cancel" that slides in while focused (phones). Enter submits (onSearch); onValueChange can be debounced.
 // A keyboard shortcut (e.g. "/" or "mod+k") focuses it from anywhere.
 "use client";
@@ -46,7 +46,7 @@ export function SearchBar({
   loading = false,
   shortcut,
   size = "md",
-  variant = "filled",
+  variant = "surface",
   label = "Search",
   placeholder = "Search",
   className,
@@ -99,18 +99,19 @@ export function SearchBar({
     else if (ref) ref.current = node;
   };
 
-  const height = size === "sm" ? "h-8 text-callout md:text-subhead" : "h-10 text-body";
+  const height = size === "sm" ? "h-8 text-[1rem] md:text-footnote" : "h-9 text-[1rem] md:text-subhead";
   return (
     // A search landmark, not a <form>: it can live inside your own form without nesting forms.
     <div role="search" aria-label={label} className={cn("flex w-full min-w-0 items-center gap-2", className)}>
       <div
         className={cn(
-          "pl-focus-within-ring relative flex min-w-0 flex-1 items-center gap-1.5 rounded-[0.625rem] ps-2.5 pe-1.5 text-fg",
-          variant === "filled" ? "bg-fill-2" : "bg-surface shadow-xs",
+          "pl-field relative flex min-w-0 flex-1 items-center gap-2 rounded-md ps-2.5 pe-1.5 text-fg transition-shadow duration-(--pl-duration-fast)",
+          "has-[:focus-visible]:[--pl-field-border:var(--pl-accent-ink)] has-[:focus-visible]:shadow-[inset_0_0_0_1px_var(--pl-field-border),0_0_0_3px_var(--pl-accent-soft)]",
+          variant === "filled" ? "bg-fill-2 [--pl-field-border:transparent]" : "bg-surface",
           height,
         )}
       >
-        <svg viewBox="0 0 24 24" className="size-[1.0625rem] shrink-0 text-fg-muted" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
+        <svg viewBox="0 0 24 24" className="size-4 shrink-0 text-fg-subtle" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
           <circle cx="10.5" cy="10.5" r="6.5" />
           <path d="M15.5 15.5L20 20" />
         </svg>
@@ -155,13 +156,13 @@ export function SearchBar({
               change("");
               inner.current?.focus();
             }}
-            className="pl-focus-ring grid size-5 shrink-0 cursor-pointer place-items-center rounded-full bg-fg-subtle/70 text-surface hover:bg-fg-subtle [&_svg]:size-3"
+            className="pl-focus-ring grid size-5 shrink-0 cursor-pointer place-items-center rounded-xs text-fg-subtle hover:bg-fill-2 hover:text-fg [&_svg]:size-3.5"
           >
             <XIcon strokeWidth={3.2} />
           </button>
         )}
         {shortcut && !text && !focused && (
-          <kbd className="hidden shrink-0 rounded-md bg-surface px-1.5 py-0.5 font-sans text-caption1 font-medium text-fg-muted shadow-xs md:inline">
+          <kbd className="pl-field hidden shrink-0 rounded-xs bg-surface-2 px-1.5 py-px font-mono text-caption2 text-fg-subtle md:inline">
             {shortcut === "/" ? "/" : isMac ? "⌘K" : "Ctrl K"}
           </kbd>
         )}
@@ -180,7 +181,7 @@ export function SearchBar({
             animate={{ opacity: 1, width: "auto" }}
             exit={reduced ? { opacity: 0 } : { opacity: 0, width: 0 }}
             transition={reduced ? { duration: 0.1 } : spring.snap}
-            className="pl-focus-ring shrink-0 cursor-pointer overflow-hidden rounded-md text-body whitespace-nowrap text-accent-ink"
+            className="pl-focus-ring shrink-0 cursor-pointer overflow-hidden rounded-sm text-subhead whitespace-nowrap text-accent-ink"
           >
             {cancelLabel}
           </motion.button>

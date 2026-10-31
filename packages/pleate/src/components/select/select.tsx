@@ -22,8 +22,9 @@ export function SelectTrigger({ className, variant, size, invalid, startAdornmen
       aria-invalid={invalid || undefined}
       className={cn(
         fieldVariants({ variant, size }),
-        "pl-touch cursor-pointer justify-between text-start focus-visible:outline-ring",
-        "aria-invalid:shadow-[inset_0_0_0_1.5px_var(--pl-danger-ink)] disabled:cursor-not-allowed disabled:opacity-50",
+        "pl-touch cursor-pointer justify-between text-start outline-none",
+        "focus-visible:[--pl-field-border:var(--pl-accent-ink)] focus-visible:shadow-[inset_0_0_0_1px_var(--pl-field-border),0_0_0_3px_var(--pl-accent-soft)]",
+        "aria-invalid:[--pl-field-border:var(--pl-danger-ink)] disabled:cursor-not-allowed disabled:opacity-50",
         "data-placeholder:text-fg-subtle [&>span]:truncate",
         className,
       )}
@@ -53,7 +54,7 @@ export function SelectContent({
         sideOffset={sideOffset}
         collisionPadding={collisionPadding}
         className={cn(
-          "pl-pop relative z-(--pl-z-dropdown) overflow-hidden rounded-xl bg-elevated text-fg shadow-lg",
+          "pl-pop relative z-(--pl-z-dropdown) overflow-hidden rounded-lg bg-elevated text-fg shadow-lg",
           "max-h-(--radix-select-content-available-height) min-w-[max(var(--radix-select-trigger-width),10rem)]",
           className,
         )}
@@ -80,7 +81,7 @@ export function SelectItem({
   return (
     <SelectPrimitive.Item
       className={cn(
-        "pl-touch relative flex min-h-10 cursor-pointer items-center gap-2 rounded-md py-2 ps-8 pe-3 text-body outline-none",
+        "pl-touch relative flex min-h-8 cursor-pointer items-center gap-2 rounded-sm py-1.5 ps-8 pe-2 text-subhead outline-none pointer-coarse:min-h-10",
         "transition-colors duration-(--pl-duration-instant) data-highlighted:bg-fill-2 data-disabled:pointer-events-none data-disabled:opacity-40",
         "[&_svg]:size-[1.125rem]",
         className,
@@ -103,7 +104,7 @@ export function SelectItem({
 export function SelectLabel({ className, ...props }: ComponentProps<typeof SelectPrimitive.Label>) {
   return (
     <SelectPrimitive.Label
-      className={cn("px-3 pt-2 pb-1 text-footnote font-semibold text-fg-muted", className)}
+      className={cn("px-2 pt-2 pb-1 text-caption1 font-medium text-fg-subtle", className)}
       {...props}
     />
   );

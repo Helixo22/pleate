@@ -508,7 +508,7 @@ function LiveFace({ state = "idle", size = 64, track = false, seed, level, ...re
         <motion.g aria-hidden="true" style={center} animate={{ rotate: 360 }} transition={{ duration: 3.6, repeat: Infinity, ease: "linear" }}>
           {[0, 1, 2].map((i) => {
             const a = (i / 3) * Math.PI * 2;
-            return <circle key={i} cx={50 + Math.cos(a) * 56} cy={50 + Math.sin(a) * 56} r={3.4 - i * 0.7} fill="var(--pl-bot)" opacity={0.8 - i * 0.2} />;
+            return <circle key={i} cx={Math.round((50 + Math.cos(a) * 56) * 100) / 100} cy={Math.round((50 + Math.sin(a) * 56) * 100) / 100} r={3.4 - i * 0.7} fill="var(--pl-bot)" opacity={0.8 - i * 0.2} />;
           })}
         </motion.g>
       )}

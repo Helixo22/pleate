@@ -1,23 +1,24 @@
 // Docs shell: sticky header with theme controls, a solid sidebar on desktop and a slide-over menu on phones.
 "use client";
 
-import { Menu, X } from "lucide-react";
+import { BookOpen, LayoutGrid, Menu, Search, Server, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Badge, cn, IconButton, SegmentedControl, spring } from "pleate";
+import { Badge, cn, IconButton, SegmentedControl, spring, TabBar, TabBarItem, TabBarSpacer } from "pleate";
 import { useEffect, useState, type ReactNode } from "react";
 import { type Area, AREA_HOME, areaOf, BACKEND_NAV, NAV } from "@/lib/nav";
+import { SearchTrigger, SiteSearch } from "./site-search";
 import { PalettePicker, ThemeSwitch } from "./theme-controls";
 
 function Wordmark({ area }: { area: Area }) {
   return (
     <Link
       href={AREA_HOME[area]}
-      className="pl-focus-ring flex items-center gap-2 rounded-md text-headline font-bold tracking-tight"
+      className="pl-focus-ring flex items-center gap-2 rounded-sm text-headline font-semibold"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/logo.svg" alt="" className="size-7" />
+      <img src="/logo.svg" alt="" className="size-6" />
       pleate
       {area === "backend" && (
         <Badge size="sm" tone="accent">
@@ -67,8 +68,8 @@ function SidebarNav({ area, onNavigate }: { area: Area; onNavigate?: () => void 
     <nav aria-label={area === "backend" ? "Backend documentation" : "Documentation"} className="flex flex-col gap-6 pb-10">
       {sections.map((section) => (
         <div key={section.title}>
-          <p className="px-3 pb-1.5 text-footnote font-semibold text-fg-muted">{section.title}</p>
-          <ul className="flex flex-col gap-px">
+          <p className="px-2.5 pb-2 text-caption1 font-medium text-fg-subtle">{section.title}</p>
+          <ul className="flex flex-col gap-0.5">
             {section.items.map((item) => {
               const active = pathname === item.href;
               return (
@@ -79,18 +80,18 @@ function SidebarNav({ area, onNavigate }: { area: Area; onNavigate?: () => void 
                       onClick={onNavigate}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "pl-focus-ring flex h-9 items-center rounded-md px-3 text-subhead transition-colors",
-                        active ? "bg-accent-soft font-semibold text-accent-ink" : "text-fg hover:bg-fill-2",
+                        "pl-focus-ring relative flex h-8 items-center rounded-sm px-2.5 text-subhead transition-colors",
+                        active
+                          ? "pl-field bg-surface font-medium text-fg [--pl-field-border:var(--pl-separator)] before:absolute before:inset-y-2 before:start-0 before:w-0.5 before:bg-accent-ink"
+                          : "text-fg-muted hover:bg-fill-3 hover:text-fg",
                       )}
                     >
                       {item.name}
                     </Link>
                   ) : (
-                    <span className="flex h-9 items-center justify-between rounded-md px-3 text-subhead text-fg-subtle">
+                    <span className="flex h-8 items-center justify-between px-2.5 text-subhead text-fg-subtle">
                       {item.name}
-                      <Badge size="sm" tone="neutral">
-                        Soon
-                      </Badge>
+                      <span className="font-mono text-caption2">soon</span>
                     </span>
                   )}
                 </li>
@@ -105,6 +106,7 @@ function SidebarNav({ area, onNavigate }: { area: Area; onNavigate?: () => void 
 
 export function Shell({ children }: { children: ReactNode }) {
   const [menu, setMenu] = useState(false);
+  const [search, setSearch] = useState(false);
   const pathname = usePathname();
   const area = areaOf(pathname);
   // Example pages are full-bleed sites of their own: no docs chrome.
@@ -136,20 +138,12 @@ export function Shell({ children }: { children: ReactNode }) {
     <div className="min-h-dvh">
       <header className="sticky top-0 z-(--pl-z-sticky) border-b border-separator bg-bg pt-(--pl-safe-top)">
         <div className="mx-auto flex h-14 max-w-[90rem] items-center gap-3 px-4 md:px-6">
-          <IconButton
-            aria-label="Open menu"
-            size="sm"
-            variant="plain"
-            tone="neutral"
-            className="-ms-1.5 lg:hidden"
-            onClick={() => setMenu(true)}
-            icon={<Menu />}
-          />
           <Wordmark area={area} />
           <div className="ms-6 hidden sm:block">
             <AreaToggle area={area} />
           </div>
           <div className="ms-auto flex items-center gap-2">
+            <SearchTrigger onOpen={() => setSearch(true)} className="hidden md:flex" />
             <PalettePicker />
             <ThemeSwitch />
           </div>
@@ -157,11 +151,36 @@ export function Shell({ children }: { children: ReactNode }) {
       </header>
 
       <div className="mx-auto flex max-w-[90rem]">
-        <aside className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-64 shrink-0 overflow-y-auto px-3 pt-6 lg:block">
+        <aside className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-60 shrink-0 overflow-y-auto border-e border-separator px-3 pt-6 lg:block">
           <SidebarNav area={area} />
         </aside>
-        <main className="min-w-0 flex-1 px-4 pt-8 pb-24 md:px-10 md:pt-12">{children}</main>
+        <main className="min-w-0 flex-1 px-4 pt-8 pb-24 md:px-10 md:pt-10">
+          {children}
+          <TabBarSpacer hideFrom="lg" variant="floating" />
+        </main>
       </div>
+
+      {/* Phones and tablets: a floating bar under the thumb, search in its own pane at the trailing end (it opens
+          the palette in place, it is not a place). Menu opens the full page list. */}
+      <TabBar
+        hideFrom="lg"
+        variant="floating"
+        label="Sections"
+        trailing={
+          <IconButton aria-label="Search the docs" aria-haspopup="dialog" variant="plain" tone="neutral" size="lg" icon={<Search />} onClick={() => setSearch(true)} />
+        }
+      >
+        <TabBarItem asChild active={pathname === "/"} icon={<BookOpen />} label="Overview">
+          <Link href="/">Overview</Link>
+        </TabBarItem>
+        <TabBarItem asChild active={pathname.startsWith("/components")} icon={<LayoutGrid />} label="Components">
+          <Link href="/components">Components</Link>
+        </TabBarItem>
+        <TabBarItem asChild active={area === "backend"} icon={<Server />} label="Backend">
+          <Link href="/backend/overview">Backend</Link>
+        </TabBarItem>
+        <TabBarItem active={menu} icon={<Menu />} label="Menu" aria-haspopup="dialog" aria-expanded={menu} onClick={() => setMenu(true)} />
+      </TabBar>
 
       <AnimatePresence>
         {menu && (
@@ -185,7 +204,7 @@ export function Shell({ children }: { children: ReactNode }) {
             >
               <div className="flex h-14 shrink-0 items-center justify-between px-4 pt-(--pl-safe-top)">
                 <Wordmark area={area} />
-                <IconButton aria-label="Close menu" size="sm" variant="gray" tone="neutral" onClick={() => setMenu(false)} icon={<X />} />
+                <IconButton aria-label="Close menu" size="sm" variant="plain" tone="neutral" onClick={() => setMenu(false)} icon={<X />} />
               </div>
               <div className="px-4 pt-1 pb-3">
                 <AreaToggle area={area} fullWidth onSwitch={() => setMenu(false)} />
@@ -197,6 +216,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
         )}
       </AnimatePresence>
+      <SiteSearch open={search} onOpenChange={setSearch} />
     </div>
   );
 }

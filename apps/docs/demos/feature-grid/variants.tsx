@@ -13,7 +13,7 @@ const FEATURES = [
 
 export default function Demo() {
   return (
-    <div className="grid w-full gap-12 rounded-3xl bg-bg p-4 md:p-6">
+    <div className="grid w-full gap-12 rounded-xl bg-bg p-4 md:p-6">
       <FeatureGrid features={FEATURES} />
       <FeatureGrid
         variant="bento"

@@ -31,7 +31,7 @@ export function AuthCard({
     <section
       className={cn(
         "flex w-full max-w-[26rem] flex-col gap-6 text-fg",
-        variant === "card" && "rounded-3xl bg-surface p-5 shadow-md sm:p-8",
+        variant === "card" && "pl-field [--pl-field-border:var(--pl-separator)] rounded-xl bg-surface p-5 sm:p-8",
         className,
       )}
       {...props}
@@ -44,7 +44,7 @@ export function AuthCard({
         </header>
       )}
       {children}
-      {footer && <footer className="text-center text-subhead text-fg-muted [&_a]:font-semibold [&_a]:text-accent-ink [&_a:hover]:underline">{footer}</footer>}
+      {footer && <footer className="text-center text-subhead text-fg-muted [&_a]:font-medium [&_a]:text-accent-ink [&_a:hover]:underline">{footer}</footer>}
     </section>
   );
 }

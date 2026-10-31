@@ -11,8 +11,8 @@ import { CheckIcon, MinusIcon } from "../../lib/icons.tsx";
 
 export const checkboxVariants = cva(
   [
-    "peer pl-focus-ring pl-field relative grid shrink-0 cursor-pointer place-items-center bg-surface text-on-accent",
-    "transition-[background-color,box-shadow] duration-(--pl-duration-fast) ease-out hover:[--pl-field-border:var(--pl-fg-subtle)]",
+    "peer pl-focus-ring pl-field [--pl-field-border:var(--pl-border-strong)] relative grid shrink-0 cursor-pointer place-items-center bg-surface text-on-accent",
+    "transition-[background-color,box-shadow] duration-(--pl-duration-fast) ease-out hover:[--pl-field-border:var(--pl-fg-muted)]",
     "data-[state=checked]:bg-accent data-[state=checked]:pl-lift data-[state=indeterminate]:bg-accent data-[state=indeterminate]:pl-lift",
     "aria-invalid:[--pl-field-border:var(--pl-danger-ink)] disabled:cursor-not-allowed disabled:opacity-50",
     "after:absolute after:-inset-2.5 after:content-['']",

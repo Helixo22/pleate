@@ -28,6 +28,8 @@ export type TabBarProps = {
   /** Fixed to the bottom of the viewport (default) or in flow (e.g. inside a demo frame). */
   position?: "fixed" | "static";
   label?: string;
+  /** A separate pane beside a floating bar, usually a search IconButton (variant="floating" only). */
+  trailing?: ReactNode;
   className?: string;
 };
 
@@ -40,6 +42,7 @@ export function TabBar({
   hideFrom = "never",
   position = "fixed",
   label = "Tabs",
+  trailing,
   className,
 }: TabBarProps) {
   const [current, setCurrent] = useControllableState({ value, defaultValue: defaultValue ?? "", onChange: onValueChange });
@@ -59,14 +62,19 @@ export function TabBar({
           className,
         )}
       >
-        <ul
-          className={cn(
-            "mx-auto flex",
-            floating ? "h-16 max-w-md items-center rounded-full bg-elevated p-1.5 shadow-lg" : "h-[3.25rem] max-w-2xl items-stretch",
+        <div className={cn("mx-auto flex items-center gap-2", floating ? "max-w-md" : "max-w-2xl")}>
+          <ul
+            className={cn(
+              "flex min-w-0 flex-1",
+              floating ? "h-14 items-stretch rounded-xl bg-elevated p-1 shadow-lg" : "h-[3.25rem] items-stretch",
+            )}
+          >
+            {children}
+          </ul>
+          {floating && trailing && (
+            <div className="grid size-14 shrink-0 place-items-center rounded-xl bg-elevated shadow-lg">{trailing}</div>
           )}
-        >
-          {children}
-        </ul>
+        </div>
       </nav>
     </TabBarContext.Provider>
   );
@@ -80,7 +88,7 @@ export type TabBarItemProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "val
   /** Selected state for link-driven bars (e.g. from the current pathname). */
   active?: boolean;
   icon: ReactNode;
-  /** Icon variant when selected (iOS uses filled glyphs). */
+  /** Icon variant when selected (e.g. a filled glyph). */
   activeIcon?: ReactNode;
   label: ReactNode;
   /** A count or dot on the icon. */
@@ -99,7 +107,7 @@ export function TabBarItem({ className, asChild, value, active, icon, activeIcon
         <motion.span
           layoutId={context.pillId}
           transition={spring.snap}
-          className="absolute inset-0 rounded-full bg-accent-soft"
+          className="absolute inset-0 rounded-lg bg-accent-soft"
           aria-hidden="true"
         />
       )}
@@ -111,10 +119,12 @@ export function TabBarItem({ className, asChild, value, active, icon, activeIcon
           if (value !== undefined) context.select(value);
         }}
         className={cn(
-          "pl-focus-ring pl-touch relative flex flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-full",
+          "pl-focus-ring pl-touch relative flex flex-1 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg",
           "text-[0.625rem] leading-3 font-medium transition-colors duration-(--pl-duration-fast)",
-          "[&_svg]:size-6 motion-safe:active:[&_svg]:scale-90 [&_svg]:transition-[scale] [&_svg]:duration-(--pl-duration-fast)",
+          "[&_svg]:size-5 motion-safe:active:[&_svg]:scale-90 [&_svg]:transition-[scale] [&_svg]:duration-(--pl-duration-fast)",
           selected ? "text-accent-ink" : "text-fg-muted hover:text-fg",
+          // classic bar: a 2px accent rule above the selected tab
+          !floating && selected && "before:absolute before:inset-x-1/4 before:top-0 before:h-0.5 before:bg-accent-ink",
           floating && "text-[0.6875rem]",
           className,
         )}
@@ -123,7 +133,7 @@ export function TabBarItem({ className, asChild, value, active, icon, activeIcon
         <span className="relative">
           {selected && activeIcon ? activeIcon : icon}
           {badge !== undefined && badge !== null && badge !== false && (
-            <span className="absolute -end-2.5 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[0.625rem] leading-none font-semibold text-on-status">
+            <span className="absolute -end-2.5 -top-1 flex h-4 min-w-4 items-center justify-center rounded-xs bg-danger px-1 font-mono text-[0.625rem] leading-none font-medium text-on-status">
               {badge === true ? "" : badge}
             </span>
           )}

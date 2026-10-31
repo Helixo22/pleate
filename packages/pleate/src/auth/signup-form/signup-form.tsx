@@ -135,7 +135,7 @@ export function SignupForm({
         </FormField>
         {terms && (
           <FormField name="acceptTerms" required={{ value: true, message: l.termsRequired }} error={fieldErrors?.acceptTerms}>
-            <Checkbox shape="square" size="sm" label={<span className="text-subhead text-fg-muted [&_a]:font-semibold [&_a]:text-accent-ink [&_a:hover]:underline">{terms}</span>} />
+            <Checkbox shape="square" size="sm" label={<span className="text-subhead text-fg-muted [&_a]:font-medium [&_a]:text-accent-ink [&_a:hover]:underline">{terms}</span>} />
           </FormField>
         )}
         <div className="pt-1">

@@ -4,15 +4,15 @@ import type { HTMLAttributes, Ref } from "react";
 import { cn } from "../../lib/cn.ts";
 
 export const badgeVariants = cva(
-  "pl-tabular inline-flex shrink-0 items-center justify-center gap-1 rounded-full font-semibold whitespace-nowrap",
+  "pl-tabular inline-flex shrink-0 items-center justify-center gap-1 rounded-xs font-medium whitespace-nowrap",
   {
     variants: {
       variant: { solid: "", soft: "", outline: "bg-transparent" },
       tone: { accent: "", neutral: "", success: "", warning: "", danger: "", info: "" },
       size: {
-        sm: "h-[1.125rem] min-w-[1.125rem] px-1.5 text-caption2",
-        md: "h-[1.375rem] min-w-[1.375rem] px-2 text-caption1",
-        lg: "h-7 min-w-7 px-2.5 text-footnote",
+        sm: "h-[1.125rem] min-w-[1.125rem] px-1 text-caption2",
+        md: "h-5 min-w-5 px-1.5 text-caption1",
+        lg: "h-6 min-w-6 px-2 text-footnote",
       },
     },
     compoundVariants: [

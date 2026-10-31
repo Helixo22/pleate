@@ -1,4 +1,4 @@
-// Menu: an action menu opened from a trigger (Radix DropdownMenu) with the iOS look. Items take a trailing icon,
+// Menu: an action menu opened from a trigger (Radix DropdownMenu) with a compact bordered look. Items take a leading icon,
 // a shortcut and a destructive tone; checkbox and radio items show a leading checkmark; submenus open sideways.
 // Full keyboard support and typeahead come from Radix.
 "use client";
@@ -43,9 +43,9 @@ export type MenuItemProps = ComponentProps<typeof DropdownMenu.Item> & {
 export function MenuItem({ className, icon, shortcut, destructive, inset, children, ...props }: MenuItemProps) {
   return (
     <DropdownMenu.Item className={cn(menuItem, destructive && menuItemDestructive, inset && menuInset, className)} {...props}>
+      {icon}
       <span className="min-w-0 flex-1 truncate">{children}</span>
       {shortcut && <span className={menuShortcut}>{shortcut}</span>}
-      {icon}
     </DropdownMenu.Item>
   );
 }

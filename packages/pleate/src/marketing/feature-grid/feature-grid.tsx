@@ -47,14 +47,14 @@ export function FeatureGrid({ features, columns = 3, variant = "cards", classNam
           variants={{ hidden: { opacity: 0, y: 22 }, shown: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } } }}
           className={cn(
             "group relative flex flex-col gap-3",
-            variant !== "plain" && "overflow-hidden rounded-3xl bg-surface p-6 shadow-xs",
+            variant !== "plain" && "overflow-hidden pl-field [--pl-field-border:var(--pl-separator)] rounded-xl bg-surface p-6",
             variant === "bento" && f.span === 2 && "lg:col-span-2",
             variant === "bento" && f.rowSpan === 2 && "lg:row-span-2",
-            f.href && "transition-shadow duration-(--pl-duration-base) hover:shadow-md",
+            f.href && "transition-[box-shadow] duration-(--pl-duration-base) hover:[--pl-field-border:var(--pl-border)]",
           )}
         >
           {f.icon && (
-            <span className="grid size-11 place-items-center rounded-2xl bg-accent-soft text-accent-ink [&_svg]:size-[1.375rem]">{f.icon}</span>
+            <span className="grid size-10 place-items-center rounded-lg bg-fill-2 text-fg [&_svg]:size-5">{f.icon}</span>
           )}
           <h3 className="text-headline text-fg">
             {f.href ? (
@@ -67,7 +67,7 @@ export function FeatureGrid({ features, columns = 3, variant = "cards", classNam
           </h3>
           {f.description && <p className="text-subhead text-pretty text-fg-muted">{f.description}</p>}
           {f.href && (
-            <span aria-hidden="true" className="mt-auto inline-flex items-center gap-0.5 text-subhead font-semibold text-accent-ink">
+            <span aria-hidden="true" className="mt-auto inline-flex items-center gap-0.5 text-subhead font-medium text-accent-ink">
               {f.linkLabel ?? "Learn more"}
               <ChevronRightIcon className="size-4 transition-[translate] duration-(--pl-duration-fast) group-hover:translate-x-0.5 rtl:rotate-180" strokeWidth={2.5} />
             </span>

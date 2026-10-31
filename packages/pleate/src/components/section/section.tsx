@@ -57,7 +57,7 @@ export function Section({
 }: SectionProps) {
   const header = (eyebrow || title || description) && (
     <div className={cn("mb-10 flex max-w-3xl flex-col gap-3 md:mb-14", align === "center" && "mx-auto items-center text-center")}>
-      {eyebrow && <p className="text-subhead font-semibold text-accent-ink">{eyebrow}</p>}
+      {eyebrow && <p className="text-subhead font-medium text-accent-ink">{eyebrow}</p>}
       {title && <Title className="text-display-sm text-balance">{title}</Title>}
       {description && <p className="text-title3 font-normal text-pretty text-fg-muted">{description}</p>}
     </div>

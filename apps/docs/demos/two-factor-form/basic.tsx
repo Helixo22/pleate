@@ -12,7 +12,7 @@ export default function Demo() {
     toast.success("Signed in");
   };
   return (
-    <div className="grid w-full place-items-center rounded-3xl sm:bg-bg sm:px-4 sm:py-10">
+    <div className="grid w-full place-items-center rounded-xl sm:bg-bg sm:px-4 sm:py-10">
       <AuthCard title="Two-step verification" description="Enter the code from your authenticator app.">
         <TwoFactorForm
           onSubmit={verify}

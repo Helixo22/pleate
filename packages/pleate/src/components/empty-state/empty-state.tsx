@@ -18,7 +18,7 @@ export type EmptyStateProps = Omit<HTMLAttributes<HTMLDivElement>, "title"> & {
 const SIZE = {
   sm: { root: "gap-2 py-6", tile: "size-10 rounded-xl [&_svg]:size-5", title: "text-headline", text: "text-footnote" },
   md: { root: "gap-3 py-10", tile: "size-14 rounded-2xl [&_svg]:size-7", title: "text-title3", text: "text-subhead" },
-  lg: { root: "gap-4 py-16", tile: "size-20 rounded-3xl [&_svg]:size-10", title: "text-title2", text: "text-body" },
+  lg: { root: "gap-4 py-16", tile: "size-20 rounded-xl [&_svg]:size-10", title: "text-title2", text: "text-body" },
 };
 
 export function EmptyState({ icon, illustration, title, description, actions, size = "md", bordered, className, ...props }: EmptyStateProps) {
@@ -28,7 +28,7 @@ export function EmptyState({ icon, illustration, title, description, actions, si
       className={cn(
         "flex w-full flex-col items-center px-6 text-center",
         s.root,
-        bordered && "rounded-3xl border-2 border-dashed border-separator",
+        bordered && "rounded-xl border border-dashed border-separator",
         className,
       )}
       {...props}

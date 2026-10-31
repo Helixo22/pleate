@@ -112,7 +112,7 @@ export function Navbar({
               aria-expanded={open}
               aria-controls={panelId}
               onClick={() => setOpen((v) => !v)}
-              className="pl-focus-ring pl-touch -me-2 grid size-10 cursor-pointer place-items-center rounded-full text-fg md:hidden"
+              className="pl-focus-ring pl-touch pl-hit relative -me-2 grid size-10 cursor-pointer place-items-center rounded-md text-fg md:hidden"
             >
               <MenuIcon open={open} />
             </button>
@@ -165,7 +165,7 @@ export function NavbarLink({ className, asChild, active, onClick, ...props }: Na
       className={cn(
         "pl-focus-ring pl-touch transition-colors duration-(--pl-duration-fast)",
         placement === "bar"
-          ? "rounded-full px-3 py-1.5 text-subhead text-fg-muted hover:text-fg aria-[current=page]:text-fg aria-[current=page]:font-semibold"
+          ? "rounded-md px-3 py-1.5 text-subhead text-fg-muted hover:text-fg aria-[current=page]:text-fg aria-[current=page]:font-medium"
           : "flex min-h-14 items-center border-b border-separator text-title2 text-fg aria-[current=page]:text-accent-ink",
         className,
       )}

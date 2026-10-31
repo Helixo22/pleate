@@ -32,9 +32,9 @@ export default function Demo() {
         <FooterBottom>
           <span>© 2026 Plate. All rights reserved.</span>
           <div className="flex gap-4">
-            <a href="#basic" className="hover:text-fg">Privacy</a>
-            <a href="#basic" className="hover:text-fg">Terms</a>
-            <a href="#basic" className="hover:text-fg">Cookies</a>
+            <FooterLink href="#basic">Privacy</FooterLink>
+            <FooterLink href="#basic">Terms</FooterLink>
+            <FooterLink href="#basic">Cookies</FooterLink>
           </div>
         </FooterBottom>
       </Footer>

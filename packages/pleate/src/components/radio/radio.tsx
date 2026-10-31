@@ -13,8 +13,8 @@ export function RadioGroup({ className, ...props }: ComponentProps<typeof RadioP
 
 export const radioVariants = cva(
   [
-    "pl-focus-ring pl-field relative grid shrink-0 cursor-pointer place-items-center rounded-full bg-surface",
-    "transition-[background-color,box-shadow] duration-(--pl-duration-fast) ease-out hover:[--pl-field-border:var(--pl-fg-subtle)]",
+    "pl-focus-ring pl-field [--pl-field-border:var(--pl-border-strong)] relative grid shrink-0 cursor-pointer place-items-center rounded-full bg-surface",
+    "transition-[background-color,box-shadow] duration-(--pl-duration-fast) ease-out hover:[--pl-field-border:var(--pl-fg-muted)]",
     "data-[state=checked]:bg-accent data-[state=checked]:pl-lift disabled:cursor-not-allowed disabled:opacity-50",
     "after:absolute after:-inset-2.5 after:content-['']",
   ],

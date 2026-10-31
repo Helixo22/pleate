@@ -7,28 +7,28 @@ import { XIcon } from "../../lib/icons.tsx";
 
 export const tagVariants = cva(
   [
-    "pl-touch inline-flex max-w-full shrink-0 items-center rounded-full font-medium whitespace-nowrap",
-    "transition-[background-color,color,box-shadow,scale] duration-(--pl-duration-fast) ease-ios",
+    "pl-touch inline-flex max-w-full shrink-0 items-center rounded-sm font-medium whitespace-nowrap",
+    "transition-[background-color,color,box-shadow,scale] duration-(--pl-duration-fast) ease-out",
   ],
   {
     variants: {
       variant: {
         soft: "bg-fill-2 text-fg",
-        outline: "bg-transparent text-fg shadow-[inset_0_0_0_1px_var(--pl-border)]",
-        surface: "bg-surface text-fg shadow-xs",
+        outline: "pl-field bg-transparent text-fg",
+        surface: "pl-field bg-surface text-fg",
         accent: "bg-accent-soft text-accent-ink",
       },
       size: {
-        sm: "h-7 gap-1 px-2.5 text-footnote [&_svg]:size-3.5",
-        md: "h-8 gap-1.5 px-3 text-subhead [&_svg]:size-4",
-        lg: "h-10 gap-2 px-4 text-callout [&_svg]:size-[1.125rem]",
+        sm: "h-6 gap-1 px-2 text-caption1 [&_svg]:size-3",
+        md: "h-7 gap-1.5 px-2.5 text-footnote [&_svg]:size-3.5",
+        lg: "h-8 gap-1.5 px-3 text-subhead [&_svg]:size-4",
       },
       selected: {
-        true: "bg-accent text-on-accent shadow-none",
+        true: "bg-accent text-on-accent pl-lift",
         false: "",
       },
       interactive: {
-        true: "pl-focus-ring cursor-pointer motion-safe:active:scale-[0.96]",
+        true: "pl-focus-ring pl-hit relative cursor-pointer motion-safe:active:scale-[0.98]",
         false: "",
       },
     },
@@ -92,7 +92,7 @@ export function Tag({
         event.stopPropagation();
         onRemove();
       }}
-      className="pl-focus-ring grid size-6 shrink-0 cursor-pointer place-items-center rounded-full opacity-60 transition-opacity hover:bg-fill hover:opacity-100 [&_svg]:size-3.5"
+      className="pl-focus-ring pl-hit relative grid size-5 shrink-0 cursor-pointer place-items-center rounded-xs opacity-60 transition-opacity hover:bg-fill hover:opacity-100 [&_svg]:size-3.5"
     >
       <XIcon strokeWidth={2.5} />
     </button>
@@ -108,7 +108,7 @@ export function Tag({
             aria-pressed={selected ?? undefined}
             disabled={disabled}
             onClick={onClick}
-            className="pl-focus-ring inline-flex cursor-pointer items-center gap-[inherit] rounded-full"
+            className="pl-focus-ring inline-flex cursor-pointer items-center gap-[inherit] rounded-xs"
           >
             {content}
           </button>

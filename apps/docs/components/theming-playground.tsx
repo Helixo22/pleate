@@ -15,7 +15,7 @@ function Swatch({ color, label, on }: { color: string; label: string; on?: strin
       </span>
       <span className="min-w-0">
         <span className="block text-subhead font-medium">{label}</span>
-        <span className="block font-mono text-caption1 text-fg-muted uppercase">{color}</span>
+        <span className="block font-mono text-caption1 text-fg-muted">{color}</span>
       </span>
     </div>
   );
@@ -41,7 +41,7 @@ export function ThemingPlayground() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[20rem_1fr]">
-      <div className="flex flex-col gap-6 rounded-3xl bg-surface p-5 shadow-xs">
+      <div className="flex flex-col gap-6 rounded-xl bg-surface p-5 shadow-xs">
         <div>
           <h2 className="mb-3 text-headline">Palette</h2>
           <PaletteSwatches />
@@ -63,13 +63,13 @@ export function ThemingPlayground() {
       </div>
 
       {generated && (
-        <div className="grid gap-6 rounded-3xl bg-surface p-5 shadow-xs md:grid-cols-2">
+        <div className="grid gap-6 rounded-xl bg-surface p-5 shadow-[inset_0_0_0_1px_var(--pl-separator)] md:grid-cols-2">
           {(["light", "dark"] as const).map((mode) => {
             const m = generated[mode];
-            const page = mode === "light" ? "#f2f2f7" : "#2c2c2e";
+            const page = mode === "light" ? "#fafafa" : "#141415";
             return (
               <div key={mode} className="flex flex-col gap-4" data-theme={mode}>
-                <div className="flex flex-col gap-4 rounded-2xl bg-bg p-4">
+                <div className="flex flex-col gap-4 rounded-lg bg-bg p-4">
                   <h3 className="text-headline capitalize text-fg">{mode}</h3>
                   <Swatch color={m.accent} on={m.onAccent} label="accent + on-accent" />
                   <Ratio value={contrast(m.accent, m.onAccent)} />

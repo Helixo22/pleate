@@ -41,11 +41,11 @@ const L = { input: "Message", send: "Send", stop: "Stop generating", attach: "At
 function Chip({ file, onRemove, label }: { file: File; onRemove: () => void; label: string }) {
   const url = useImageUrl(file);
   return (
-    <div className="relative flex max-w-56 items-center gap-2 rounded-xl bg-fill-2 p-1.5 pe-8">
+    <div className="relative flex max-w-56 items-center gap-2 rounded-lg bg-fill-2 p-1.5 pe-8">
       {url ? (
-        <img src={url} alt="" className="size-9 shrink-0 rounded-lg object-cover" />
+        <img src={url} alt="" className="size-9 shrink-0 rounded-xs object-cover" />
       ) : (
-        <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-accent text-caption2 font-bold text-on-accent">
+        <span className="grid size-9 shrink-0 place-items-center rounded-xs bg-fill text-caption2 font-medium text-fg-muted">
           {(file.name.split(".").pop() ?? "FILE").slice(0, 4).toUpperCase()}
         </span>
       )}
@@ -54,7 +54,7 @@ function Chip({ file, onRemove, label }: { file: File; onRemove: () => void; lab
         type="button"
         aria-label={`${label} ${file.name}`}
         onClick={onRemove}
-        className="pl-focus-ring absolute end-1.5 top-1/2 grid size-5 -translate-y-1/2 cursor-pointer place-items-center rounded-full bg-fg-subtle/70 text-surface hover:bg-fg-subtle [&_svg]:size-3"
+        className="pl-focus-ring pl-hit absolute end-1.5 top-1/2 grid size-5 -translate-y-1/2 cursor-pointer place-items-center rounded-xs bg-fg-subtle/70 text-surface hover:bg-fg-subtle [&_svg]:size-3"
       >
         <XIcon strokeWidth={3} />
       </button>
@@ -136,7 +136,7 @@ export function Composer({
   };
 
   const iconButton =
-    "pl-focus-ring grid size-9 shrink-0 cursor-pointer place-items-center rounded-full text-fg-muted transition-colors hover:bg-fill-2 hover:text-fg disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-5";
+    "pl-focus-ring pl-hit relative grid size-9 shrink-0 cursor-pointer place-items-center rounded-md text-fg-muted transition-colors hover:bg-fill-2 hover:text-fg disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-5";
 
   return (
     <div
@@ -147,7 +147,7 @@ export function Composer({
       onDragLeave={(e) => !e.currentTarget.contains(e.relatedTarget as Node) && setDragging(false)}
       onDrop={onDrop}
       className={cn(
-        "pl-focus-within-ring relative flex w-full flex-col gap-2 rounded-[1.625rem] bg-surface p-2 shadow-md",
+        "pl-focus-within-ring relative flex w-full flex-col gap-2 rounded-xl bg-surface p-2 pl-field [--pl-field-border:var(--pl-border-strong)]",
         "transition-shadow duration-(--pl-duration-base)",
         dragging && "shadow-[0_0_0_2px_var(--pl-accent-ink)]",
         disabled && "opacity-60",
@@ -155,7 +155,7 @@ export function Composer({
       )}
     >
       {dragging && (
-        <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center rounded-[inherit] bg-accent-soft text-subhead font-semibold text-accent-ink">
+        <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center rounded-[inherit] bg-accent-soft text-subhead font-medium text-accent-ink">
           {l.drop}
         </div>
       )}
@@ -230,7 +230,7 @@ export function Composer({
           onClick={generating ? onStop : submit}
           disabled={generating ? !onStop : !canSend}
           className={cn(
-            "pl-focus-ring grid size-9 shrink-0 cursor-pointer place-items-center rounded-full transition-[background-color,color,scale] duration-(--pl-duration-fast)",
+            "pl-focus-ring pl-hit relative grid size-9 shrink-0 cursor-pointer place-items-center rounded-md transition-[background-color,color,scale] duration-(--pl-duration-fast)",
             "motion-safe:active:scale-90 disabled:cursor-default",
             generating || canSend ? "bg-fg text-bg" : "bg-fill text-fg-subtle",
           )}

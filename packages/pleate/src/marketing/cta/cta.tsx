@@ -21,17 +21,14 @@ export function CTA({ title, description, actions, media, tone = "accent", align
     <section
       data-theme={tone === "dark" ? "dark" : undefined}
       className={cn(
-        "relative isolate overflow-hidden rounded-[2rem] px-6 py-14 md:px-14 md:py-20",
+        "relative isolate overflow-hidden rounded-xl px-6 py-14 md:px-14 md:py-20",
         tone === "accent" && "bg-accent text-on-accent",
-        tone === "surface" && "bg-surface text-fg shadow-sm",
+        tone === "surface" && "pl-field [--pl-field-border:var(--pl-separator)] bg-surface text-fg",
         tone === "dark" && "bg-surface text-fg",
         media ? "grid items-center gap-10 md:grid-cols-[1.2fr_1fr]" : "",
         className,
       )}
     >
-      {tone === "accent" && (
-        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(70%_80%_at_100%_0%,var(--pl-accent-400),transparent_60%)] opacity-60" />
-      )}
       <div className={cn("flex flex-col gap-5", align === "center" && !media ? "mx-auto max-w-2xl items-center text-center" : "items-start")}>
         <h2 className="text-display-sm text-balance">{title}</h2>
         {description && <p className={cn("text-title3 font-normal text-pretty", tone === "accent" ? "opacity-85" : "text-fg-muted")}>{description}</p>}
@@ -78,11 +75,11 @@ export function Newsletter({
     }
   };
   return (
-    <section className={cn("flex flex-col items-center gap-5 rounded-[2rem] bg-surface px-6 py-12 text-center shadow-sm md:py-16", className)}>
+    <section className={cn("flex flex-col items-center gap-5 pl-field [--pl-field-border:var(--pl-separator)] rounded-xl bg-surface px-6 py-12 text-center md:py-16", className)}>
       <h2 className="text-title1 text-balance">{title}</h2>
       {description && <p className="max-w-xl text-body text-fg-muted">{description}</p>}
       {state === "done" ? (
-        <p role="status" className="rounded-full bg-success-soft px-4 py-2 text-subhead font-semibold text-success-ink">
+        <p role="status" className="rounded-md bg-success-soft px-4 py-2 text-subhead font-medium text-success-ink">
           {successMessage}
         </p>
       ) : (
@@ -97,7 +94,7 @@ export function Newsletter({
             required
             autoComplete="email"
             placeholder={placeholder}
-            className="pl-focus-ring h-12 min-w-0 flex-1 rounded-full bg-fill-2 px-5 text-body text-fg outline-offset-0 placeholder:text-fg-subtle"
+            className="pl-focus-ring pl-field h-11 min-w-0 flex-1 rounded-md bg-surface px-3.5 [--pl-field-border:var(--pl-border-strong)] text-body text-fg outline-offset-0 placeholder:text-fg-subtle"
           />
           <Button type="submit" size="lg" loading={state === "loading"}>
             {buttonLabel}

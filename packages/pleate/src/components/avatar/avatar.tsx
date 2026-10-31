@@ -1,4 +1,4 @@
-// Avatar: photo with a graceful fallback, initials on a gradient whose hue comes from the name (stable per person),
+// Avatar: photo with a graceful fallback, initials on a flat tint whose hue comes from the name (stable per person),
 // or a custom icon. Circle or rounded square, six sizes, optional presence dot. AvatarGroup overlaps a row of avatars
 // and folds the rest into "+N".
 "use client";
@@ -9,11 +9,11 @@ import { Children, createContext, useContext, type CSSProperties, type HTMLAttri
 import { cn } from "../../lib/cn.ts";
 
 export const avatarVariants = cva(
-  "relative inline-flex shrink-0 items-center justify-center align-middle font-semibold text-on-status select-none",
+  "relative inline-flex shrink-0 items-center justify-center align-middle font-medium select-none",
   {
     variants: {
       size: {
-        xs: "size-6 text-[0.625rem] [&_svg]:size-3.5",
+        xs: "size-6 text-[0.6875rem] [&_svg]:size-3.5",
         sm: "size-8 text-caption1 [&_svg]:size-4",
         md: "size-10 text-subhead [&_svg]:size-5",
         lg: "size-14 text-title3 [&_svg]:size-7",
@@ -22,7 +22,7 @@ export const avatarVariants = cva(
       },
       shape: {
         circle: "rounded-full",
-        rounded: "rounded-[28%]",
+        rounded: "rounded-[22%]",
       },
     },
     defaultVariants: { size: "md", shape: "circle" },
@@ -42,8 +42,8 @@ const STATUS_CLASS: Record<Status, string> = {
 // How much each avatar in a group tucks under the previous one (about a quarter of its size).
 const GROUP_OVERLAP: Record<NonNullable<AvatarVariants["size"]>, string> = {
   xs: "-space-x-1.5",
-  sm: "-space-x-2",
-  md: "-space-x-2.5",
+  sm: "-space-x-1",
+  md: "-space-x-1.5",
   lg: "-space-x-3.5",
   xl: "-space-x-5",
   "2xl": "-space-x-7",
@@ -68,11 +68,18 @@ export function nameHue(name: string) {
 
 function fallbackBackground(name?: string, color?: string): CSSProperties {
   if (color) {
-    return { backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${color} 80%, white), ${color})` };
+    return tint(color);
   }
-  if (!name) return { backgroundImage: "linear-gradient(180deg, var(--pl-fg-subtle), var(--pl-fg-muted))" };
-  const h = nameHue(name);
-  return { backgroundImage: `linear-gradient(180deg, oklch(0.68 0.12 ${h}), oklch(0.52 0.14 ${h}))` };
+  if (!name) return { background: "var(--pl-fill-2)", color: "var(--pl-fg-muted)" };
+  return tint(`oklch(0.6 0.13 ${nameHue(name)})`);
+}
+
+// Flat tint of the color, mixed with the surface and the text color so it reads in both themes.
+function tint(color: string): CSSProperties {
+  return {
+    background: `color-mix(in oklab, ${color} 20%, var(--pl-surface))`,
+    color: `color-mix(in oklab, ${color} 62%, var(--pl-fg))`,
+  };
 }
 
 export type AvatarProps = Omit<HTMLAttributes<HTMLSpanElement>, "color"> &
@@ -158,7 +165,7 @@ export function AvatarGroup({ className, size, shape, max, children, ...props }:
         {shown}
         {rest > 0 && (
           <span
-            className={cn(avatarVariants({ size, shape }), "bg-fill text-fg-muted")}
+            className={cn(avatarVariants({ size, shape }), "relative bg-surface-2 text-fg-muted")}
             aria-label={`${rest} more`}
             role="img"
           >

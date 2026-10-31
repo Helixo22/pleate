@@ -38,8 +38,8 @@ export function ModelPicker({ models, value, onValueChange, label = "Model", ali
       <DropdownMenu.Trigger
         aria-label={`${label}: ${current?.name ?? ""}`}
         className={cn(
-          "pl-focus-ring pl-touch inline-flex min-w-0 cursor-pointer items-center gap-1.5 text-subhead font-semibold text-fg transition-colors [&_svg]:size-4",
-          variant === "ghost" ? "h-9 rounded-full px-3 hover:bg-fill-2 data-[state=open]:bg-fill-2" : "h-11 rounded-lg bg-fill-2 px-3.5 hover:bg-fill",
+          "pl-focus-ring pl-touch inline-flex min-w-0 cursor-pointer items-center gap-1.5 text-subhead font-medium text-fg transition-colors [&_svg]:size-4",
+          variant === "ghost" ? "pl-hit relative h-9 rounded-md px-3 hover:bg-fill-2 data-[state=open]:bg-fill-2" : "h-11 rounded-lg bg-fill-2 px-3.5 hover:bg-fill",
           className,
         )}
       >
@@ -59,7 +59,7 @@ export function ModelPicker({ models, value, onValueChange, label = "Model", ali
             {groups.map((group, gi) => (
               <DropdownMenu.Group key={group || gi}>
                 {gi > 0 && <DropdownMenu.Separator className="-mx-1.5 my-1.5 h-px bg-separator" />}
-                {group && <DropdownMenu.Label className="px-3 pt-2 pb-1 text-footnote font-semibold text-fg-muted">{group}</DropdownMenu.Label>}
+                {group && <DropdownMenu.Label className="px-3 pt-2 pb-1 text-footnote font-medium text-fg-muted">{group}</DropdownMenu.Label>}
                 {models
                   .filter((m) => (m.group ?? "") === group)
                   .map((m) => (
@@ -69,9 +69,9 @@ export function ModelPicker({ models, value, onValueChange, label = "Model", ali
                       disabled={m.disabled}
                       className="pl-touch relative flex cursor-pointer items-start gap-3 rounded-xl px-3 py-2.5 outline-none transition-colors data-disabled:pointer-events-none data-disabled:opacity-40 data-highlighted:bg-fill-2"
                     >
-                      {m.icon && <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent-ink [&_svg]:size-4">{m.icon}</span>}
+                      {m.icon && <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-sm bg-fill-2 text-fg-muted [&_svg]:size-4">{m.icon}</span>}
                       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                        <span className="flex flex-wrap items-center gap-1.5 text-subhead font-semibold">
+                        <span className="flex flex-wrap items-center gap-1.5 text-subhead font-medium">
                           {m.name}
                           {m.badges}
                         </span>

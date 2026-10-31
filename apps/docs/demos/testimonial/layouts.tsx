@@ -10,7 +10,7 @@ const ITEMS = [
 
 export default function Demo() {
   return (
-    <div className="grid w-full gap-14 rounded-3xl bg-bg p-4 md:p-8">
+    <div className="grid w-full gap-14 rounded-xl bg-bg p-4 md:p-8">
       <Testimonials layout="featured" items={[{ ...ITEMS[3], quote: "It's the first travel app my clients open without me asking them to." }]} />
       <Testimonials layout="grid" items={ITEMS} />
       <Testimonials layout="carousel" items={ITEMS} />

@@ -3,7 +3,7 @@ import { Pricing } from "pleate/marketing/pricing";
 
 export default function Demo() {
   return (
-    <div className="w-full rounded-3xl bg-bg p-4 md:p-8">
+    <div className="w-full rounded-xl bg-bg p-4 md:p-8">
       <Pricing
         plans={[
           {

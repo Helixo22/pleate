@@ -1,7 +1,7 @@
 {
   "name": "pleate",
   "version": "0.1.0",
-  "description": "iOS-inspired React components, design tokens and themes for Next.js and Tailwind CSS v4.",
+  "description": "React components, design tokens and themes for Next.js and Tailwind CSS v4.",
   "license": "MIT",
   "author": "Helixo22",
   "repository": {

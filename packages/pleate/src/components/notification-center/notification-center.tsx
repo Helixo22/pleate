@@ -8,6 +8,7 @@
 import { Popover as Primitive } from "radix-ui";
 import { useMemo, useSyncExternalStore, type ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";
+import { Odometer } from "../../effects/motion-graphics/motion-graphics.tsx";
 import { BellIcon, CheckIcon, TrashIcon } from "../../lib/icons.tsx";
 import { sameDay } from "../../lib/date.ts";
 import { formatTimeAgo, toDate, type DateInput } from "../../lib/time.ts";
@@ -106,11 +107,11 @@ function Row({
   };
   const content = (
     <>
-      <span className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-accent-ink [&_svg]:size-[1.125rem]" aria-hidden="true">
+      <span className="grid size-9 shrink-0 place-items-center rounded-md bg-fill-2 text-fg-muted [&_svg]:size-[1.125rem]" aria-hidden="true">
         {icon}
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className={cn("text-subhead text-fg", !item.read && "font-semibold")}>
+        <span className={cn("text-subhead text-fg", !item.read && "font-medium")}>
           {!item.read && <span className="sr-only">{l.unread}: </span>}
           {item.title}
         </span>
@@ -213,7 +214,7 @@ export function NotificationCenter({
         <div className="flex items-center justify-between gap-3 border-b border-separator px-4 py-3">
           <h2 className="flex items-center gap-2 text-headline">
             {l.title}
-            {unread > 0 && <span className="rounded-full bg-accent px-1.5 text-caption1 font-semibold text-on-accent pl-tabular">{unread}</span>}
+            {unread > 0 && <span className="rounded-sm bg-accent px-1.5 text-caption1 font-medium text-on-accent pl-tabular">{unread}</span>}
           </h2>
           {onMarkAllRead && (
             <Button variant="plain" size="xs" onClick={onMarkAllRead} disabled={unread === 0} className="-me-1.5">
@@ -243,7 +244,7 @@ export function NotificationCenter({
           <div className="flex flex-col gap-1 p-2">
             {groups.map((group) => (
               <section key={group.key} aria-label={group.title}>
-                {group.title && <h3 className="px-2 pt-2 pb-1 text-footnote font-semibold text-fg-muted">{group.title}</h3>}
+                {group.title && <h3 className="px-2 pt-2 pb-1 text-footnote font-medium text-fg-muted">{group.title}</h3>}
                 <ul className="flex flex-col">
                   {group.items.map((item) => (
                     <Row
@@ -310,9 +311,9 @@ export function NotificationBell({
           {unread > 0 && (
             <span
               aria-hidden="true"
-              className="absolute -end-1 -top-1 flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-full bg-danger px-1 text-caption2 font-semibold text-on-status shadow-[0_0_0_2px_var(--pl-bg)] pl-tabular"
+              className="absolute -end-1 -top-1 flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-sm bg-danger px-1 font-mono text-caption2 text-on-status shadow-[0_0_0_2px_var(--pl-bg)] pl-tabular"
             >
-              {unread > 99 ? "99+" : unread}
+              {unread > 99 ? "99+" : <Odometer value={unread} duration={0.4} />}
             </span>
           )}
         </IconButton>

@@ -16,7 +16,7 @@ const MODES: { value: ThemePreference; label: string; Icon: typeof Sun }[] = [
 export function ThemeSwitch() {
   const { theme, setTheme } = useTheme();
   return (
-    <div role="radiogroup" aria-label="Color scheme" className="flex rounded-full bg-fill-2 p-0.5">
+    <div role="radiogroup" aria-label="Color scheme" className="pl-field flex rounded-md bg-surface-2 p-0.5 [--pl-field-border:var(--pl-separator)]">
       {MODES.map(({ value, label, Icon }) => {
         const active = theme === value;
         return (
@@ -29,7 +29,7 @@ export function ThemeSwitch() {
             title={label}
             onClick={() => setTheme(value)}
             className={cn(
-              "pl-focus-ring pl-touch relative grid size-8 cursor-pointer place-items-center rounded-full transition-colors",
+              "pl-focus-ring pl-touch relative grid size-7 cursor-pointer place-items-center rounded-[calc(var(--radius-md)-2px)] transition-colors",
               active ? "text-fg" : "text-fg-muted hover:text-fg",
             )}
           >
@@ -37,7 +37,7 @@ export function ThemeSwitch() {
               <motion.span
                 layoutId="theme-pill"
                 transition={spring.snap}
-                className="absolute inset-0 rounded-full bg-surface shadow-sm"
+                className="absolute inset-0 rounded-[calc(var(--radius-md)-2px)] bg-surface shadow-[inset_0_0_0_1px_var(--pl-border),var(--pl-lip)] dark:bg-fill-2"
               />
             )}
             <Icon className="relative size-4" />
@@ -76,7 +76,7 @@ export function PaletteSwatches({ className }: { className?: string }) {
           );
         })}
       </div>
-      <label className="flex items-center gap-3 rounded-lg bg-fill-2 p-2 pe-3">
+      <label className="pl-field flex items-center gap-3 rounded-md bg-surface-2 p-2 pe-3 [--pl-field-border:var(--pl-separator)]">
         <span
           className={cn(
             "relative size-9 shrink-0 overflow-hidden rounded-full",
@@ -97,7 +97,7 @@ export function PaletteSwatches({ className }: { className?: string }) {
         </span>
         <span className="flex min-w-0 flex-col">
           <span className="text-subhead font-medium">Custom</span>
-          <span className="text-footnote text-fg-muted uppercase">{draft}</span>
+          <span className="font-mono text-caption1 text-fg-muted">{draft}</span>
         </span>
       </label>
     </div>
@@ -126,7 +126,7 @@ export function PalettePicker() {
         aria-label="Palette"
         aria-expanded={open}
         size="sm"
-        variant="gray"
+        variant="surface"
         tone="neutral"
         onClick={() => setOpen((v) => !v)}
         icon={<Palette />}
@@ -134,9 +134,9 @@ export function PalettePicker() {
       {open && (
         <div
           data-state="open"
-          className="pl-pop absolute end-0 top-full z-(--pl-z-dropdown) mt-2 w-64 rounded-2xl bg-elevated p-4 shadow-xl [--radix-popper-transform-origin:top_right]"
+          className="pl-pop absolute end-0 top-full z-(--pl-z-dropdown) mt-2 w-64 rounded-lg bg-elevated p-3 shadow-lg [--radix-popper-transform-origin:top_right]"
         >
-          <p className="mb-3 text-footnote font-semibold text-fg-muted">Palette</p>
+          <p className="mb-3 text-caption1 font-medium text-fg-subtle">Palette</p>
           <PaletteSwatches />
         </div>
       )}

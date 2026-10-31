@@ -27,8 +27,8 @@ const SECRET = "JBSWY3DPEHPK3PXPJBSWY3DP";
 export default function Demo() {
   const [key, setKey] = useState(0);
   return (
-    <div className="grid w-full place-items-center rounded-3xl sm:bg-bg sm:px-4 sm:py-10">
-      <div className="w-full max-w-[26rem] rounded-3xl bg-surface p-6 shadow-md sm:p-8">
+    <div className="grid w-full place-items-center rounded-xl sm:bg-bg sm:px-4 sm:py-10">
+      <div className="w-full max-w-[26rem] rounded-xl pl-field [--pl-field-border:var(--pl-separator)] bg-surface p-6 sm:p-8">
         <TwoFactorSetup
           key={key}
           qrSvg={fakeQrSvg(SECRET)}

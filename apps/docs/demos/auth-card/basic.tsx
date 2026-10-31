@@ -5,9 +5,9 @@ import { Button } from "pleate/button";
 
 export default function Demo() {
   return (
-    <div className="grid w-full place-items-center rounded-3xl sm:bg-bg sm:px-4 sm:py-10">
+    <div className="grid w-full place-items-center rounded-xl sm:bg-bg sm:px-4 sm:py-10">
       <AuthCard
-        logo={<span className="grid size-12 place-items-center rounded-2xl bg-accent text-title3 font-bold text-on-accent">P</span>}
+        logo={<span className="grid size-12 place-items-center rounded-lg bg-accent text-title3 font-semibold text-on-accent">P</span>}
         title="Welcome to Plate"
         description="Plan meals with your household and never ask what's for dinner again."
         footer={

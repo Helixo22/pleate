@@ -51,14 +51,14 @@ export default function Demo() {
         <span className="text-headline">Plate</span>
         <NotificationBell {...bell} />
       </div>
-      <div className="mx-auto w-full max-w-md overflow-hidden rounded-2xl bg-surface shadow-md">
+      <div className="mx-auto w-full max-w-md overflow-hidden rounded-xl pl-field [--pl-field-border:var(--pl-separator)] bg-surface">
         <NotificationCenter {...inline} />
       </div>
       <div className="mx-auto grid w-full max-w-md gap-4 md:grid-cols-2 md:max-w-3xl">
-        <div className="overflow-hidden rounded-2xl bg-surface shadow-md">
+        <div className="overflow-hidden rounded-xl pl-field [--pl-field-border:var(--pl-separator)] bg-surface">
           <NotificationCenter items={[]} loading labels={{ title: "Loading" }} />
         </div>
-        <div className="overflow-hidden rounded-2xl bg-surface shadow-md">
+        <div className="overflow-hidden rounded-xl pl-field [--pl-field-border:var(--pl-separator)] bg-surface">
           <NotificationCenter items={[]} onMarkAllRead={() => {}} />
         </div>
       </div>

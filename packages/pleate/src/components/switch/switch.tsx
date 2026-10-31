@@ -10,6 +10,7 @@ import { cn } from "../../lib/cn.ts";
 export const switchVariants = cva(
   [
     "group pl-focus-ring pl-touch pl-hit relative inline-flex shrink-0 cursor-pointer items-center rounded-sm bg-fill p-px",
+    "data-[state=unchecked]:shadow-[inset_0_0_0_1px_var(--pl-border-strong)]",
     "transition-colors duration-(--pl-duration-fast) ease-out disabled:cursor-not-allowed disabled:opacity-50",
   ],
   {

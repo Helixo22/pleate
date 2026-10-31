@@ -82,10 +82,27 @@ export * from "./auth/signup-form/index.ts";
 export * from "./auth/two-factor-form/index.ts";
 export * from "./auth/two-factor-setup/index.ts";
 
+export * from "./components/action-bar/index.ts";
+export * from "./components/fab/index.ts";
+export * from "./components/stepper/index.ts";
+export * from "./components/number-field/index.ts";
+export * from "./components/rating/index.ts";
+export * from "./components/kbd/index.ts";
+export * from "./components/command-palette/index.ts";
+export * from "./components/drawer/index.ts";
+export * from "./components/hover-card/index.ts";
+export * from "./components/toggle-group/index.ts";
+export * from "./components/snippet/index.ts";
+export * from "./components/banner/index.ts";
+export * from "./components/usage-meter/index.ts";
+export * from "./components/countdown/index.ts";
 export * from "./effects/animated-text/index.ts";
 export * from "./effects/hover/index.ts";
 export * from "./effects/page-transition/index.ts";
 export * from "./effects/reveal/index.ts";
+export * from "./effects/motion-graphics/index.ts";
+export * from "./effects/depth/index.ts";
+export * from "./effects/scroll/index.ts";
 
 export * from "./marketing/contact/index.ts";
 export * from "./marketing/cta/index.ts";
