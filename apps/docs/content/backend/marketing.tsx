@@ -25,6 +25,8 @@ export default function Marketing() {
         <C>subscribe</C> answers the same way whatever the state of the email, so it cannot be used to find out who is
         subscribed. With <C>NEWSLETTER_DOUBLE_OPT_IN</C> the <C>newsletter_confirm</C> email links to{" "}
         <C>{`FRONTEND_PATHS["NEWSLETTER_CONFIRM"]`}</C>; a signed in user subscribing their own verified email skips it.
+        Without it, an unsubscribed address still gets the confirmation email instead of being subscribed again, so
+        nobody can sign someone else back up.
       </P>
       <Code lang="python" title="Sending a newsletter">{`
 from pleate_backend.marketing.models import NewsletterSubscriber
@@ -49,7 +51,8 @@ await client.marketing.confirmSubscription(token);   // or client.marketing.unsu
 
       <H2>Waitlist</H2>
       <P>
-        Joining is idempotent: an email already on the list gets its current status. Each person gets a referral code;
+        Joining is idempotent: an email already on the list gets the same shape with every field <C>null</C>, so nobody
+        can read someone else&apos;s code by typing their email. Each person gets a referral code;
         every referral moves them up <C>WAITLIST_REFERRAL_BONUS</C> places:
       </P>
       <Code lang="text">{`position = max(1, rank - bonus * referrals)     # rank: 1 + people still waiting who joined earlier
@@ -72,7 +75,7 @@ share(\`https://plate.app/?ref=\${status.referral_code}\`);
           ["POST", "/marketing/newsletter/confirm", <><C>{"{token}"}</C> → <C>{"{email, status}"}</C>. Scope <C>auth</C>.</>],
           ["POST", "/marketing/newsletter/unsubscribe", <><C>{"{token}"}</C> → <C>{"{email, status}"}</C>. Scope <C>auth</C>.</>],
           ["POST", "/marketing/contact", <><C>{"{name, email, subject?, message, website?}"}</C>, message 10 to 5000 characters → 201 <C>{"{received: true}"}</C></>],
-          ["POST", "/marketing/waitlist", <><C>{"{email, ref?}"}</C> → <C>{"{position, referral_code, referrals, invited}"}</C></>],
+          ["POST", "/marketing/waitlist", <><C>{"{email, ref?}"}</C> → <C>{"{position, referral_code, referrals, invited}"}</C>, all <C>null</C> if already on the list.</>],
           ["GET", "/marketing/waitlist/<referral_code>", <><C>{"{position, referrals}"}</C></>],
         ]}
       />
@@ -103,7 +106,7 @@ share(\`https://plate.app/?ref=\${status.referral_code}\`);
       </P>
       <Callout>
         The account export gets a <C>marketing</C> section: subscriptions, contact messages and waitlist entries that
-        match the user&apos;s email.
+        are linked to the user, plus those that match its email once that email is verified.
       </Callout>
     </>
   );

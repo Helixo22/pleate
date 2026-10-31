@@ -3,6 +3,7 @@ import secrets
 import time
 
 import pyotp
+from django.core.cache import cache
 from django.utils import timezone
 
 from pleate_backend.core.conf import pleate_settings
@@ -118,7 +119,8 @@ def login_challenge(request, user, remember: bool):
         "uid": str(user.pk),
         "remember": bool(remember),
         "at": time.time(),
-        "attempts": 0,
+        # Keys the attempt counter in the cache.
+        "id": secrets.token_urlsafe(16),
     }
     return {"methods": list(METHODS)}
 
@@ -127,14 +129,29 @@ def read_pending(request) -> dict | None:
     pending = request.session.get(PENDING_KEY)
     if not isinstance(pending, dict):
         return None
-    max_age = int(conf().get("PENDING_LOGIN_SECONDS") or 300)
-    if (
-        time.time() - float(pending.get("at", 0)) > max_age
-        or pending.get("attempts", 0) >= MAX_PENDING_ATTEMPTS
-    ):
+    if not pending.get("id") or time.time() - float(pending.get("at", 0)) > _pending_max_age():
         clear_pending(request)
         return None
     return pending
+
+
+def _pending_max_age() -> int:
+    return int(conf().get("PENDING_LOGIN_SECONDS") or 300)
+
+
+def count_pending_attempt(pending: dict) -> int:
+    """
+    Counts one code attempt for this pending login and returns the total.
+    In the cache, atomically: the session is saved after the response, so
+    parallel requests would each read the old count. Fails closed.
+    """
+    key = f"pl:mfa:pending:{pending['id']}"
+    try:
+        if cache.add(key, 1, timeout=_pending_max_age()):
+            return 1
+        return cache.incr(key)
+    except Exception:  # noqa: BLE001
+        return MAX_PENDING_ATTEMPTS + 1
 
 
 def clear_pending(request):

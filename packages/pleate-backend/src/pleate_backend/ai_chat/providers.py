@@ -17,6 +17,8 @@ user should see.
 """
 
 import base64
+import functools
+import importlib
 import time
 from collections.abc import Iterator
 
@@ -24,6 +26,7 @@ from django.utils.translation import gettext_lazy as _
 
 IMAGE_TYPES = {"image/png", "image/jpeg", "image/webp", "image/gif"}
 TEXT_TYPES = {"text/plain", "text/csv", "text/markdown", "application/json"}
+DEFAULT_TIMEOUT = 120.0
 
 
 class ProviderError(Exception):
@@ -51,6 +54,30 @@ def _text(data: bytes) -> str:
 
 def _b64(data: bytes) -> str:
     return base64.b64encode(data).decode("ascii")
+
+
+@functools.lru_cache(maxsize=32)
+def _cached_client(module: str, cls: str, frozen: tuple):
+    kwargs = {k: dict(v) if k == "default_headers" else v for k, v in frozen}
+    return getattr(importlib.import_module(module), cls)(**kwargs)
+
+
+def sdk_client(module: str, cls: str, options: dict, allowed):
+    """One SDK client per distinct options (it holds the connection pool), ``timeout`` defaults to 120 s."""
+    try:
+        importlib.import_module(module)
+    except ImportError as exc:  # pragma: no cover
+        raise ProviderError("provider_not_configured") from exc
+    kwargs = {"timeout": DEFAULT_TIMEOUT}
+    kwargs.update({k: v for k, v in options.items() if k in allowed and v is not None})
+    frozen = tuple(
+        sorted((k, tuple(sorted(v.items())) if isinstance(v, dict) else v) for k, v in kwargs.items())
+    )
+    try:
+        hash(frozen)
+    except TypeError:  # unhashable option values: build an uncached client
+        return getattr(importlib.import_module(module), cls)(**kwargs)
+    return _cached_client(module, cls, frozen)
 
 
 class EchoProvider(Provider):
@@ -96,7 +123,7 @@ class OpenAIProvider(Provider):
     OpenAI Chat Completions, and every compatible server (LiteLLM, vLLM,
     Ollama, OpenRouter, Together...) through ``base_url``.
 
-    Options: ``api_key``, ``base_url``, ``organization``, ``timeout``,
+    Options: ``api_key``, ``base_url``, ``organization``, ``timeout`` (default 120 s),
     ``max_retries``, ``default_headers``, ``http_client`` (an ``httpx2.Client``).
     """
 
@@ -111,12 +138,7 @@ class OpenAIProvider(Provider):
     )
 
     def client(self):
-        try:
-            import openai
-        except ImportError as exc:  # pragma: no cover
-            raise ProviderError("provider_not_configured") from exc
-        kwargs = {k: v for k, v in self.options.items() if k in self.CLIENT_OPTIONS and v is not None}
-        return openai.OpenAI(**kwargs)
+        return sdk_client("openai", "OpenAI", self.options, self.CLIENT_OPTIONS)
 
     @staticmethod
     def _content(message: dict):
@@ -212,7 +234,7 @@ class AnthropicProvider(Provider):
     Anthropic Messages API with streaming. Thinking blocks become ``reasoning``
     chunks, web search citations become ``sources``.
 
-    Options: ``api_key``, ``base_url``, ``timeout``, ``max_retries``,
+    Options: ``api_key``, ``base_url``, ``timeout`` (default 120 s), ``max_retries``,
     ``default_headers``, ``http_client`` and ``max_tokens`` (default 4096, a
     model's ``params`` can override it).
     """
@@ -220,12 +242,7 @@ class AnthropicProvider(Provider):
     CLIENT_OPTIONS = ("api_key", "base_url", "timeout", "max_retries", "default_headers", "http_client")
 
     def client(self):
-        try:
-            import anthropic
-        except ImportError as exc:  # pragma: no cover
-            raise ProviderError("provider_not_configured") from exc
-        kwargs = {k: v for k, v in self.options.items() if k in self.CLIENT_OPTIONS and v is not None}
-        return anthropic.Anthropic(**kwargs)
+        return sdk_client("anthropic", "Anthropic", self.options, self.CLIENT_OPTIONS)
 
     @staticmethod
     def _content(message: dict):

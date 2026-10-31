@@ -6,10 +6,11 @@
 "use client";
 
 import { Popover as Primitive } from "radix-ui";
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useSyncExternalStore, type ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";
 import { BellIcon, CheckIcon, TrashIcon } from "../../lib/icons.tsx";
-import { formatTimeAgo, isSameDay, toDate, type DateInput } from "../../lib/time.ts";
+import { sameDay } from "../../lib/date.ts";
+import { formatTimeAgo, toDate, type DateInput } from "../../lib/time.ts";
 import { Button } from "../button/button.tsx";
 import { EmptyState } from "../empty-state/empty-state.tsx";
 import { IconButton, type IconButtonProps } from "../icon-button/icon-button.tsx";
@@ -169,6 +170,8 @@ function Row({
   );
 }
 
+const noopSubscribe = () => () => {};
+
 export function NotificationCenter({
   items,
   unreadCount,
@@ -189,16 +192,19 @@ export function NotificationCenter({
 }: NotificationCenterProps) {
   const l = { ...L, ...labels };
   const unread = unreadCount ?? items.filter((i) => !i.read).length;
+  // Without `now`, the server can't know "today": group only once mounted so hydration matches.
+  const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false);
   const groups = useMemo(() => {
-    const ref = now ?? new Date();
+    const ref = now ?? (hydrated ? new Date() : null);
+    if (!ref) return [{ key: "all", title: undefined, items }];
     const today: NotificationItem[] = [];
     const earlier: NotificationItem[] = [];
-    for (const item of items) (isSameDay(toDate(item.createdAt), ref) ? today : earlier).push(item);
+    for (const item of items) (sameDay(toDate(item.createdAt), ref) ? today : earlier).push(item);
     return [
       { key: "today", title: l.today, items: today },
       { key: "earlier", title: l.earlier, items: earlier },
     ].filter((g) => g.items.length);
-  }, [items, now, l.today, l.earlier]);
+  }, [items, now, hydrated, l.today, l.earlier]);
   const initialLoading = loading && items.length === 0;
 
   return (
@@ -237,7 +243,7 @@ export function NotificationCenter({
           <div className="flex flex-col gap-1 p-2">
             {groups.map((group) => (
               <section key={group.key} aria-label={group.title}>
-                <h3 className="px-2 pt-2 pb-1 text-footnote font-semibold text-fg-muted">{group.title}</h3>
+                {group.title && <h3 className="px-2 pt-2 pb-1 text-footnote font-semibold text-fg-muted">{group.title}</h3>}
                 <ul className="flex flex-col">
                   {group.items.map((item) => (
                     <Row

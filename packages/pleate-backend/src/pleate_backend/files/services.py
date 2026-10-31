@@ -39,7 +39,7 @@ SNIFF_BYTES = 8192
 TEXT_SNIFF_BYTES = 64 * 1024
 PENDING_MAX_AGE = timedelta(days=1)
 PRESIGN_EXPIRES = 15 * 60
-MAX_FRAMES = 1000
+MAX_FRAMES = 300
 
 TEXT_EXTENSIONS = {
     ".txt": "text/plain",
@@ -145,9 +145,23 @@ def check_quota(user, size: int, exclude=None) -> None:
         return
     used = usage(user, exclude)
     if used + size > quota:
-        raise ApiError(
-            "quota_exceeded", _("You are out of storage space."), 413, {"quota": quota, "used": used}
-        )
+        raise _quota_error(quota, used)
+
+
+def _quota_error(quota: int, used: int) -> ApiError:
+    return ApiError("quota_exceeded", _("You are out of storage space."), 413, {"quota": quota, "used": used})
+
+
+def _recheck_quota(file: File) -> File:
+    """
+    Parallel uploads can each pass ``check_quota``. Once the File exists the total is
+    checked again and, when over, this File is removed and the quota error raised.
+    """
+    quota = _conf()["USER_QUOTA"]
+    if quota is not None and usage(file.owner) > quota:
+        file.delete()
+        raise _quota_error(quota, usage(file.owner))
+    return file
 
 
 def process_image(data, content_type: str) -> tuple[bytes, int, int]:
@@ -173,6 +187,9 @@ def process_image(data, content_type: str) -> tuple[bytes, int, int]:
         frames = getattr(image, "n_frames", 1)
         if frames > MAX_FRAMES:
             raise ValueError("too many frames")
+        # Every frame is decoded to RGBA and kept in memory until saved.
+        if frames > 1 and frames * image.width * image.height > _conf()["ANIMATION_MAX_PIXELS"]:
+            raise ValueError("animation too large")
         if frames > 1 and fmt in ("GIF", "WEBP", "PNG"):
             converted, durations = [], []
             for frame in ImageSequence.Iterator(image):
@@ -252,7 +269,7 @@ def save_upload(user, uploaded_file, purpose: str = "") -> File:
     storage = get_storage()
     key = storage.save(_new_key(user, content_type), content)
     try:
-        return File.objects.create(
+        file = File.objects.create(
             owner=user,
             name=name,
             key=key,
@@ -266,6 +283,7 @@ def save_upload(user, uploaded_file, purpose: str = "") -> File:
     except Exception:
         storage.delete(key)
         raise
+    return _recheck_quota(file)
 
 
 def open_file(file: File):
@@ -329,6 +347,7 @@ def presign_upload(user, name: str, size: int, content_type: str, purpose: str =
         purpose=(purpose or "")[:32],
         status=File.Status.PENDING,
     )
+    _recheck_quota(file)
     post = _s3_client(storage).generate_presigned_post(
         Bucket=storage.bucket_name,
         Key=_s3_key(storage, file.key),
@@ -388,4 +407,4 @@ def complete_upload(file: File) -> File:
     file.width, file.height = width, height
     file.status = File.Status.READY
     file.save(update_fields=["content_type", "size", "checksum", "width", "height", "status"])
-    return file
+    return _recheck_quota(file)

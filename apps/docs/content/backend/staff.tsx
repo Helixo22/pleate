@@ -11,7 +11,12 @@ export default function Staff() {
       <P>
         Every endpoint needs <C>is_staff</C> or the matching model permission, which can be granted through a role:{" "}
         <C>pleate_accounts.view_user</C>, <C>change_user</C> and <C>delete_user</C> for users and stats,{" "}
-        <C>pleate_staff.*_ban</C> for bans. A support role can therefore read users without being staff.
+        <C>pleate_staff.*_ban</C> for bans. A support role can therefore read users without being staff. These endpoints
+        need a signed in session: an API key is refused with <C>api_key_not_allowed</C>, even for a superuser.
+      </P>
+      <P>
+        Only a superuser can change, sign out or delete another staff account or a superuser. Without superuser rights,{" "}
+        <C>roles</C> can only add or remove roles whose permissions you hold yourself, and never your own.
       </P>
 
       <H2>Endpoints</H2>
@@ -90,8 +95,11 @@ Ban.objects.active()           # bans that have not expired
       <H2>Error codes</H2>
       <Errors
         rows={[
-          ["cannot_modify_self", "400", "Deactivating, demoting or deleting yourself."],
+          ["cannot_modify_self", "400", "Deactivating, demoting or deleting yourself. 403 when changing your own roles."],
           ["cannot_modify_superuser", "403", "Only superusers change superusers."],
+          ["cannot_modify_staff", "403", "Only superusers change another staff account."],
+          ["permission_not_held", "403", "Giving or taking a role with a permission you do not hold."],
+          ["api_key_not_allowed", "403", "The request used an API key."],
           ["permission_denied", "403", <>Changing staff access needs <C>is_staff</C>; changing roles needs <C>is_staff</C> or <C>auth.change_group</C>.</>],
           ["unknown_role", "400", "A role name that does not exist."],
           ["user_inactive", "400", "Password reset for a deactivated user."],

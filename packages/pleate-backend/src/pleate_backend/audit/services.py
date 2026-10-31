@@ -47,6 +47,8 @@ def mask(data: dict | None) -> dict:
             out[key] = MASK
         elif isinstance(value, dict):
             out[key] = mask(value)
+        elif isinstance(value, list | tuple):
+            out[key] = [mask(v) if isinstance(v, dict) else to_json(v) for v in value]
         else:
             out[key] = to_json(value)
     return out

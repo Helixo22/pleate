@@ -7,6 +7,7 @@ of pleate-client run against it.
 docker compose up -d                       # from the repo root: MongoDB, Redis, Mailpit
 cd apps/backend-demo
 uv sync
+export DEBUG=1                             # local http; without it SECRET_KEY is required
 uv run python manage.py migrate
 uv run python manage.py seed               # demo users, roles, 120 products, notifications
 uv run python manage.py runserver 8000
@@ -19,7 +20,9 @@ admin at http://localhost:8000/admin.
 `demo/catalog` shows how a project resource gets pagination, search, ordering and
 filters from the pleate-backend defaults with a plain DRF `ModelViewSet`.
 
-Optional environment variables: `REDIS_URL` (enables Celery, Redis cache and realtime
+Every variable the settings read is listed in `.env.example`. With `DEBUG` off the demo
+needs `SECRET_KEY` and turns on HTTPS (`SECURE_SSL_REDIRECT`, `SECURE_PROXY_SSL_HEADER`,
+`SECURE_HSTS_SECONDS`, each configurable). Optional environment variables: `REDIS_URL` (enables Celery, Redis cache and realtime
 across processes; run `uv run celery -A demo worker -B -l info`), `ANTHROPIC_API_KEY`
 (real AI answers instead of the echo provider), `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`,
 `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET`, `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`.

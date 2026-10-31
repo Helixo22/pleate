@@ -7,14 +7,14 @@ from django.utils.translation import gettext as _
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework import generics
-from rest_framework.renderers import BaseRenderer, JSONRenderer
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from pleate_backend.core.conf import pleate_settings
 from pleate_backend.core.exceptions import ApiError
 from pleate_backend.core.pagination import CursorPagination
-from pleate_backend.core.realtime import sse_format, sse_response
+from pleate_backend.core.realtime import EventStreamRenderer, sse_format, sse_response
 from pleate_backend.ratelimit.throttles import ScopedRateThrottle, UserRateThrottle
 
 from . import serializers as s
@@ -43,17 +43,6 @@ def get_owned(queryset, pk):
 def wants_json(request) -> bool:
     accept = request.META.get("HTTP_ACCEPT", "")
     return "application/json" in accept and "text/event-stream" not in accept
-
-
-class EventStreamRenderer(BaseRenderer):
-    """Lets DRF accept ``Accept: text/event-stream``. Bodies are streamed by the view."""
-
-    media_type = "text/event-stream"
-    format = "sse"
-    charset = "utf-8"
-
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        return JSONRenderer().render(data)
 
 
 class StreamingMixin:
@@ -242,7 +231,14 @@ class MessagesView(StreamingMixin, generics.ListAPIView):
         entry = services.resolve_model(data.get("model") or conversation.model)
         attachments = services.validate_attachments(request.user, data["attachments"])
         services.check_quota(request.user)
+        services.acquire_slot(request.user)
+        try:
+            return self.start(request, conversation, entry, content, attachments)
+        except BaseException:
+            services.release_slot(request.user.pk)
+            raise
 
+    def start(self, request, conversation, entry, content, attachments):
         now = timezone.now()
         user_message = Message.objects.create(
             conversation=conversation,
@@ -257,6 +253,7 @@ class MessagesView(StreamingMixin, generics.ListAPIView):
             status=Message.Status.STREAMING,
             model=entry["id"],
             created_at=now + timedelta(milliseconds=1),
+            stream_started_at=now,
         )
         updates = {"last_message_at": now}
         if conversation.model != entry["id"]:
@@ -300,13 +297,30 @@ class RegenerateView(MessageMixin, StreamingMixin, APIView):
         last = Message.objects.filter(conversation=conversation).order_by("-created_at", "-id").first()
         if message.role != Message.Role.ASSISTANT or last is None or last.pk != message.pk:
             raise ApiError("cannot_regenerate", _("Only the last answer can be regenerated."), 409)
+        streaming = ApiError("message_streaming", _("This answer is still being written."), 409)
         if message.status == Message.Status.STREAMING:
-            raise ApiError("message_streaming", _("This answer is still being written."), 409)
+            raise streaming
         ser = s.RegenerateSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         entry = services.resolve_model(ser.validated_data.get("model") or message.model or conversation.model)
         services.check_quota(request.user)
+        services.acquire_slot(request.user)
+        try:
+            # Atomic claim: only one regenerate can turn the message into a stream.
+            now = timezone.now()
+            claimed = (
+                Message.objects.filter(pk=message.pk)
+                .exclude(status=Message.Status.STREAMING)
+                .update(status=Message.Status.STREAMING, stream_started_at=now)
+            )
+            if not claimed:
+                raise streaming
+            return self.start(request, conversation, message, entry, now)
+        except BaseException:
+            services.release_slot(request.user.pk)
+            raise
 
+    def start(self, request, conversation, message, entry, now):
         if message.content:
             message.variants = [*(message.variants or []), message.content]
         message.content = ""
@@ -314,6 +328,7 @@ class RegenerateView(MessageMixin, StreamingMixin, APIView):
         message.sources = []
         message.error_code = ""
         message.status = Message.Status.STREAMING
+        message.stream_started_at = now
         message.model = entry["id"]
         message.save()
 
@@ -331,8 +346,14 @@ class StopView(MessageMixin, APIView):
         message = self.get_message(request, pk)
         if message.status == Message.Status.STREAMING:
             services.request_stop(message.pk)
-            if timezone.now() - message.created_at > STALE_STREAM:
+            started = message.stream_started_at or message.created_at
+            if timezone.now() - started > STALE_STREAM:
                 # Nothing is writing this message any more (worker restarted).
-                message.status = Message.Status.STOPPED
-                message.save(update_fields=["status"])
+                stale = Message.objects.filter(
+                    pk=message.pk,
+                    status=Message.Status.STREAMING,
+                    stream_started_at=message.stream_started_at,
+                )
+                if stale.update(status=Message.Status.STOPPED):
+                    message.status = Message.Status.STOPPED
         return Response(s.MessageSerializer(message).data, status=202)

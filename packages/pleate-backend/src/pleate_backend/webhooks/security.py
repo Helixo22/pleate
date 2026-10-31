@@ -8,6 +8,8 @@ import socket
 import time
 from urllib.parse import urlsplit
 
+import httpcore
+import httpx
 from django.utils.translation import gettext_lazy as _
 
 from pleate_backend.core.conf import pleate_settings
@@ -53,11 +55,12 @@ def _blocked(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
     )
 
 
-def check_url(url: str) -> None:
+def check_url(url: str) -> str | None:
     """
     Raises ``UrlNotAllowed`` unless ``url`` is https and every address its host
-    resolves to is public. ``WEBHOOKS["ALLOW_PRIVATE_URLS"]`` lifts both rules
-    (local development).
+    resolves to is public. Returns the address to connect to, so the caller
+    does not resolve the host a second time (DNS rebinding). Returns None when
+    ``WEBHOOKS["ALLOW_PRIVATE_URLS"]`` lifts both rules (local development).
     """
     allow_private = bool(pleate_settings.WEBHOOKS.get("ALLOW_PRIVATE_URLS"))
     try:
@@ -74,7 +77,7 @@ def check_url(url: str) -> None:
     if parts.username or parts.password:
         raise UrlNotAllowed(_("Credentials in the URL are not allowed."))
     if allow_private:
-        return
+        return None
     try:
         infos = socket.getaddrinfo(host, port or 443, proto=socket.IPPROTO_TCP)
     except (socket.gaierror, UnicodeError, OSError) as exc:
@@ -89,3 +92,23 @@ def check_url(url: str) -> None:
             raise UrlNotAllowed(_("The host of this URL could not be resolved.")) from exc
         if _blocked(ip):
             raise UrlNotAllowed(_("This URL points to a private or reserved address."))
+    return infos[0][4][0].split("%", 1)[0]
+
+
+class _PinnedBackend(httpcore.SyncBackend):
+    def __init__(self, address: str):
+        self.address = address
+
+    def connect_tcp(self, host, port, timeout=None, local_address=None, socket_options=None):
+        return super().connect_tcp(self.address, port, timeout, local_address, socket_options)
+
+
+class PinnedTransport(httpx.HTTPTransport):
+    """
+    Opens every connection to ``address`` whatever the URL host says. The Host
+    header, TLS SNI and certificate check still use the hostname of the URL.
+    """
+
+    def __init__(self, address: str, **kwargs):
+        super().__init__(**kwargs)
+        self._pool._network_backend = _PinnedBackend(address)

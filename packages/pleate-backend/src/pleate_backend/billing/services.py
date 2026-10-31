@@ -7,10 +7,14 @@ Billing helpers.
 """
 
 import logging
-from datetime import UTC, datetime
+import time
+from contextlib import suppress
+from datetime import UTC, datetime, timedelta
 
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.db import IntegrityError
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -27,7 +31,15 @@ INTERVALS = ("month", "year")
 ACTIVE_STATUSES = ("active", "trialing", "past_due")
 ENDED_STATUSES = ("canceled", "incomplete_expired")
 # Currencies without minor units: https://docs.stripe.com/currencies#zero-decimal
-ZERO_DECIMAL = set("bif clp djf gnf jpy kmf krw mga pyg rwf ugx vnd vuv xaf xof xpf".split())
+ZERO_DECIMAL = {
+    "bif", "clp", "djf", "gnf", "jpy", "kmf", "krw", "mga",
+    "pyg", "rwf", "ugx", "vnd", "vuv", "xaf", "xof", "xpf",
+}  # fmt: skip
+# A webhook delivery owns its event this long; a crashed worker's claim expires after it.
+EVENT_LEASE = timedelta(minutes=5)
+CHECKOUT_LOCK_SECONDS = 30
+# Clicks within this window reuse the same Checkout Session through Stripe's idempotency key.
+CHECKOUT_IDEMPOTENCY_WINDOW = 60
 
 
 def conf() -> dict:
@@ -115,7 +127,11 @@ def _pricing_price(plan: dict, currency: str) -> dict | None:
         return {"monthly": 0, "yearly": 0}
     monthly = _major(month["amount"], currency) if month and month["amount"] is not None else None
     # Yearly is shown as its monthly equivalent.
-    yearly = _major(year["amount"] / 12, currency) if year and year["amount"] is not None else None
+    yearly = None
+    if year and year["amount"] is not None:
+        # Zero decimal currencies (JPY...) have no fractional unit to show.
+        per_month = year["amount"] / 12
+        yearly = _major(round(per_month) if currency.lower() in ZERO_DECIMAL else per_month, currency)
     if monthly is None and yearly is None:
         return None
     return {
@@ -233,6 +249,16 @@ def create_checkout(user, plan_id: str, interval: str) -> str:
     if not price_id:
         raise ApiError("invalid_plan", _("This plan is not available."), 400)
     client = get_client()
+    lock = f"pleate:billing:checkout:{user.pk}"
+    if not cache.add(lock, 1, CHECKOUT_LOCK_SECONDS):
+        raise ApiError("checkout_in_progress", _("A checkout is already starting. Try again."), 409)
+    try:
+        return _create_checkout(user, client, plan_id, interval, price_id)
+    finally:
+        cache.delete(lock)
+
+
+def _create_checkout(user, client, plan_id: str, interval: str, price_id: str) -> str:
     if active_subscription(user):
         raise ApiError(
             "already_subscribed",
@@ -258,7 +284,11 @@ def create_checkout(user, plan_id: str, interval: str) -> str:
     import stripe
 
     try:
-        session = client.v1.checkout.sessions.create(params=params)
+        bucket = int(time.time()) // CHECKOUT_IDEMPOTENCY_WINDOW
+        session = client.v1.checkout.sessions.create(
+            params=params,
+            options={"idempotency_key": f"checkout-{user.pk}-{plan_id}-{interval}-{bucket}"},
+        )
     except stripe.StripeError as exc:
         raise _stripe_error(exc) from exc
     return session.url
@@ -340,18 +370,37 @@ def _link_customer(user, customer_id):
         return
     if Customer.objects.filter(stripe_customer_id=customer_id).exists():
         return
-    try:
+    with suppress(IntegrityError):
         Customer.objects.update_or_create(user=user, defaults={"stripe_customer_id": customer_id})
-    except IntegrityError:
-        pass
 
 
-def sync_subscription(data: dict, event_created: datetime | None = None) -> Subscription | None:
-    """Creates or updates the local copy of a Stripe subscription object."""
+def _subscription(sub_id) -> Subscription | None:
+    if not sub_id:
+        return None
+    return Subscription.objects.filter(stripe_subscription_id=sub_id).select_related("user").first()
+
+
+def _fetch_subscription(sub_id: str) -> dict:
+    remote = get_client().v1.subscriptions.retrieve(sub_id)
+    return remote.to_dict() if hasattr(remote, "to_dict") else dict(remote)
+
+
+def sync_subscription(
+    data: dict, event_created: datetime | None = None, fetched: bool = False
+) -> Subscription | None:
+    """
+    Creates or updates the local copy of a Stripe subscription object.
+    ``fetched`` tells that ``data`` was just read from Stripe, so it is current.
+    """
     sub_id = data["id"]
-    existing = Subscription.objects.filter(stripe_subscription_id=sub_id).select_related("user").first()
-    if existing and event_created and existing.last_event_at and event_created < existing.last_event_at:
-        return existing  # a late delivery of an older state
+    existing = _subscription(sub_id)
+    if existing and event_created and existing.last_event_at and not fetched:
+        if event_created < existing.last_event_at:
+            return existing  # a late delivery of an older state
+        if event_created == existing.last_event_at:
+            # Same second: the order is unknown, so ask Stripe for the current state.
+            # A failure raises and Stripe delivers the event again later.
+            data = _fetch_subscription(sub_id)
     metadata = data.get("metadata") or {}
     customer_id = _id(data.get("customer"))
     user = (
@@ -380,24 +429,28 @@ def sync_subscription(data: dict, event_created: datetime | None = None) -> Subs
     sub.current_period_end = _ts(period_end)
     sub.cancel_at_period_end = bool(data.get("cancel_at_period_end")) or bool(data.get("cancel_at"))
     sub.trial_end = _ts(data.get("trial_end"))
-    if event_created:
+    if event_created and (not sub.last_event_at or event_created > sub.last_event_at):
         sub.last_event_at = event_created
     try:
         sub.save()
     except IntegrityError:  # created concurrently by another delivery
-        return sync_subscription(data, event_created)
+        return sync_subscription(data, event_created, fetched)
     _link_customer(user, customer_id)
     if previous != sub.status:
         subscription_changed.send(sender=Subscription, user=user, subscription=sub, previous_status=previous)
     return sub
 
 
-def _set_status(sub: Subscription, status: str):
+def _set_status(sub: Subscription, status: str, event_created: datetime | None = None):
     previous = sub.status
     if previous == status:
         return
+    if event_created:
+        if sub.last_event_at and event_created < sub.last_event_at:
+            return  # a newer event already set the state
+        sub.last_event_at = event_created
     sub.status = status
-    sub.save(update_fields=["status", "updated_at"])
+    sub.save(update_fields=["status", "last_event_at", "updated_at"])
     subscription_changed.send(sender=Subscription, user=sub.user, subscription=sub, previous_status=previous)
 
 
@@ -430,18 +483,16 @@ def _on_checkout_completed(obj: dict, created):
     # The customer.subscription.* events carry the same data; fetching makes the
     # subscription visible as soon as the user lands back on the site.
     try:
-        remote = get_client().v1.subscriptions.retrieve(sub_id)
+        data = _fetch_subscription(sub_id)
     except Exception:  # noqa: BLE001
         logger.warning("could not fetch subscription %s", sub_id, exc_info=True)
         return
-    data = remote.to_dict() if hasattr(remote, "to_dict") else dict(remote)
     data.setdefault("metadata", {}).setdefault("user_id", str(user.pk))
-    sync_subscription(data, created)
+    sync_subscription(data, created, fetched=True)
 
 
 def _on_payment_failed(obj: dict, created):
-    sub_id = _invoice_subscription_id(obj)
-    sub = sub_id and Subscription.objects.filter(stripe_subscription_id=sub_id).select_related("user").first()
+    sub = _subscription(_invoice_subscription_id(obj))
     user = sub.user if sub else _user_by_customer(_id(obj.get("customer")))
     if user is None:
         return
@@ -455,17 +506,16 @@ def _on_payment_failed(obj: dict, created):
 
 
 def _on_invoice_paid(obj: dict, created):
-    sub_id = _invoice_subscription_id(obj)
-    sub = sub_id and Subscription.objects.filter(stripe_subscription_id=sub_id).select_related("user").first()
+    sub = _subscription(_invoice_subscription_id(obj))
     if sub and sub.status in ("past_due", "unpaid", "incomplete"):
-        _set_status(sub, "active")
+        _set_status(sub, "active", created)
 
 
 HANDLERS = {
     "checkout.session.completed": _on_checkout_completed,
-    "customer.subscription.created": lambda obj, created: sync_subscription(obj, created),
-    "customer.subscription.updated": lambda obj, created: sync_subscription(obj, created),
-    "customer.subscription.deleted": lambda obj, created: sync_subscription(obj, created),
+    "customer.subscription.created": sync_subscription,
+    "customer.subscription.updated": sync_subscription,
+    "customer.subscription.deleted": sync_subscription,
     "invoice.payment_failed": _on_payment_failed,
     "invoice.paid": _on_invoice_paid,
 }
@@ -473,18 +523,32 @@ HANDLERS = {
 
 def process_event(event: dict) -> bool:
     """
-    Applies a verified Stripe event once. Returns False for a replay. If a
-    handler raises, the event stays unprocessed so Stripe's retry runs it again.
+    Applies a verified Stripe event once. Returns False for a replay. A delivery
+    claims the event with a lease, so a redelivery while it runs gets a 409 and
+    Stripe tries again later. If a handler raises, the claim is released and the
+    event stays unprocessed so Stripe's retry runs it again.
     """
+    event_id = event["id"]
+    now = timezone.now()
     try:
-        record = StripeEvent.objects.create(event_id=event["id"], type=event.get("type", ""))
+        StripeEvent.objects.create(event_id=event_id, type=event.get("type", ""), started_at=now)
     except IntegrityError:
-        record = StripeEvent.objects.get(event_id=event["id"])
-        if record.processed_at is not None:
-            return False
+        claimed = (
+            StripeEvent.objects.filter(event_id=event_id, processed_at=None)
+            .filter(Q(started_at=None) | Q(started_at__lt=now - EVENT_LEASE))
+            .update(started_at=now)
+        )
+        if not claimed:
+            if StripeEvent.objects.filter(event_id=event_id, processed_at__isnull=False).exists():
+                return False
+            raise ApiError("event_in_progress", _("This event is being processed."), 409) from None
+    record = StripeEvent.objects.filter(event_id=event_id)
     handler = HANDLERS.get(event.get("type", ""))
-    if handler:
-        handler((event.get("data") or {}).get("object") or {}, _ts(event.get("created")))
-    record.processed_at = timezone.now()
-    record.save(update_fields=["processed_at"])
+    try:
+        if handler:
+            handler((event.get("data") or {}).get("object") or {}, _ts(event.get("created")))
+    except BaseException:
+        record.update(started_at=None)
+        raise
+    record.update(processed_at=timezone.now())
     return True

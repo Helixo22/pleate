@@ -250,6 +250,17 @@ def test_email_change_flow(auth_api, user):
     assert mail.outbox[-1].to == ["ada@example.com"]
 
 
+def test_email_change_link_dies_with_a_password_reset(auth_api, user):
+    auth_api.post("/api/auth/email/change", {"new_email": "x@example.com", "password": PASSWORD})
+    token = link_token(mail.outbox[-1])
+    user.set_password("another-Passw0rd!")
+    user.save()
+    res = auth_api.post("/api/auth/email/change/confirm", {"token": token})
+    assert res.json()["error"]["code"] == "invalid_token"
+    user.refresh_from_db()
+    assert user.email == "ada@example.com"
+
+
 def test_email_change_needs_password(auth_api):
     res = auth_api.post("/api/auth/email/change", {"new_email": "z@example.com", "password": "bad"})
     assert res.json()["error"]["fields"]["password"][0]["code"] == "wrong_password"

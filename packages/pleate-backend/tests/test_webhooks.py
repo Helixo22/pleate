@@ -366,6 +366,74 @@ def test_ssrf_is_checked_again_before_sending(user, mock_http):
     assert route.call_count == 0
 
 
+def test_dns_rebinding_connects_to_the_checked_address(user, monkeypatch):
+    """The host resolves to a public address when checked, then to 127.0.0.1: only the first is used."""
+    import httpcore
+
+    host = "rebind.attacker.test"
+    answers = iter([PUBLIC_IP])
+    lookups = []
+
+    def resolve(name, port, *args, **kwargs):
+        lookups.append(name)
+        address = next(answers, "127.0.0.1")
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", (address, port))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", resolve)
+    connected, sni = [], []
+
+    class FakeStream:
+        def start_tls(self, ssl_context, server_hostname=None, timeout=None):
+            sni.append(server_hostname)
+            raise httpcore.ConnectError("stop here")
+
+        def close(self):
+            pass
+
+    def connect_tcp(self, address, port, *args, **kwargs):
+        connected.append((address, port))
+        return FakeStream()
+
+    monkeypatch.setattr(httpcore.SyncBackend, "connect_tcp", connect_tcp)
+    endpoint = Endpoint.objects.create(owner=user, url=f"https://{host}/hook", secret="whsec_x", events=["*"])
+    delivery = dispatch("ping", {}, owner=user)[0]
+    delivery.refresh_from_db()
+    assert delivery.endpoint_id == endpoint.pk and delivery.status == "failed"
+    assert lookups == [host]
+    assert connected == [(PUBLIC_IP, 443)]
+    assert sni == [host]
+
+
+def test_test_ping_uses_a_short_timeout(auth_api, user, mock_http, monkeypatch):
+    from pleate_backend.webhooks import services
+
+    seen = []
+    real_send = services.send
+    monkeypatch.setattr(
+        services, "send", lambda d, timeout=None: seen.append(timeout) or real_send(d, timeout)
+    )
+    mock_http.post(URL).mock(return_value=httpx.Response(200))
+    endpoint = make_endpoint(user)
+    auth_api.post(f"/api/webhooks/endpoints/{endpoint.pk}/test")
+    dispatch("ping", {}, owner=user)
+    assert seen == [services.TEST_TIMEOUT_SECONDS, None]
+
+
+def test_endpoint_management_refuses_api_keys(user):
+    from rest_framework.test import APIClient
+
+    from pleate_backend.apikeys.services import create_key
+
+    endpoint = make_endpoint(user)
+    _key, raw = create_key(user, "CI", ["read", "write"])
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION=f"Bearer {raw}")
+    assert client.post("/api/webhooks/endpoints", {"url": URL}).status_code == 403
+    assert client.post(f"/api/webhooks/endpoints/{endpoint.pk}/rotate-secret").status_code == 403
+    assert client.delete(f"/api/webhooks/endpoints/{endpoint.pk}").status_code == 403
+    assert Endpoint.objects.filter(pk=endpoint.pk, secret="whsec_test_secret").exists()
+
+
 def test_endpoint_disabled_after_20_failures(user, mock_http, monkeypatch):
     sent = []
     fake = types.ModuleType("pleate_backend.notifications.services")

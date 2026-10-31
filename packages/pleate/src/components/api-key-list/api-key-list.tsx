@@ -4,7 +4,7 @@
 // keys, this renders them and reports intents.
 "use client";
 
-import { useId, useState, type ReactNode } from "react";
+import { useId, useState, useSyncExternalStore, type ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";
 import { CheckIcon, CopyIcon, KeyIcon, PlusIcon } from "../../lib/icons.tsx";
 import { formatShortDate, formatTimeAgo, toDate, type DateInput } from "../../lib/time.ts";
@@ -188,15 +188,13 @@ function CreateDialog({
     setError(undefined);
     setSecret(undefined);
   };
+  const close = () => {
+    onOpenChange(false);
+    reset();
+  };
 
   return (
-    <Modal
-      open={open}
-      onOpenChange={(next) => {
-        onOpenChange(next);
-        if (!next) reset();
-      }}
-    >
+    <Modal open={open} onOpenChange={(next) => (next ? onOpenChange(true) : close())}>
       <ModalContent size="sm">
         {secret ? (
           <>
@@ -211,7 +209,7 @@ function CreateDialog({
               <CopyField value={secret} l={l} />
             </ModalBody>
             <ModalFooter>
-              <Button onClick={() => onOpenChange(false)}>{l.done}</Button>
+              <Button onClick={close}>{l.done}</Button>
             </ModalFooter>
           </>
         ) : (
@@ -293,7 +291,7 @@ function CreateDialog({
               </div>
             </ModalBody>
             <ModalFooter>
-              <Button variant="gray" onClick={() => onOpenChange(false)}>
+              <Button variant="gray" onClick={close}>
                 {l.cancel}
               </Button>
               <CreateSubmit label={l.submit} />
@@ -304,6 +302,8 @@ function CreateDialog({
     </Modal>
   );
 }
+
+const noopSubscribe = () => () => {};
 
 export function ApiKeyList({
   keys,
@@ -325,7 +325,9 @@ export function ApiKeyList({
   const [confirm, setConfirm] = useState<ApiKey | null>(null);
   const [pending, setPending] = useState<string[]>([]);
   const scopeLabel = (value: string) => scopes.find((s) => s.value === value)?.label ?? value;
-  const reference = now ?? new Date();
+  // Without `now`, flag expired keys only once mounted so the server markup matches hydration.
+  const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false);
+  const reference = now ?? (hydrated ? new Date() : null);
 
   const revoke = async (id: string) => {
     if (!onRevoke) return;
@@ -387,7 +389,7 @@ export function ApiKeyList({
         </TableHeader>
         <TableBody>
           {keys.map((k) => {
-            const expired = k.expiresAt ? toDate(k.expiresAt).getTime() < reference.getTime() : false;
+            const expired = k.expiresAt && reference ? toDate(k.expiresAt).getTime() < reference.getTime() : false;
             return (
               <TableRow key={k.id} className={cn(expired && "opacity-60")}>
                 <TableCell label={l.name}>

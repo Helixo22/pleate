@@ -24,9 +24,6 @@ export function formatTimeAgo(value: DateInput, { now = new Date(), locale }: { 
   return rtf.format(0, "second");
 }
 
-export const isSameDay = (a: Date, b: Date) =>
-  a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-
 /** "Mar 4, 2026" style short date. */
 export function formatShortDate(value: DateInput, locale?: string) {
   return new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric" }).format(toDate(value));

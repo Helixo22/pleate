@@ -1,3 +1,15 @@
+from pleate_backend.core.conf import pleate_settings
+from pleate_backend.core.mongo import ensure_ttl_index
+
+
+def ensure_indexes(**kwargs):
+    from .models import StripeEvent
+
+    days = pleate_settings.BILLING["EVENT_RETENTION_DAYS"]
+    if days:
+        ensure_ttl_index(StripeEvent, "received_at", int(days) * 24 * 60 * 60)
+
+
 def cancel_on_delete(sender, instance, **kwargs):
     """Account deletion: stop charging the user. Errors are logged, never raised."""
     from .services import cancel_user_subscriptions

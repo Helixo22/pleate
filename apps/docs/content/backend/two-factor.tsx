@@ -57,7 +57,8 @@ return login.mfaRequired
         <LI>TOTP secrets are encrypted at rest with Fernet. The key is <C>ENCRYPTION_KEY</C>, or derived from <C>SECRET_KEY</C>; secrets encrypted under a key in <C>SECRET_KEY_FALLBACKS</C> stay readable, so keys can rotate.</LI>
         <LI>Backup codes are stored hashed and work once. Using one sends <C>backup_code_used</C> and is recorded in the activity log.</LI>
         <LI>Enabling and disabling 2FA email a security notice. The data export includes the state and dates, never secrets.</LI>
-        <LI><C>verify</C> is CSRF protected and throttled with the <C>auth</C> scope.</LI>
+        <LI><C>verify</C> is CSRF protected and throttled with the <C>auth</C> scope. Each code attempt is counted before it is checked, so parallel guesses cannot exceed the limits.</LI>
+        <LI><C>setup</C>, <C>confirm</C>, <C>disable</C> and <C>backup-codes</C> need a session: an API key gets 403 <C>api_key_not_allowed</C>.</LI>
       </UL>
 
       <H2>Settings</H2>

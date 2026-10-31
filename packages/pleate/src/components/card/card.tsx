@@ -1,5 +1,5 @@
 // Card: a solid rounded surface for grouped content. Compose CardMedia (bleeds to the edges), CardHeader, CardTitle,
-// CardDescription, CardContent and CardFooter. `interactive` lifts on hover and presses in; with asChild the whole
+// CardDescription, CardContent and CardFooter. `interactive` sharpens its border on hover and presses in; with asChild the whole
 // card can be a link.
 import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
@@ -9,10 +9,10 @@ import { cn } from "../../lib/cn.ts";
 export const cardVariants = cva("relative flex flex-col overflow-hidden text-fg [--pl-card-gap:calc(var(--pl-card-p)*0.75)]", {
   variants: {
     variant: {
-      elevated: "bg-surface shadow-sm",
+      elevated: "pl-field bg-surface [--pl-field-border:var(--pl-separator)]",
       flat: "bg-surface",
-      filled: "bg-fill-2",
-      outline: "bg-surface shadow-[inset_0_0_0_1px_var(--pl-separator)]",
+      filled: "bg-surface-2",
+      outline: "bg-transparent shadow-[inset_0_0_0_1px_var(--pl-separator)]",
       raised: "bg-elevated shadow-lg",
     },
     padding: {
@@ -30,8 +30,8 @@ export const cardVariants = cva("relative flex flex-col overflow-hidden text-fg 
     interactive: {
       true: [
         "pl-focus-ring pl-touch cursor-pointer",
-        "transition-[box-shadow,translate,scale] duration-(--pl-duration-base) ease-ios",
-        "hover:shadow-md motion-safe:hover:-translate-y-0.5 motion-safe:active:translate-y-0 motion-safe:active:scale-[0.985]",
+        "transition-[background-color,box-shadow,scale] duration-(--pl-duration-fast) ease-out",
+        "hover:[--pl-field-border:var(--pl-border)] hover:shadow-[inset_0_0_0_1px_var(--pl-border),var(--pl-lip)] motion-safe:active:scale-[0.99]",
       ],
       false: "",
     },

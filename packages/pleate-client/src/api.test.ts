@@ -564,10 +564,10 @@ describe("marketing", () => {
     expect(short.fields.message[0].code).toBe("min_length");
     const joined = await api.marketing.joinWaitlist("third@plate.dev");
     expect(joined).toMatchObject({ position: 3, referrals: 0, invited: false });
-    expect(await api.marketing.joinWaitlist("third@plate.dev")).toEqual(joined);
-    const friend = await api.marketing.joinWaitlist("friend@plate.dev", joined.referral_code);
+    expect(await api.marketing.joinWaitlist("third@plate.dev")).toEqual({ position: null, referral_code: null, referrals: null, invited: null });
+    const friend = await api.marketing.joinWaitlist("friend@plate.dev", joined.referral_code!);
     expect(friend.position).toBe(4);
-    expect(await api.marketing.waitlistStatus(joined.referral_code)).toEqual({ position: 1, referrals: 1 });
+    expect(await api.marketing.waitlistStatus(joined.referral_code!)).toEqual({ position: 1, referrals: 1 });
     await expectError(api.marketing.waitlistStatus("NOPE"), "not_found", 404);
   });
 });

@@ -25,10 +25,35 @@ def test_csrf_endpoint_sets_cookie(api):
     assert "csrftoken" in res.cookies
 
 
-def test_openapi_schema(api):
+def test_openapi_schema(api, staff):
+    assert api.get("/api/schema").status_code in (401, 403)
+    assert api.get("/api/docs").status_code in (401, 403)
+    api.force_authenticate(staff)
     res = api.get("/api/schema", HTTP_ACCEPT="application/vnd.oai.openapi+json")
     assert res.status_code == 200
     assert b"/api/auth/login" in res.content
+    cached = api.get("/api/schema", HTTP_ACCEPT="application/vnd.oai.openapi+json")
+    assert cached.status_code == 200 and cached.content == res.content
+
+
+def test_unhandled_error_is_json_500(caplog):
+    from pleate_backend.core.exceptions import exception_handler
+
+    request = RequestFactory().get("/api/x")
+    request.request_id = "req-12345678"
+    res = exception_handler(RuntimeError("boom"), {"request": request, "view": None})
+    assert res.status_code == 500
+    assert res.data["error"]["code"] == "server_error"
+    assert res.data["error"]["request_id"] == "req-12345678"
+    assert "boom" in caplog.text
+
+
+def test_memory_broker_check():
+    from pleate_backend.core.checks import realtime_broker
+
+    assert [w.id for w in realtime_broker(None)] == ["pleate_core.W001"]
+    with override_settings(DEBUG=True):
+        assert realtime_broker(None) == []
 
 
 def test_unauthenticated_error_format(api):

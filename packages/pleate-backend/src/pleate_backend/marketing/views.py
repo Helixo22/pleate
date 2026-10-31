@@ -3,18 +3,20 @@ import io
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import generics
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from pleate_backend.apikeys.permissions import DenyAPIKey
 from pleate_backend.core.conf import pleate_settings
 from pleate_backend.core.csrf import CsrfProtectedMixin
 from pleate_backend.core.exceptions import ApiError
@@ -66,28 +68,31 @@ class SubscribeView(PublicFormView):
         owns_email = bool(user and user.email == email and user.email_verified)
         needs_confirmation = double_opt_in and not owns_email
 
-        sub, created = NewsletterSubscriber.objects.get_or_create(
-            email=email,
-            defaults={
-                "locale": (user and user.locale) or get_language() or "",
-                "source": source,
-                "user": user if user and user.email == email else None,
-            },
-        )
+        try:
+            sub, created = NewsletterSubscriber.objects.get_or_create(
+                email=email,
+                defaults={
+                    "locale": (user and user.locale) or get_language() or "",
+                    "source": source,
+                    "user": user if user and user.email == email else None,
+                },
+            )
+        except IntegrityError:  # a concurrent request created it first
+            sub, created = NewsletterSubscriber.objects.get(email=email), False
         if created or sub.status != NewsletterSubscriber.Status.SUBSCRIBED:
             if not created and source:
                 sub.source = source
             if sub.user_id is None and user and user.email == email:
                 sub.user = user
-            if needs_confirmation:
+            # Without double opt in, only the inbox owner may undo an unsubscribe.
+            resubscribe = sub.status == NewsletterSubscriber.Status.UNSUBSCRIBED and not owns_email
+            if needs_confirmation or resubscribe:
                 sub.status = NewsletterSubscriber.Status.PENDING
                 sub.save()
                 services.send_confirmation(sub)
             else:
-                sub.status = NewsletterSubscriber.Status.SUBSCRIBED
-                sub.confirmed_at = timezone.now()
-                sub.unsubscribed_at = None
-                sub.save()
+                sub.mark_subscribed()
+        # Same body for every case (even the unsubscribed one), so it does not reveal who is on the list.
         return Response({"confirmation_required": needs_confirmation}, status=202)
 
 
@@ -103,11 +108,8 @@ class ConfirmView(PublicFormView):
         sub = services.read_confirm_token(ser.validated_data["token"])
         if sub is None:
             raise _invalid_token()
-        if sub.status != NewsletterSubscriber.Status.SUBSCRIBED:
-            sub.status = NewsletterSubscriber.Status.SUBSCRIBED
-            sub.confirmed_at = timezone.now()
-            sub.unsubscribed_at = None
-            sub.save(update_fields=["status", "confirmed_at", "unsubscribed_at"])
+        if sub.status == NewsletterSubscriber.Status.PENDING:
+            sub.mark_subscribed()
         return Response({"email": sub.email, "status": sub.status})
 
 
@@ -131,7 +133,7 @@ class UnsubscribeView(PublicFormView):
 
 
 class SubscriberListView(generics.ListAPIView):
-    permission_classes = [IsStaff]
+    permission_classes = [DenyAPIKey, IsStaff]
     serializer_class = s.SubscriberSerializer
     queryset = NewsletterSubscriber.objects.all()
     search_fields = ["email"]
@@ -151,7 +153,7 @@ def _csv_cell(value) -> str:
 
 
 class SubscriberExportView(APIView):
-    permission_classes = [IsStaff]
+    permission_classes = [DenyAPIKey, IsStaff]
 
     @extend_schema(
         responses={
@@ -232,7 +234,7 @@ class ContactView(PublicFormView):
 
 
 class ContactMessageListView(generics.ListAPIView):
-    permission_classes = [IsStaff]
+    permission_classes = [DenyAPIKey, IsStaff]
     serializer_class = s.ContactMessageSerializer
     queryset = ContactMessage.objects.all()
     search_fields = ["name", "email", "subject"]
@@ -246,7 +248,7 @@ class ContactMessageListView(generics.ListAPIView):
 
 
 class ContactMessageDetailView(APIView):
-    permission_classes = [IsStaff]
+    permission_classes = [DenyAPIKey, IsStaff]
 
     @extend_schema(
         request=s.ContactStatusSerializer, responses=s.ContactMessageSerializer, tags=["marketing"]
@@ -276,7 +278,7 @@ class WaitlistView(CsrfProtectedMixin, generics.ListAPIView):
     def get_permissions(self):
         if self.request.method == "POST":
             return [AllowAny()]
-        return [IsStaff()]
+        return [DenyAPIKey(), IsStaff()]
 
     def get_throttles(self):
         if self.request.method == "POST":
@@ -289,16 +291,21 @@ class WaitlistView(CsrfProtectedMixin, generics.ListAPIView):
 
     @extend_schema(request=s.WaitlistJoinSerializer, responses=s.WaitlistStatusSerializer, tags=["marketing"])
     def post(self, request):
-        """Idempotent: an email already on the list gets its current status back."""
+        """
+        Idempotent. A new entry gets its status and referral code; an email already
+        on the list gets the same shape with every field null, so nobody can read
+        another person's code or position by typing their email.
+        """
         ser = s.WaitlistJoinSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
         email = ser.validated_data["email"]
-        entry = WaitlistEntry.objects.filter(email=email).first()
-        if entry is None:
-            ref = ser.validated_data["ref"].strip().upper()
-            referrer = WaitlistEntry.objects.filter(referral_code=ref).first() if ref else None
-            entry = services.create_waitlist_entry(email, referrer)
-        return Response(services.waitlist_status(entry))
+        if WaitlistEntry.objects.filter(email=email).exists():
+            return Response(dict.fromkeys(("position", "referral_code", "referrals", "invited")))
+        ref = ser.validated_data["ref"].strip().upper()
+        referrer = WaitlistEntry.objects.filter(referral_code=ref).first() if ref else None
+        # shortcut: two joins racing on one email can both get the code,
+        # make create_waitlist_entry report it if that matters.
+        return Response(services.waitlist_status(services.create_waitlist_entry(email, referrer)))
 
 
 class WaitlistStatusView(APIView):
@@ -312,7 +319,7 @@ class WaitlistStatusView(APIView):
 
 
 class WaitlistInviteView(APIView):
-    permission_classes = [IsStaff]
+    permission_classes = [DenyAPIKey, IsStaff]
 
     @extend_schema(request=None, responses=s.WaitlistEntrySerializer, tags=["marketing"])
     def post(self, request, pk):

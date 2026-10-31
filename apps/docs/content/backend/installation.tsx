@@ -58,13 +58,16 @@ pip install "pleate-backend[all]"`}</Code>
           </P>
           <Code lang="python" title="myproject/settings.py">{`
 import os
+from django.core.exceptions import ImproperlyConfigured
 from pleate_backend.settings import *  # noqa: F403
 from pleate_backend.settings import INSTALLED_APPS, database, redis
 
 env = os.environ.get
 
-SECRET_KEY = env("SECRET_KEY", "dev-only-change-me")
-DEBUG = env("DEBUG", "1") == "1"
+DEBUG = env("DEBUG", "0") == "1"                # DEBUG=1 for local development
+SECRET_KEY = env("SECRET_KEY") or ("dev-only-change-me" if DEBUG else None)
+if not SECRET_KEY:
+    raise ImproperlyConfigured("Set SECRET_KEY")
 ALLOWED_HOSTS = env("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS", "http://localhost:3000").split(",")
 ROOT_URLCONF = "myproject.urls"
@@ -83,6 +86,10 @@ MAILERS = {
     }
 }
 DEFAULT_FROM_EMAIL = "Plate <hello@plate.test>"
+
+# The base settings make both cookies secure; plain http needs them off.
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 PLEATE = {
     "SITE_NAME": "Plate",

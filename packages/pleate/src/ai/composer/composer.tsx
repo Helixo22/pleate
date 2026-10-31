@@ -4,8 +4,9 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo, useRef, useState, type ClipboardEvent, type DragEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ClipboardEvent, type DragEvent, type ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";
+import { fileKey, matchesAccept, useImageUrl } from "../../lib/files.ts";
 import { XIcon } from "../../lib/icons.tsx";
 import { useReducedMotion } from "../../motion/use-reduced-motion.ts";
 
@@ -38,8 +39,7 @@ export type ComposerProps = {
 const L = { input: "Message", send: "Send", stop: "Stop generating", attach: "Attach files", voice: "Voice input", remove: "Remove", drop: "Drop files to attach" };
 
 function Chip({ file, onRemove, label }: { file: File; onRemove: () => void; label: string }) {
-  const url = useMemo(() => (file.type.startsWith("image/") ? URL.createObjectURL(file) : null), [file]);
-  useEffect(() => () => (url ? URL.revokeObjectURL(url) : undefined), [url]);
+  const url = useImageUrl(file);
   return (
     <div className="relative flex max-w-56 items-center gap-2 rounded-xl bg-fill-2 p-1.5 pe-8">
       {url ? (
@@ -96,7 +96,13 @@ export function Composer({
   };
   const addFiles = (incoming: File[]) => {
     if (!accept) return;
-    setFiles((list) => [...list, ...incoming].slice(0, maxFiles));
+    setFiles((list) => {
+      const next = [...list];
+      for (const file of incoming) {
+        if (matchesAccept(file, accept) && !next.some((f) => fileKey(f) === fileKey(file))) next.push(file);
+      }
+      return next.slice(0, maxFiles);
+    });
   };
 
   // Grow with the content where CSS field-sizing isn't available.
@@ -162,7 +168,7 @@ export function Composer({
             className="flex flex-wrap gap-2 overflow-hidden px-1 pt-1"
           >
             {files.map((file, i) => (
-              <Chip key={`${file.name}-${i}`} file={file} label={l.remove} onRemove={() => setFiles((list) => list.filter((_, j) => j !== i))} />
+              <Chip key={fileKey(file)} file={file} label={l.remove} onRemove={() => setFiles((list) => list.filter((_, j) => j !== i))} />
             ))}
           </motion.div>
         )}

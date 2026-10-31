@@ -37,8 +37,9 @@ export function paginationRange(page: number, pageCount: number, siblings = 1): 
   if (pageCount <= total) return Array.from({ length: pageCount }, (_, i) => i + 1);
   const start = Math.max(2, page - siblings);
   const end = Math.min(pageCount - 1, page + siblings);
-  const left = start > 2;
-  const right = end < pageCount - 1;
+  // A gap must hide at least two pages: one hidden page is shown instead of "…".
+  const left = start > 3;
+  const right = end < pageCount - 2;
   if (!left) return [...Array.from({ length: siblings * 2 + 3 }, (_, i) => i + 1), "…", pageCount];
   if (!right) return [1, "…", ...Array.from({ length: siblings * 2 + 3 }, (_, i) => pageCount - siblings * 2 - 2 + i)];
   return [1, "…", ...Array.from({ length: end - start + 1 }, (_, i) => start + i), "…", pageCount];

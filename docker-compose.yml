@@ -3,9 +3,9 @@
 # (catches every email, UI on http://localhost:8025).
 services:
   mongo:
-    image: mongo:8
+    image: mongo:8.3
     command: ["--replSet", "rs0", "--bind_ip_all"]
-    ports: ["27027:27017"]
+    ports: ["127.0.0.1:27027:27017"]
     volumes: [mongo-data:/data/db]
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "try { rs.status().ok } catch (e) { rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]}).ok }"]
@@ -13,11 +13,11 @@ services:
       timeout: 10s
       retries: 20
   redis:
-    image: redis:7-alpine
-    ports: ["6389:6379"]
+    image: redis:7.4-alpine
+    ports: ["127.0.0.1:6389:6379"]
   mailpit:
-    image: axllent/mailpit
-    ports: ["8025:8025", "1025:1025"]
+    image: axllent/mailpit:v1.32
+    ports: ["127.0.0.1:8025:8025", "127.0.0.1:1025:1025"]
 
 volumes:
   mongo-data:

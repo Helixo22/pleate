@@ -170,9 +170,10 @@ def test_write_scope_allows_unsafe_methods_without_csrf(user):
     _key, raw = create_key(user, "rw", ["read", "write"])
     client = APIClient(enforce_csrf_checks=True)
     client.credentials(HTTP_AUTHORIZATION=f"Bearer {raw}")
-    res = client.patch("/api/auth/me", {"name": "Key"}, format="json")
+    # Account endpoints are session only, so this uses another write endpoint.
+    res = client.post("/api/notifications/read-all")
     assert res.status_code == 200
-    assert res.json()["name"] == "Key"
+    assert res.json() == {"count": 0}
 
 
 def test_expired_key(user):

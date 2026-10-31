@@ -1,7 +1,6 @@
+from django.apps import apps
 from django.utils.translation import gettext_lazy as _
 from rest_framework.permissions import BasePermission
-
-from .models import APIKey
 
 
 class DenyAPIKey(BasePermission):
@@ -11,4 +10,9 @@ class DenyAPIKey(BasePermission):
     code = "api_key_not_allowed"
 
     def has_permission(self, request, view):
+        # Lazy: account views use this even when the apikeys app is not installed.
+        if not apps.is_installed("pleate_backend.apikeys"):
+            return True
+        from .models import APIKey
+
         return not isinstance(getattr(request, "auth", None), APIKey)

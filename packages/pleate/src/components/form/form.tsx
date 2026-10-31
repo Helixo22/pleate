@@ -159,7 +159,12 @@ export function FormField({ name, label, description, hint, error: errorProp, ch
 
   useEffect(() => {
     if (!form || !name) return;
-    return form.register(name, { rules: rulesRef.current, id: `${id}-control` });
+    return form.register(name, {
+      get rules() {
+        return rulesRef.current;
+      },
+      id: `${id}-control`,
+    });
     // Rules are read through the ref, so changing them doesn't re-register.
   }, [form, name, id]);
 
