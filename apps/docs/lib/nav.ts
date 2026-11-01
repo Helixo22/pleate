@@ -1,5 +1,14 @@
 // Docs navigation: every category of the plan, with the components already built marked ready.
 import { BACKEND_PAGES } from "./backend-pages";
+import { NAV_TEXT } from "./nav-bits/text";
+import { NAV_ANIMATIONS } from "./nav-bits/animations";
+import { NAV_ANIMATIONS_B } from "./nav-bits/animations-b";
+import { NAV_COMPONENTS_A } from "./nav-bits/components-a";
+import { NAV_COMPONENTS_B } from "./nav-bits/components-b";
+import { NAV_BACKGROUNDS_A } from "./nav-bits/backgrounds-a";
+import { NAV_BACKGROUNDS_B } from "./nav-bits/backgrounds-b";
+import { NAV_BACKGROUNDS_C } from "./nav-bits/backgrounds-c";
+import { NAV_ASCII } from "./nav-bits/ascii";
 
 export type NavItem = { name: string; href: string; ready: boolean };
 export type NavSection = { title: string; items: NavItem[] };
@@ -18,6 +27,7 @@ export const NAV: NavSection[] = [
       { name: "Tokens", href: "/tokens", ready: true },
       { name: "Theming", href: "/theming", ready: true },
       { name: "All components", href: "/components", ready: true },
+      { name: "Composer", href: "/composer", ready: true },
     ],
   },
   {
@@ -63,6 +73,10 @@ export const NAV: NavSection[] = [
   },
   { title: "Effects", items: [c("Animated Text", true), c("Reveal", true), c("Page Transition", true), c("Hover Effects", true), c("Motion Graphics", true), c("Scroll Effects", true), c("3D Effects", true)] },
   { title: "Marketing", items: [c("Hero", true), c("Feature Grid", true), c("Pricing", true), c("Testimonial", true), c("CTA", true), { name: "Contact Form", href: "/components/contact", ready: true }, c("Logo Marquee", true)] },
+  { title: "Text Animations", items: NAV_TEXT },
+  { title: "Animations", items: [...NAV_ANIMATIONS, ...NAV_ANIMATIONS_B] },
+  { title: "Interactive", items: [...NAV_COMPONENTS_A, ...NAV_COMPONENTS_B] },
+  { title: "Backgrounds", items: [...NAV_BACKGROUNDS_A, ...NAV_BACKGROUNDS_B, ...NAV_BACKGROUNDS_C, ...NAV_ASCII] },
   { title: "Examples", items: [{ name: "Landing page", href: "/examples/landing", ready: true }] },
 ];
 

@@ -6,6 +6,21 @@ import { Input } from "pleate/input";
 import { NavigationBar, NavigationBarBack } from "pleate/navigation-bar";
 import { useRef } from "react";
 
+const TRIPS = [
+  ["Weekend in Lisbon", "14 to 17 Nov"],
+  ["Kyoto in spring", "2 to 11 Apr"],
+  ["Porto and the Douro", "May, 5 nights"],
+  ["Road trip in Andalusia", "June, 9 nights"],
+  ["Reykjavik", "Draft"],
+  ["Marrakesh", "Draft"],
+  ["Naples and Procida", "12 to 18 Sep"],
+  ["Oaxaca", "Day of the Dead, 6 nights"],
+  ["Hanoi to Hoi An", "Feb, 10 nights"],
+  ["Valencia", "Las Fallas, 4 nights"],
+  ["Copenhagen", "Draft"],
+  ["Sintra day trip", "Saturday"],
+];
+
 export default function Demo() {
   const scroller = useRef<HTMLDivElement>(null);
   return (
@@ -19,9 +34,10 @@ export default function Demo() {
         accessory={<Input size="sm" type="search" aria-label="Search trips" placeholder="Search" />}
       />
       <ul className="mx-4 mb-6 overflow-hidden rounded-xl bg-surface">
-        {Array.from({ length: 16 }, (_, i) => (
-          <li key={i} className="flex h-12 items-center border-b border-separator px-4 text-body last:border-0">
-            Trip {i + 1}
+        {TRIPS.map(([place, dates]) => (
+          <li key={place} className="flex min-h-14 flex-col justify-center border-b border-separator px-4 py-2 last:border-0">
+            <span className="text-body">{place}</span>
+            <span className="text-subhead text-fg-muted">{dates}</span>
           </li>
         ))}
       </ul>

@@ -2,6 +2,7 @@
 
 import { AlertDialog } from "pleate/alert-dialog";
 import { Button } from "pleate/button";
+import { Input } from "pleate/input";
 import { toast } from "pleate/toast";
 
 export default function Demo() {
@@ -26,6 +27,17 @@ export default function Demo() {
           { label: "Cancel", role: "cancel" },
         ]}
       />
+      <AlertDialog
+        trigger={<Button variant="gray">Rename</Button>}
+        title="Rename trip"
+        description="Everyone on the trip will see the new name."
+        actions={[
+          { label: "Cancel", role: "cancel" },
+          { label: "Save", onSelect: () => toast.success("Renamed") },
+        ]}
+      >
+        <Input aria-label="Trip name" defaultValue="Weekend in Lisbon" size="sm" />
+      </AlertDialog>
     </>
   );
 }

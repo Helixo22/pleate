@@ -2,49 +2,33 @@
 "use client";
 
 import { Check, Monitor, Moon, Palette, Sun } from "lucide-react";
-import { motion } from "motion/react";
-import { cn, IconButton, spring } from "pleate";
+import { cn, IconButton, SegmentedControl } from "pleate";
 import { createPalette, CUSTOM_PALETTE, PALETTES, useTheme, type ThemePreference } from "pleate/theme";
 import { useEffect, useRef, useState } from "react";
 
 const MODES: { value: ThemePreference; label: string; Icon: typeof Sun }[] = [
+  { value: "system", label: "Auto", Icon: Monitor },
   { value: "light", label: "Light", Icon: Sun },
-  { value: "system", label: "System", Icon: Monitor },
   { value: "dark", label: "Dark", Icon: Moon },
 ];
 
-export function ThemeSwitch() {
+/** Auto / Light / Dark. Icons only by default; `labels` spells them out (the sidebar footer). */
+export function ThemeSwitch({ labels = false }: { labels?: boolean }) {
   const { theme, setTheme } = useTheme();
   return (
-    <div role="radiogroup" aria-label="Color scheme" className="pl-field flex rounded-md bg-surface-2 p-0.5 [--pl-field-border:var(--pl-separator)]">
-      {MODES.map(({ value, label, Icon }) => {
-        const active = theme === value;
-        return (
-          <button
-            key={value}
-            type="button"
-            role="radio"
-            aria-checked={active}
-            aria-label={label}
-            title={label}
-            onClick={() => setTheme(value)}
-            className={cn(
-              "pl-focus-ring pl-touch relative grid size-7 cursor-pointer place-items-center rounded-[calc(var(--radius-md)-2px)] transition-colors",
-              active ? "text-fg" : "text-fg-muted hover:text-fg",
-            )}
-          >
-            {active && (
-              <motion.span
-                layoutId="theme-pill"
-                transition={spring.snap}
-                className="absolute inset-0 rounded-[calc(var(--radius-md)-2px)] bg-surface shadow-[inset_0_0_0_1px_var(--pl-border),var(--pl-lip)] dark:bg-fill-2"
-              />
-            )}
-            <Icon className="relative size-4" />
-          </button>
-        );
-      })}
-    </div>
+    <SegmentedControl<ThemePreference>
+      aria-label="Color scheme"
+      size="sm"
+      fullWidth={labels}
+      value={theme}
+      onValueChange={setTheme}
+      options={MODES.map(({ value, label, Icon }) => ({
+        value,
+        icon: <Icon />,
+        label: labels ? label : null,
+        "aria-label": labels ? undefined : label,
+      }))}
+    />
   );
 }
 
@@ -104,7 +88,8 @@ export function PaletteSwatches({ className }: { className?: string }) {
   );
 }
 
-export function PalettePicker() {
+/** `up` opens the swatches above the button (when it sits at the bottom of the screen). */
+export function PalettePicker({ up = false }: { up?: boolean }) {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -134,7 +119,7 @@ export function PalettePicker() {
       {open && (
         <div
           data-state="open"
-          className="pl-pop absolute end-0 top-full z-(--pl-z-dropdown) mt-2 w-64 rounded-lg bg-elevated p-3 shadow-lg [--radix-popper-transform-origin:top_right]"
+          className={cn("pl-pop absolute z-(--pl-z-dropdown) w-64 rounded-lg bg-elevated p-3 shadow-lg", up ? "start-0 bottom-full mb-2 [--radix-popper-transform-origin:bottom_left]" : "end-0 top-full mt-2 [--radix-popper-transform-origin:top_right]")}
         >
           <p className="mb-3 text-caption1 font-medium text-fg-subtle">Palette</p>
           <PaletteSwatches />

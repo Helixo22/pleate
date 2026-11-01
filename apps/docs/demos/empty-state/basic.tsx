@@ -6,18 +6,20 @@ export default function Demo() {
   return (
     <div className="grid w-full gap-4 md:grid-cols-2">
       <EmptyState
+        className="rounded-2xl bg-surface"
         icon={<MapPinned />}
         title="No trips yet"
         description="Plan your first getaway, invite friends and build the itinerary together."
         actions={<Button>New trip</Button>}
-        bordered
       />
       <EmptyState
         size="sm"
+        iconStyle="tile"
         icon={<SearchX />}
         title="No results for “Atlantis”"
         description="Check the spelling or try a nearby city."
         actions={<Button size="sm" variant="tinted">Clear search</Button>}
+        bordered
       />
     </div>
   );

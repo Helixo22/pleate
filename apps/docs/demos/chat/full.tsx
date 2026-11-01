@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Compass, Copy, Map, Plane, RefreshCw, Sparkles, ThumbsUp, Utensils, Zap } from "lucide-react";
+import { Check, Compass, Copy, Map, Paperclip, Plane, RefreshCw, Sparkles, ThumbsUp, Utensils, Zap } from "lucide-react";
 import { BotFace, type BotState } from "pleate/ai/bot-face";
 import { ChatThread, Message, MessageAction } from "pleate/ai/chat";
 import { Composer } from "pleate/ai/composer";
@@ -124,7 +124,7 @@ export default function Demo() {
         <ChatThread className="flex-1">
           {turns.map((t, i) =>
             t.role === "user" ? (
-              <Message key={t.id} role="user" status="sent" footer={t.files?.length ? <p className="text-end text-footnote text-fg-muted">📎 {t.files.join(", ")}</p> : undefined}>
+              <Message key={t.id} role="user" status="sent" footer={t.files?.length ? <p className="flex items-center justify-end gap-1 text-footnote text-fg-muted"><Paperclip className="size-3.5" aria-hidden="true" />{t.files.join(", ")}</p> : undefined}>
                 {t.text}
               </Message>
             ) : (

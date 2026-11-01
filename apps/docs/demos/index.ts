@@ -1,5 +1,14 @@
 // Component pages: description, import path, the examples (each file in demos/<slug>/<id>.tsx) and the main props.
 import type { ComponentType } from "react";
+import { DOCS_TEXT } from "./bits/text";
+import { DOCS_ANIMATIONS } from "./bits/animations";
+import { DOCS_ANIMATIONS_B } from "./bits/animations-b";
+import { DOCS_COMPONENTS_A } from "./bits/components-a";
+import { DOCS_COMPONENTS_B } from "./bits/components-b";
+import { DOCS_BACKGROUNDS_A } from "./bits/backgrounds-a";
+import { DOCS_BACKGROUNDS_B } from "./bits/backgrounds-b";
+import { DOCS_BACKGROUNDS_C } from "./bits/backgrounds-c";
+import { DOCS_ASCII } from "./bits/ascii";
 import ApiKeyListBasic from "./api-key-list/basic";
 import AuthCardBasic from "./auth-card/basic";
 import ContactBasic from "./contact/basic";
@@ -69,6 +78,7 @@ import BotFaceStates from "./bot-face/states";
 import BotFaceVariants from "./bot-face/variants";
 import BotFaceVoice from "./bot-face/voice";
 import ChatFull from "./chat/full";
+import ChatMessages from "./chat/messages";
 import ComposerBasic from "./composer/basic";
 import ModelPickerBasic from "./model-picker/basic";
 import PromptSuggestionsBasic from "./prompt-suggestions/basic";
@@ -104,6 +114,7 @@ import SegmentedControlBasic from "./segmented-control/basic";
 import TabsVariants from "./tabs/variants";
 import CardComposed from "./card/composed";
 import CardVariants from "./card/variants";
+import CardTinted from "./card/tinted";
 import ContainerSizes from "./container/sizes";
 import DividerBasic from "./divider/basic";
 import FooterBasic from "./footer/basic";
@@ -112,6 +123,7 @@ import NavbarBasic from "./navbar/basic";
 import NavigationBarLargeTitle from "./navigation-bar/large-title";
 import SectionTones from "./section/tones";
 import SidebarBasic from "./sidebar/basic";
+import SidebarSettings from "./sidebar/settings";
 import StackBasic from "./stack/basic";
 import TabBarVariants from "./tab-bar/variants";
 import TabBarSearch from "./tab-bar/search";
@@ -158,7 +170,7 @@ export type ComponentDoc = {
 
 const SIZE = (sizes: string, d = "md"): PropRow => ({ name: "size", type: sizes, default: `"${d}"`, description: "Height, padding and type size." });
 
-export const DOCS: Record<string, ComponentDoc> = {
+const BASE_DOCS: Record<string, ComponentDoc> = {
 
   hero: {
     name: "Hero",
@@ -181,7 +193,7 @@ export const DOCS: Record<string, ComponentDoc> = {
     importPath: "pleate/marketing/feature-grid",
     demos: [{ id: "variants", title: "Cards, bento, plain", align: "stretch", Component: FeatureGridVariants }],
     props: [
-      { name: "features", type: "{ icon, title, description, href?, linkLabel?, media?, span?, rowSpan? }[]", description: "Items; href makes the whole card a link." },
+      { name: "features", type: "{ icon, title, description, href?, linkLabel?, media?, span?, rowSpan?, tint? }[]", description: "Items; href makes the whole card a link, tint fills the icon tile with the item's own color." },
       { name: "columns", type: "2 | 3 | 4", default: "3", description: "Columns on large screens." },
       { name: "variant", type: '"cards" | "plain" | "bento"', default: '"cards"', description: "Look." },
     ],
@@ -325,7 +337,7 @@ export const DOCS: Record<string, ComponentDoc> = {
       { name: "step", type: "number", default: "1", description: "Increment; its decimals set the rounding." },
       { name: "format", type: "Intl.NumberFormatOptions", description: "How the number is shown." },
       SIZE('"sm" | "md" | "lg"'),
-      { name: "variant", type: '"outline" | "filled" | "surface"', default: '"outline"', description: "Field look." },
+      { name: "variant", type: '"outline" | "filled" | "surface"', default: '"filled"', description: "Field look." },
       { name: "disabled / invalid", type: "boolean", description: "States." },
     ],
     a11y: ["The input has role=\"spinbutton\" with aria-valuenow/min/max and a formatted aria-valuetext.", "ArrowUp/Down step, PageUp/Down take ten steps, Home/End jump to the bounds.", "The buttons are named Decrease and Increase and are left out of the tab order (the keys cover them).", "Name it with aria-label or aria-labelledby."],
@@ -407,7 +419,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   "toggle-group": {
     name: "Toggle Group",
-    description: "Pressable options on a bordered rail, one at a time or several. Toggle is a single pressable button.",
+    description: "Pressable options on a gray rail, one at a time or several, in the iOS segmented look. Toggle is a single pressable capsule.",
     importName: "ToggleGroup, ToggleGroupItem, Toggle",
     importPath: "pleate/toggle-group",
     demos: [
@@ -671,12 +683,15 @@ export const DOCS: Record<string, ComponentDoc> = {
     description: "A complete AI chat: thread that follows the stream, bubbles or document-style answers, reasoning, sources and message actions, composed from the AI components.",
     importName: "ChatThread, Message, MessageAction",
     importPath: "pleate/ai/chat",
-    demos: [{ id: "full", title: "Trip assistant", description: "Pick a suggestion or type. Try Stop while it streams, and scroll up during a reply.", align: "stretch", Component: ChatFull }],
+    demos: [{ id: "full", title: "Trip assistant", description: "Pick a suggestion or type. Try Stop while it streams, and scroll up during a reply.", align: "stretch", Component: ChatFull },
+      { id: "messages", title: "Messages", description: "Bubbles grouped by sender with the tail on the last one, a read receipt, the typing bubble and the capsule composer.", Component: ChatMessages },
+    ],
     props: [
       { name: "ChatThread", type: "threshold, latestLabel, contentClassName", description: "Auto-scroll while at the bottom; a jump button otherwise. role=log." },
       { name: "Message role / variant", type: '"user" | "assistant" | "system" / "bubble" | "document"', description: "Who and how." },
       { name: "avatar / name / time / status", type: "", description: "Header and delivery state." },
       { name: "actions / footer / continued", type: "ReactNode / ReactNode / boolean", description: "Hover actions, attachments or sources, grouping." },
+      { name: "tail / receipt", type: "boolean / ReactNode", description: "Tight corner on the sender side (pass it on the last bubble of a group); a line like Read 9:42 under the bubble." },
     ],
     a11y: ["New messages are announced politely (role=log).", "Actions stay reachable by keyboard (shown on focus)."],
   },
@@ -685,13 +700,14 @@ export const DOCS: Record<string, ComponentDoc> = {
     description: "The prompt box: grows with text, attachments by button, drag & drop or paste, a toolbar slot, voice, and Send that becomes Stop.",
     importName: "Composer",
     importPath: "pleate/ai/composer",
-    demos: [{ id: "basic", title: "Full and minimal", description: "Paste an image, or drop files on it.", align: "stretch", Component: ComposerBasic }],
+    demos: [{ id: "basic", title: "Card, capsule and minimal", description: "Paste an image, or drop files on it. The capsule swaps the mic for Send as soon as you type.", align: "stretch", Component: ComposerBasic }],
     props: [
       { name: "onSubmit", type: "({ text, files }) => void", description: "Enter or the send button; clears after." },
       { name: "generating / onStop", type: "boolean / () => void", description: "Stop mode." },
       { name: "accept / maxFiles", type: "string / number", default: "none / 8", description: "Enables attachments." },
       { name: "onVoice / listening", type: "() => void / boolean", description: "Mic button." },
       { name: "toolbar", type: "ReactNode", description: "Model picker, tools." },
+      { name: "variant", type: '"card" | "capsule"', default: '"card"', description: "A box with a toolbar row, or one line like the Messages input." },
       { name: "value / onValueChange / labels", type: "", description: "Controlled text and translatable labels." },
     ],
     a11y: ["Enter sends, Shift+Enter breaks the line; IME composition is respected."],
@@ -706,6 +722,7 @@ export const DOCS: Record<string, ComponentDoc> = {
       { name: "text", type: "string", description: "The whole text so far." },
       { name: "streaming", type: "boolean", description: "Caret and aria-busy." },
       { name: "animate", type: "boolean", default: "true", description: "Fade new chunks." },
+      { name: "TypingIndicator bubble", type: "boolean", default: "false", description: "Dots inside a gray message bubble." },
     ],
   },
   "prompt-suggestions": {
@@ -713,11 +730,11 @@ export const DOCS: Record<string, ComponentDoc> = {
     description: "Starter prompts for an empty chat: cards with icons, or chips that scroll on phones.",
     importName: "PromptSuggestions",
     importPath: "pleate/ai/prompt-suggestions",
-    demos: [{ id: "basic", title: "Grid and chips", align: "stretch", Component: PromptSuggestionsBasic }],
+    demos: [{ id: "basic", title: "Grid, chips and list", align: "stretch", Component: PromptSuggestionsBasic }],
     props: [
       { name: "suggestions", type: "{ title, description?, icon?, prompt }[]", description: "Items." },
       { name: "onSelect", type: "(prompt, suggestion) => void", description: "Choice." },
-      { name: "variant", type: '"grid" | "chips"', default: '"grid"', description: "Look." },
+      { name: "variant", type: '"grid" | "chips" | "list"', default: '"grid"', description: "Cards, capsules, or an inset grouped list with chevrons." },
     ],
   },
   "result-card": {
@@ -801,7 +818,7 @@ export const DOCS: Record<string, ComponentDoc> = {
       { name: "onSearch", type: "(value) => void", description: "Enter." },
       { name: "cancelable / loading", type: "boolean", description: "Cancel button while focused; spinner instead of clear." },
       { name: "shortcut", type: '"/" | "mod+k"', description: "Global focus shortcut with a hint." },
-      { name: "size / variant", type: '"sm" | "md" / "filled" | "surface"', description: "Look." },
+      { name: "size / variant", type: '"sm" | "md" / "filled" | "surface"', default: '"md" / "filled"', description: "Look." },
     ],
     a11y: ["A search landmark around a type=search input.", "Escape clears; Enter searches."],
   },
@@ -855,7 +872,8 @@ export const DOCS: Record<string, ComponentDoc> = {
     importName: "EmptyState",
     demos: [{ id: "basic", title: "First run and no results", align: "stretch", Component: EmptyStateBasic }],
     props: [
-      { name: "icon / illustration", type: "ReactNode", description: "Tile icon, or a larger visual." },
+      { name: "icon / illustration", type: "ReactNode", description: "Symbol, or a larger visual." },
+      { name: "iconStyle", type: '"plain" | "tile"', default: '"plain"', description: "Large gray symbol (iOS) or a soft accent tile." },
       { name: "title / description / actions", type: "ReactNode", description: "Content." },
       { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', description: "Scale." },
       { name: "bordered", type: "boolean", description: "Dashed outline." },
@@ -891,7 +909,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   accordion: {
     name: "Accordion",
-    description: "Sections that expand in place: on one bordered panel, as separate cards, or with hairlines only.",
+    description: "Disclosure rows that expand in place: grouped on one rounded panel, as separate cards, or with hairlines only.",
     importName: "Accordion, AccordionItem, AccordionTrigger, AccordionContent",
     demos: [{ id: "variants", title: "Inset, separated, plain", align: "stretch", Component: AccordionVariants }],
     props: [
@@ -915,7 +933,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   "stat-card": {
     name: "Stat Card",
-    description: "One number that matters: it counts up into view, shows the change with a colored trend and a sparkline.",
+    description: "One number that matters: it counts up into view and shows the change against a previous period, with an optional sparkline.",
     importName: "StatCard",
     demos: [{ id: "basic", title: "Dashboard row", align: "stretch", Component: StatCardBasic }],
     props: [
@@ -956,7 +974,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   "action-sheet": {
     name: "Action Sheet",
-    description: "A short list of choices from the bottom, Cancel on its own row. A centered panel on wide screens.",
+    description: "The iOS action sheet: centered choices in one group, a small title on top and Cancel in its own group below. A centered panel on wide screens.",
     importName: "ActionSheet",
     demos: [{ id: "basic", title: "Photo actions", Component: ActionSheetBasic }],
     props: [
@@ -968,12 +986,13 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   "alert-dialog": {
     name: "Alert Dialog",
-    description: "A dialog for decisions that need an answer. Buttons sit on a footer strip, stacked on phones; the cancel action is focused first.",
+    description: "The iOS alert for decisions that need an answer: centered text, buttons as text rows under a hairline, side by side for two and stacked for more. Cancel is bold and focused first.",
     importName: "AlertDialog",
     demos: [{ id: "basic", title: "Destructive and three-way", Component: AlertDialogBasic }],
     props: [
       { name: "title / description", type: "ReactNode", description: "Question and context." },
       { name: "actions", type: '{ label, onSelect?, role?: "default" | "cancel" | "destructive" }[]', description: "Buttons, in order." },
+      { name: "buttons", type: '"auto" | "row" | "stack"', default: '"auto"', description: "Two buttons side by side, three or more stacked." },
       { name: "trigger / open / onOpenChange", type: "", description: "Uncontrolled or controlled." },
       { name: "children", type: "ReactNode", description: "Extra content (e.g. a text field)." },
     ],
@@ -1003,7 +1022,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   toast: {
     name: "Toast",
-    description: "Brief notifications from anywhere with toast(). They drop in from the top, pause on hover and can be swiped away.",
+    description: "Brief notifications from anywhere with toast(): capsules that drop in from the top like the iOS HUD, pause on hover and can be swiped away.",
     importName: "Toaster, toast",
     demos: [{ id: "basic", title: "Tones, action, promise", Component: ToastBasic }],
     props: [
@@ -1042,7 +1061,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   "segmented-control": {
     name: "Segmented Control",
-    description: "A single-choice picker on a bordered rail: a thumb slides under the selected segment. Text, icons, or both.",
+    description: "The iOS segmented control: a raised thumb slides under the selected segment on a gray rail. Text, icons, or both.",
     importName: "SegmentedControl",
     demos: [{ id: "basic", title: "Text, icons, sizes", align: "stretch", Component: SegmentedControlBasic }],
     props: [
@@ -1152,6 +1171,7 @@ export const DOCS: Record<string, ComponentDoc> = {
     demos: [
       { id: "variants", title: "Variants", align: "stretch", Component: CardVariants },
       { id: "composed", title: "Media, footer, interactive", align: "stretch", Component: CardComposed },
+      { id: "tinted", title: "Tinted with an icon", description: "tint colors the wash, the CardIcon tile and the call to action.", align: "stretch", Component: CardTinted },
     ],
     props: [
       { name: "variant", type: '"elevated" | "flat" | "filled" | "outline" | "raised"', default: '"elevated"', description: "Surface and shadow." },
@@ -1214,18 +1234,30 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   sidebar: {
     name: "Sidebar",
-    description: "iPadOS-style navigation: a sticky column (collapsible to icons) from a breakpoint up, a drawer below it.",
-    importName: "Sidebar, SidebarHeader, SidebarContent, SidebarGroup, SidebarItem, SidebarFooter",
-    demos: [{ id: "basic", title: "Groups, badges, collapse, drawer", align: "stretch", Component: SidebarBasic }],
+    description: "iPadOS-style navigation: a sticky column (collapsible to an icon rail) from a breakpoint up, a drawer below it. Groups take an icon and fold away; SidebarSearch filters the rows as you type.",
+    importName: "Sidebar, SidebarHeader, SidebarSearch, SidebarContent, SidebarGroup, SidebarItem, SidebarFooter",
+    demos: [
+      { id: "basic", title: "Search, folding groups, icon rail, drawer", align: "stretch", Component: SidebarBasic },
+      { id: "settings", title: "Settings in cards", description: "Groups as cards with a colored tile per row, as in iPadOS Settings.", align: "stretch", Component: SidebarSettings },
+    ],
     props: [
       { name: "open / onOpenChange", type: "boolean", description: "Drawer state below the breakpoint." },
-      { name: "collapsed", type: "boolean", description: "Icon rail on desktop." },
+      { name: "collapsed", type: "boolean", description: "Icon rail on desktop; the filter is off while collapsed." },
       { name: "breakpoint", type: '"md" | "lg"', default: '"lg"', description: "Column from here up." },
-      { name: "variant / selection", type: '"plain" | "surface" / "soft" | "filled"', description: "Background and selected-row style." },
+      { name: "variant / selection", type: '"plain" | "surface" / "soft" | "filled"', default: '"plain" / "filled"', description: "Background and selected-row style." },
       { name: "sticky / top", type: "boolean / string", description: "Sticky column and its offset." },
-      { name: "SidebarItem", type: "icon, active, badge, asChild", description: "One row; closes the drawer on press." },
+      { name: "query / onQueryChange", type: "string", description: "Control the filter text yourself (optional)." },
+      { name: "SidebarSearch", type: "placeholder, label, shortcut", description: "Filter field. Down arrow moves into the results, Enter opens the first, Escape clears." },
+      { name: "SidebarGroup", type: "label, icon, collapsible, defaultOpen, open, variant, textValue, filterable", description: "A titled group of rows. Folding animates; filterable={false} hides it while filtering." },
+      { name: "SidebarItem", type: "icon, active, badge, asChild, textValue", description: "One row; closes the drawer on press. textValue is what the filter matches when children are not text." },
+      { name: "SidebarContent emptyLabel", type: "ReactNode", description: "Shown when the filter leaves nothing." },
     ],
-    a11y: ["Drawer is a modal dialog: focus trap, Escape, scroll lock.", "Collapsed rows keep their label for screen readers."],
+    a11y: [
+      "Drawer is a modal dialog: focus trap, Escape, scroll lock.",
+      "Rail rows keep their label for screen readers and as a tooltip.",
+      "Fold buttons expose aria-expanded; a folded list is inert, so it leaves the tab order.",
+      "The filter announces the number of results in a status region.",
+    ],
   },
   footer: {
     name: "Footer",
@@ -1259,7 +1291,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   button: {
     name: "Button",
-    description: "The primary action. Squared by default (pill on request), with six looks, four tones and five sizes. Presses scale down slightly; loading keeps the width.",
+    description: "The primary action. A capsule by default (squared on request), with six looks, four tones and five sizes. Presses scale down slightly; loading keeps the width.",
     importName: "Button",
     demos: [
       { id: "variants", title: "Variants", description: "From the strongest (filled) to the quietest (plain).", Component: ButtonVariants },
@@ -1293,7 +1325,7 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   input: {
     name: "Input",
-    description: "Text field in three looks: outline (default), a filled well, and surface with a lighter border. Adornments hold icons, units or buttons.",
+    description: "Text field in the iOS filled look (default), outlined, on a surface, or plain for a field inside an inset grouped row. Adornments hold icons, units or buttons.",
     importName: "Input",
     demos: [
       { id: "variants", title: "Variants and states", align: "stretch", Component: InputVariants },
@@ -1301,7 +1333,7 @@ export const DOCS: Record<string, ComponentDoc> = {
       { id: "sizes", title: "Sizes", description: "Text stays at 16px on phones so mobile Safari never zooms in on focus.", align: "stretch", Component: InputSizes },
     ],
     props: [
-      { name: "variant", type: '"filled" | "outline" | "surface"', default: '"outline"', description: "Field look." },
+      { name: "variant", type: '"filled" | "outline" | "surface" | "plain"', default: '"filled"', description: "Field look; plain has no box, for grouped rows." },
       SIZE('"sm" | "md" | "lg"'),
       { name: "startAdornment / endAdornment", type: "ReactNode", description: "Content before and after the text." },
       { name: "invalid", type: "boolean", description: "Red edge and aria-invalid." },
@@ -1333,11 +1365,11 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   checkbox: {
     name: "Checkbox",
-    description: "Square or round, with a drawn-in checkmark and an indeterminate state. Pass label and description for a clickable row.",
+    description: "A rounded square or the iOS selection circle, with a 1.5px edge, a drawn-in checkmark and an indeterminate state. Pass label and description for a clickable row.",
     importName: "Checkbox",
     demos: [
       { id: "basic", title: "Indeterminate parent", align: "start", Component: CheckboxBasic },
-      { id: "variants", title: "Sizes, shapes, description", align: "start", Component: CheckboxVariants },
+      { id: "variants", title: "Sizes, shapes, selection list", description: "Circles at the start of each row, as in Mail edit mode.", align: "start", Component: CheckboxVariants },
     ],
     props: [
       { name: "checked / defaultChecked", type: 'boolean | "indeterminate"', description: "State." },
@@ -1350,29 +1382,30 @@ export const DOCS: Record<string, ComponentDoc> = {
   },
   radio: {
     name: "Radio",
-    description: "One choice among a few. Arrow keys move between options.",
+    description: "One choice among a few: a circle with a dot, or the iOS list style with a checkmark on the chosen row. Arrow keys move between options.",
     importName: "RadioGroup, Radio",
-    demos: [{ id: "basic", title: "Group", align: "start", Component: RadioBasic }],
+    demos: [{ id: "basic", title: "Dots and checkmark list", align: "start", Component: RadioBasic }],
     props: [
       { name: "RadioGroup", type: "value, defaultValue, onValueChange, orientation", description: "Radix RadioGroup root." },
       { name: "Radio", type: "value, label, description, size, disabled", description: "One option." },
+      { name: "indicator", type: '"dot" | "check"', default: '"dot"', description: "check: no circle, an accent checkmark when chosen (iOS lists, with labelPlacement=\"start\")." },
     ],
   },
   switch: {
     name: "Switch",
-    description: "A squared toggle; the thumb stretches while pressed. Use for settings that apply immediately.",
+    description: "The iOS capsule toggle: a round knob that stretches while pressed. Accent when on (follows the palette), or the system green. Use for settings that apply immediately.",
     importName: "Switch",
     demos: [{ id: "basic", title: "Switches and settings rows", align: "start", Component: SwitchBasic }],
     props: [
       { name: "checked / defaultChecked / onCheckedChange", type: "boolean", description: "State." },
-      { name: "tone", type: '"accent" | "success"', default: '"accent"', description: "Accent or green when on." },
-      SIZE('"sm" | "md"'),
+      { name: "tone", type: '"accent" | "success"', default: '"accent"', description: "Accent or system green when on." },
+      { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', description: "32×20, 46×28, or the native 51×31." },
       { name: "label / description / labelPlacement", type: "", description: "As Checkbox; use \"start\" for settings rows." },
     ],
   },
   slider: {
     name: "Slider",
-    description: "Pick a value or a range. A thin track with a small knob, or a thick bar where the fill is the handle.",
+    description: "Pick a value or a range. The UISlider look (a thin track and a large white knob), or a thick bar where the fill is the handle, as in Control Center.",
     importName: "Slider",
     demos: [{ id: "basic", title: "Value, range and bar", align: "stretch", Component: SliderBasic }],
     props: [
@@ -1490,7 +1523,7 @@ export const DOCS: Record<string, ComponentDoc> = {
     demos: [{ id: "basic", title: "Welcome screen", align: "stretch", Component: AuthCardBasic }],
     props: [
       { name: "logo / title / description / footer", type: "ReactNode", description: "Content around the form." },
-      { name: "variant", type: '"card" | "plain"', default: '"card"', description: "Solid surface with a shadow, or none." },
+      { name: "variant", type: '"card" | "plain"', default: '"card"', description: "Rounded surface with a hairline edge, or none." },
       { name: "headingLevel", type: "1 | 2 | 3", default: "1", description: "Level of the title." },
     ],
     a11y: ["The title is a real heading (h1 by default) so the page has an outline."],
@@ -1603,7 +1636,8 @@ export const DOCS: Record<string, ComponentDoc> = {
       { name: "onSelect", type: "(id) => void", description: "Called on press (also before following an href)." },
       { name: "loadingId", type: "string | null", description: "Spinner on that provider, others disabled." },
       { name: "layout", type: '"stack" | "row"', default: '"stack"', description: "Rows, or side by side (icons only on phones with three or more)." },
-      { name: "size / disabled", type: '"md" | "lg" / boolean', default: '"md"', description: "Look and state." },
+      { name: "size / disabled", type: '"md" | "lg" / boolean', default: '"lg"', description: "Height and state." },
+      { name: "appearance", type: '"filled" | "outline"', default: '"filled"', description: "Gray capsules with Apple in black or white, or bordered capsules." },
       { name: "labels.continueWith", type: "(name) => string", description: "Button text." },
     ],
     a11y: ["Icon-only buttons keep their full name (\"Continue with Apple\").", "Marks are decorative and hidden from screen readers."],
@@ -1699,4 +1733,17 @@ export const DOCS: Record<string, ComponentDoc> = {
     ],
     a11y: ["Labels, descriptions and errors are linked to each field; the first invalid field gets focus on submit.", "The honeypot is out of the tab order and hidden from screen readers.", "The success panel is a status region."],
   },
+};
+
+export const DOCS: Record<string, ComponentDoc> = {
+  ...BASE_DOCS,
+  ...DOCS_TEXT,
+  ...DOCS_ANIMATIONS,
+  ...DOCS_ANIMATIONS_B,
+  ...DOCS_COMPONENTS_A,
+  ...DOCS_COMPONENTS_B,
+  ...DOCS_BACKGROUNDS_A,
+  ...DOCS_BACKGROUNDS_B,
+  ...DOCS_BACKGROUNDS_C,
+  ...DOCS_ASCII,
 };

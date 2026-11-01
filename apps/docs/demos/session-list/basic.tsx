@@ -17,7 +17,7 @@ export default function Demo() {
   const [loading, setLoading] = useState(false);
   const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
   return (
-    <div className="grid w-full max-w-xl gap-4">
+    <div className="grid w-full max-w-xl gap-4 rounded-xl bg-bg p-4">
       <SessionList
         showTitle
         sessions={sessions}
@@ -35,7 +35,7 @@ export default function Demo() {
       />
       <button
         type="button"
-        className="pl-focus-ring justify-self-start rounded-md text-footnote font-semibold text-accent-ink"
+        className="pl-focus-ring justify-self-start rounded-md px-4 text-footnote text-accent-ink"
         onClick={async () => {
           setSessions([]);
           setLoading(true);
@@ -44,7 +44,7 @@ export default function Demo() {
           setLoading(false);
         }}
       >
-        Reload (shows the skeleton)
+        Reload to see the skeleton
       </button>
     </div>
   );

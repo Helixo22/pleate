@@ -1,0 +1,31 @@
+// Sidebar entries for the React Bits inspired set (text). Merged into NAV in lib/nav.ts.
+import type { NavItem } from "../nav";
+
+export const NAV_TEXT: NavItem[] = [
+  { name: "ASCII Text", href: "/components/ascii-text", ready: true },
+  { name: "Circular Text", href: "/components/circular-text", ready: true },
+  { name: "Curved Loop", href: "/components/curved-loop", ready: true },
+  { name: "Depth Text", href: "/components/depth-text", ready: true },
+  { name: "Echo Text", href: "/components/echo-text", ready: true },
+  { name: "Falling Text", href: "/components/falling-text", ready: true },
+  { name: "Fold Text", href: "/components/fold-text", ready: true },
+  { name: "Fuzzy Text", href: "/components/fuzzy-text", ready: true },
+  { name: "Glitch Text", href: "/components/glitch-text", ready: true },
+  { name: "Masked Heading", href: "/components/masked-heading", ready: true },
+  { name: "Particle Text", href: "/components/particle-text", ready: true },
+  { name: "Scrambled Text", href: "/components/scrambled-text", ready: true },
+  { name: "Scroll Float", href: "/components/scroll-float", ready: true },
+  { name: "Scroll Velocity", href: "/components/scroll-velocity", ready: true },
+  { name: "Shuffle", href: "/components/shuffle", ready: true },
+  { name: "Split Flap Text", href: "/components/split-flap-text", ready: true },
+  { name: "Split Text", href: "/components/split-text", ready: true },
+  { name: "Stroke Text", href: "/components/stroke-text", ready: true },
+  { name: "Tech Text", href: "/components/tech-text", ready: true },
+  { name: "Text Cursor", href: "/components/text-cursor", ready: true },
+  { name: "Text Loop", href: "/components/text-loop", ready: true },
+  { name: "Text Pressure", href: "/components/text-pressure", ready: true },
+  { name: "Text Type", href: "/components/text-type", ready: true },
+  { name: "True Focus", href: "/components/true-focus", ready: true },
+  { name: "Variable Proximity", href: "/components/variable-proximity", ready: true },
+  { name: "Warp Text", href: "/components/warp-text", ready: true },
+];

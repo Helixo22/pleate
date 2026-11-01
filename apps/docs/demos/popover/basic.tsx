@@ -23,7 +23,7 @@ export default function Demo() {
           <Checkbox label="Breakfast included" />
         </div>
         <PopoverClose asChild>
-          <Button size="sm">Apply</Button>
+          <Button fullWidth>Show 48 stays</Button>
         </PopoverClose>
       </PopoverContent>
     </Popover>

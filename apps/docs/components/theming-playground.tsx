@@ -34,7 +34,7 @@ export function ThemingPlayground() {
   const { palette, customColor, motion, setMotion } = useTheme();
   const seed = palette === CUSTOM_PALETTE ? customColor : PALETTES[palette as keyof typeof PALETTES]?.seed;
   const generated = useMemo(() => (seed ? createPalette(seed) : null), [seed]);
-  const [roundness, setRoundness] = useState(1);
+  const [roundness, setRoundness] = useState(1.5);
   useEffect(() => {
     document.documentElement.style.setProperty("--pl-roundness", String(roundness));
   }, [roundness]);
@@ -51,7 +51,7 @@ export function ThemingPlayground() {
             <h2 className="text-headline">Roundness</h2>
             <span className="pl-tabular text-subhead text-fg-muted">{roundness.toFixed(2)}×</span>
           </div>
-          <Slider value={[roundness]} min={0.25} max={1.5} step={0.05} onValueChange={([v]) => setRoundness(v)} thumbLabels={["Roundness"]} />
+          <Slider value={[roundness]} min={0.25} max={2} step={0.05} onValueChange={([v]) => setRoundness(v)} thumbLabels={["Roundness"]} />
         </div>
         <Switch
           label="Animations"

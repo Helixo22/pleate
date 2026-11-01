@@ -1,13 +1,21 @@
-// A component page: header, import line, every example with its source (read from demos/<slug>/<id>.tsx at build
-// time, so the code shown is the code running), props table and accessibility notes.
+// A component page: header, import line, every example in a large live frame with its source (read from
+// demos/<slug>/<id>.tsx at build time, so the code shown is the code running), props, accessibility notes and the
+// neighbours in the same section.
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DemoFrame } from "@/components/demo-frame";
 import { CodeLine, PageHeader } from "@/components/page-header";
 import { DOCS } from "@/demos";
 import { NAV } from "@/lib/nav";
+
+// Sections whose demos play once or react to the pointer: their frames get a Replay button and more room.
+const PLAYFUL = new Set(["Effects", "Text Animations", "Animations", "Interactive", "Backgrounds"]);
+
+const sectionId = (title: string) => title.toLowerCase().replace(/\s+/g, "-");
 
 export function generateStaticParams() {
   return Object.keys(DOCS).map((slug) => ({ slug }));
@@ -27,49 +35,54 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
   const { slug } = await params;
   const doc = DOCS[slug];
   if (!doc) notFound();
-  const section = NAV.find((s) => s.items.some((i) => i.href === `/components/${slug}`))?.title;
+  const href = `/components/${slug}`;
+  const section = NAV.find((s) => s.items.some((i) => i.href === href));
+  const replay = (section && PLAYFUL.has(section.title)) || doc.importPath?.startsWith("pleate/effects/");
+  const siblings = section?.items.filter((i) => i.ready && i.href.startsWith("/components/")) ?? [];
+  const at = siblings.findIndex((i) => i.href === href);
+  const prev = at > 0 ? siblings[at - 1] : undefined;
+  const next = at >= 0 && at < siblings.length - 1 ? siblings[at + 1] : undefined;
 
   return (
-    <article className="mx-auto max-w-4xl">
-      <PageHeader eyebrow={section} title={doc.name}>
+    <article className="mx-auto max-w-5xl">
+      <PageHeader eyebrow={section?.title} eyebrowHref={section && `/components#${sectionId(section.title)}`} title={doc.name}>
         {doc.description}
       </PageHeader>
-      <div className="mb-14">
+      <div className="mb-12 max-w-2xl">
         <CodeLine>{`import { ${doc.importName} } from "${doc.importPath ?? `pleate/${slug}`}";`}</CodeLine>
       </div>
 
       <div className="grid grid-cols-[minmax(0,1fr)] gap-12">
         {doc.demos.map(({ id, title, description, align, Component }) => (
-          <DemoFrame key={id} id={id} title={title} description={description} align={align} code={source(slug, id)}>
+          <DemoFrame key={id} id={id} title={title} description={description} align={align} replay={replay} code={source(slug, id)}>
             <Component />
           </DemoFrame>
         ))}
       </div>
 
-      <section className="mt-16">
-        <h2 className="mb-4 text-title2">Props</h2>
-        <div className="overflow-x-auto rounded-xl bg-surface shadow-[inset_0_0_0_1px_var(--pl-separator)]">
-          <table className="w-full min-w-[36rem] text-start text-subhead">
-            <thead>
-              <tr className="border-b border-separator bg-surface-2 text-caption1 text-fg-subtle">
-                <th className="px-5 py-2.5 text-start font-medium">Prop</th>
-                <th className="px-5 py-2.5 text-start font-medium">Type</th>
-                <th className="px-5 py-2.5 text-start font-medium">Default</th>
-                <th className="px-5 py-2.5 text-start font-medium">Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              {doc.props.map((p) => (
-                <tr key={p.name} className="border-b border-separator last:border-0 align-top">
-                  <td className="px-5 py-3 font-mono text-footnote whitespace-nowrap text-fg">{p.name}</td>
-                  <td className="px-5 py-3 font-mono text-footnote text-fg-muted">{p.type}</td>
-                  <td className="px-5 py-3 font-mono text-footnote text-fg-muted">{p.default ?? ""}</td>
-                  <td className="px-5 py-3">{p.description}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      <section className="mt-16" aria-labelledby="props">
+        <h2 id="props" className="mb-4 text-title2">
+          Props
+        </h2>
+        <dl className="overflow-hidden rounded-2xl bg-surface shadow-[inset_0_0_0_1px_var(--pl-separator)]">
+          {doc.props.map((p) => (
+            <div key={p.name} className="grid gap-x-8 gap-y-1.5 border-b border-separator px-5 py-4 last:border-0 md:grid-cols-[minmax(0,14rem)_minmax(0,1fr)]">
+              <dt className="font-mono text-footnote break-words text-fg">{p.name}</dt>
+              <dd className="min-w-0">
+                <p className="text-subhead text-fg">{p.description}</p>
+                <p className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 font-mono text-caption1 text-fg-muted">
+                  <code className="break-words">{p.type}</code>
+                  {p.default && (
+                    <span>
+                      <span className="text-fg-subtle">default </span>
+                      {p.default}
+                    </span>
+                  )}
+                </p>
+              </dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
       {doc.a11y && (
@@ -84,6 +97,25 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
             ))}
           </ul>
         </section>
+      )}
+
+      {(prev || next) && (
+        <nav aria-label="More in this section" className="mt-16 grid gap-3 sm:grid-cols-2">
+          {[prev, next].map((item, i) =>
+            item ? (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`pl-focus-ring group flex flex-col gap-1 rounded-2xl bg-surface px-5 py-4 shadow-[inset_0_0_0_1px_var(--pl-separator)] transition-colors hover:bg-fill-3 ${i ? "sm:col-start-2 sm:items-end" : ""}`}
+              >
+                <span className="flex items-center gap-1.5 text-caption1 text-fg-subtle">
+                  {i ? <>Next <ArrowRight className="size-3.5" /></> : <><ArrowLeft className="size-3.5" /> Previous</>}
+                </span>
+                <span className="text-headline text-fg">{item.name}</span>
+              </Link>
+            ) : null,
+          )}
+        </nav>
       )}
     </article>
   );

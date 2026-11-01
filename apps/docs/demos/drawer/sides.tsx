@@ -26,11 +26,11 @@ export default function Demo() {
             <DrawerDescription>Alfama, Lisbon · confirmation LX4-2817</DrawerDescription>
           </DrawerHeader>
           <DrawerBody>
-            <dl className="divide-y divide-separator">
+            <dl className="overflow-hidden rounded-xl bg-fill-3 ps-4">
               {rows.map(([term, value]) => (
-                <div key={term} className="flex justify-between gap-4 py-2.5 text-subhead">
-                  <dt className="text-fg-muted">{term}</dt>
-                  <dd className="pl-tabular text-end text-fg">{value}</dd>
+                <div key={term} className="flex min-h-11 items-center justify-between gap-4 border-b border-fg/10 py-2.5 pe-4 text-body last:border-0">
+                  <dt className="text-fg">{term}</dt>
+                  <dd className="pl-tabular text-end text-fg-muted">{value}</dd>
                 </div>
               ))}
             </dl>

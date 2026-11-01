@@ -86,6 +86,7 @@ export default function Demo() {
   }, [search, role, sort, page]);
 
   return (
+    <div className="w-full rounded-xl bg-bg p-4">
     <DataTable
       aria-label="Household members"
       columns={columns}
@@ -132,5 +133,6 @@ export default function Demo() {
       onRowClick={(m) => console.info("Open", m.name)}
       className="w-full"
     />
+    </div>
   );
 }

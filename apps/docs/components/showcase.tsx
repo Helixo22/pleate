@@ -1,10 +1,14 @@
-// Home page preview: one app window built only from pleate components, so palette and theme switches show at a
+// Home page previews. Showcase: one app window built only from pleate components, so palette and theme switches show at a
 // glance. The total rolls with Odometer as options change.
 "use client";
 
 import { Avatar, AvatarGroup, Button, Checkbox, Input, SegmentedControl, Switch, Tag } from "pleate";
-import { Odometer, StatusMark } from "pleate/effects/motion-graphics";
-import { useState } from "react";
+import { DecryptedText } from "pleate/effects/animated-text";
+import { DotGlobe } from "pleate/effects/depth";
+import { Spotlight } from "pleate/effects/hover";
+import { Odometer, StatusMark, Waveform } from "pleate/effects/motion-graphics";
+import Link from "next/link";
+import { useState, type ReactNode } from "react";
 
 const EUR: Intl.NumberFormatOptions = { style: "currency", currency: "EUR", maximumFractionDigits: 0 };
 const FARE = { economy: 412, premium: 688 } as const;
@@ -27,7 +31,7 @@ export function Showcase() {
         <span className="font-mono text-caption1 text-fg-subtle">plate.app/trips/lisbon</span>
       </div>
 
-      <div className="grid md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
         <div className="flex flex-col gap-4 p-5 md:border-e md:border-separator">
           <div className="flex items-center gap-3">
             <Avatar name="Sofia Rossi" status="online" />
@@ -96,5 +100,56 @@ export function Showcase() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Home page strip: a few effects running live, each card links to its page. Light ones only (one small canvas).
+const EFFECTS: { name: string; href: string; note: string; preview: ReactNode }[] = [
+  {
+    name: "Decrypted Text",
+    href: "/components/animated-text",
+    note: "Animated text",
+    preview: <DecryptedText text="pleate.ui" trigger="hover" className="font-brand text-title1" />,
+  },
+  {
+    name: "Dot Globe",
+    href: "/components/3d-effects",
+    note: "3D effects",
+    preview: <DotGlobe size={120} dots={600} label="Spinning dot globe" />,
+  },
+  {
+    name: "Waveform",
+    href: "/components/motion-graphics",
+    note: "Motion graphics",
+    preview: <Waveform bars={20} height={40} label="Voice level" />,
+  },
+];
+
+export function FeaturedEffects() {
+  return (
+    <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {EFFECTS.map(({ name, href, note, preview }) => (
+        <li key={name}>
+          <Link href={href} className="pl-focus-ring group flex h-full flex-col overflow-hidden rounded-2xl bg-surface shadow-[inset_0_0_0_1px_var(--pl-separator)] transition-colors hover:bg-fill-3">
+            <span className="grid h-40 place-items-center overflow-hidden border-b border-separator">{preview}</span>
+            <span className="flex items-baseline justify-between gap-3 px-4 py-3">
+              <span className="text-subhead font-medium text-fg">{name}</span>
+              <span className="text-caption1 text-fg-subtle">{note}</span>
+            </span>
+          </Link>
+        </li>
+      ))}
+      <li>
+        <Spotlight className="h-full rounded-2xl bg-surface">
+          <Link href="/components/hover-effects" className="pl-focus-ring flex h-full flex-col overflow-hidden rounded-2xl shadow-[inset_0_0_0_1px_var(--pl-separator)]">
+            <span className="grid h-40 place-items-center border-b border-separator px-6 text-center text-subhead text-fg-muted">Move the pointer here</span>
+            <span className="flex items-baseline justify-between gap-3 px-4 py-3">
+              <span className="text-subhead font-medium text-fg">Spotlight</span>
+              <span className="text-caption1 text-fg-subtle">Hover effects</span>
+            </span>
+          </Link>
+        </Spotlight>
+      </li>
+    </ul>
   );
 }
