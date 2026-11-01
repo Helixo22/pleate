@@ -9,7 +9,7 @@ export type AuthCardProps = Omit<HTMLAttributes<HTMLElement>, "title"> & {
   title?: ReactNode;
   description?: ReactNode;
   footer?: ReactNode;
-  /** "card": a surface with a shadow; "plain": no surface (when the page already provides one). */
+  /** "card": a rounded surface with a hairline edge; "plain": no surface (when the page already provides one). */
   variant?: "card" | "plain";
   /** Heading level of the title. */
   headingLevel?: 1 | 2 | 3;
@@ -31,16 +31,16 @@ export function AuthCard({
     <section
       className={cn(
         "flex w-full max-w-[26rem] flex-col gap-6 text-fg",
-        variant === "card" && "pl-field [--pl-field-border:var(--pl-separator)] rounded-xl bg-surface p-5 sm:p-8",
+        variant === "card" && "rounded-3xl bg-surface p-6 shadow-[var(--pl-edge)] sm:p-8",
         className,
       )}
       {...props}
     >
       {(logo || title || description) && (
-        <header className="flex flex-col items-center gap-2 text-center">
+        <header className="flex flex-col items-center gap-1.5 text-center">
           {logo && <div className="mb-2 flex items-center justify-center">{logo}</div>}
-          {title && <Heading className="text-title2 text-balance">{title}</Heading>}
-          {description && <p className="max-w-xs text-subhead text-pretty text-fg-muted">{description}</p>}
+          {title && <Heading className="text-title1 text-balance">{title}</Heading>}
+          {description && <p className="max-w-xs text-callout text-pretty text-fg-muted">{description}</p>}
         </header>
       )}
       {children}

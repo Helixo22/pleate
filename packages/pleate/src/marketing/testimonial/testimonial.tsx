@@ -31,7 +31,7 @@ function Stars({ rating }: { rating: number }) {
 
 export function TestimonialCard({ quote, name, role, avatar, rating, className }: Testimonial & { className?: string }) {
   return (
-    <figure className={cn("flex flex-col gap-4 pl-field [--pl-field-border:var(--pl-separator)] rounded-xl bg-surface p-6", className)}>
+    <figure className={cn("flex flex-col gap-4 rounded-2xl bg-surface p-6 shadow-[var(--pl-edge)]", className)}>
       {rating !== undefined && <Stars rating={rating} />}
       <blockquote className="text-body text-pretty text-fg">{quote}</blockquote>
       <figcaption className="mt-auto flex items-center gap-3">
@@ -62,7 +62,7 @@ export function Testimonials({ items, layout = "grid", label = "Testimonials", c
         <svg viewBox="0 0 32 24" className="h-8 text-accent-ink" fill="currentColor" aria-hidden="true">
           <path d="M0 24V14C0 6 4 1.2 12 0l1.5 3.3C9 4.6 7 7.4 6.8 11H13v13H0Zm19 0V14c0-8 4-12.8 12-14l1 3.3c-4.5 1.3-6.5 4.1-6.7 7.7H32v13H19Z" />
         </svg>
-        <blockquote className="text-title1 leading-tight font-semibold text-balance md:text-[2.25rem]">{t.quote}</blockquote>
+        <blockquote className="text-display-sm font-semibold text-balance">{t.quote}</blockquote>
         <figcaption className="flex items-center gap-3 text-start">
           <Avatar src={t.avatar} name={t.name} size="lg" />
           <span className="flex flex-col">
@@ -79,7 +79,7 @@ export function Testimonials({ items, layout = "grid", label = "Testimonials", c
       if (el) el.scrollBy({ left: dir * el.clientWidth * 0.85, behavior: "smooth" });
     };
     const arrow =
-      "pl-focus-ring pl-hit relative grid size-10 cursor-pointer place-items-center rounded-md pl-field bg-surface text-fg transition-colors hover:bg-surface-2 [&_svg]:size-5";
+      "pl-focus-ring pl-touch pl-hit relative grid size-10 cursor-pointer place-items-center rounded-full bg-fill-2 text-fg transition-[background-color,scale] hover:bg-fill motion-safe:active:scale-95 [&_svg]:size-5";
     return (
       <div className={cn("flex flex-col gap-5", className)}>
         <ul

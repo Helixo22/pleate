@@ -17,9 +17,9 @@
 
 # pleate
 
-pleate is a React component library for Next.js with a precise, quiet look: graphite neutrals and one accent, Geist
-with Geist Mono for figures, squared corners, bordered controls on solid surfaces, and motion that is quick and only
-there when it explains something.
+pleate is a React component library for Next.js with an iOS look: grouped gray and true black backgrounds, one
+accent, cards that take their own color, capsule buttons, generous corners, iOS type sizes, Space Mono for wordmarks,
+and motion that is quick and only there when it explains something.
 
 It ships more than 90 components, from buttons and form fields to bottom sheets, a full AI chat and marketing
 sections. Every one of them follows your palette, works in light and dark mode, adapts to phones and desktops, and
@@ -76,6 +76,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   );
 }
 ```
+
+Fonts are optional: load Geist, Geist Mono and Space Mono with `next/font/google` as the variables `--font-geist`,
+`--font-geist-mono` and `--font-space-mono` (Space Mono drives the `font-brand` utility for wordmarks and hero
+titles). Without them pleate falls back to the system faces.
 
 **3. Use the components.**
 

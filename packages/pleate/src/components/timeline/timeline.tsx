@@ -47,7 +47,7 @@ export function TimelineItem({ title, time, description, icon, status = "done", 
           "relative z-[1] mt-0.5 grid size-6 shrink-0 place-items-center rounded-full text-caption2 font-medium [&_svg]:size-3.5",
           status === "done" && t.fill,
           status === "current" && cn("bg-surface ring-2 ring-offset-0", t.ring, t.ink),
-          status === "upcoming" && "bg-surface ring-2 ring-separator",
+          status === "upcoming" && "bg-surface ring-2 ring-border",
         )}
       >
         {icon ?? (status === "done" ? <CheckIcon strokeWidth={3} /> : status === "current" ? <span className={cn("size-2 rounded-full", t.line)} /> : null)}

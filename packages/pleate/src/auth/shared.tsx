@@ -38,6 +38,9 @@ export function FormError({ error }: { error?: string | null }) {
   );
 }
 
+/** iOS text fields: filled wells, 44px tall. Spread on every Input in the auth forms. */
+export const field = { variant: "filled", size: "lg" } as const;
+
 export const text = (value: FieldValue) => (typeof value === "string" ? value : "");
 export const checked = (value: FieldValue) => value === "on" || value === "true";
 

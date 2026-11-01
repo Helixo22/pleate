@@ -9,7 +9,7 @@ import { Form, FormField } from "../../components/form/form.tsx";
 import { Input } from "../../components/input/input.tsx";
 import { cn } from "../../lib/cn.ts";
 import { MailIcon } from "../../lib/icons.tsx";
-import { Footer, FormError, SubmitButton, text, useSubmitError, type AuthFormBaseProps } from "../shared.tsx";
+import { Footer, FormError, SubmitButton, text, useSubmitError, type AuthFormBaseProps, field } from "../shared.tsx";
 
 export type ForgotPasswordValues = { email: string };
 
@@ -108,7 +108,7 @@ export function ForgotPasswordForm({
             type={{ value: "email", message: l.emailInvalid }}
             error={fieldErrors?.email}
           >
-            <Input type="email" autoComplete="email" inputMode="email" placeholder={l.emailPlaceholder} defaultValue={email} />
+            <Input {...field} type="email" autoComplete="email" inputMode="email" placeholder={l.emailPlaceholder} defaultValue={email} />
           </FormField>
           <div className="pt-1">
             <SubmitButton loading={loading}>{l.submit}</SubmitButton>

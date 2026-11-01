@@ -9,7 +9,7 @@ import { Dialog } from "radix-ui";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";
 import { XIcon } from "../../lib/icons.tsx";
-import { closeButton } from "../../lib/overlay-styles.ts";
+import { hairline, sheetCloseButton } from "../../lib/overlay-styles.ts";
 import { spring } from "../../motion/tokens.ts";
 import { useReducedMotion } from "../../motion/use-reduced-motion.ts";
 
@@ -130,7 +130,8 @@ export function BottomSheet({
             >
               <motion.div
                 className={cn(
-                  "fixed inset-x-0 bottom-0 z-(--pl-z-modal) mx-auto flex w-full flex-col rounded-t-xl bg-elevated text-fg shadow-xl outline-none md:max-w-xl",
+                  "fixed inset-x-0 bottom-0 z-(--pl-z-modal) mx-auto flex w-full flex-col rounded-t-3xl bg-elevated text-fg shadow-xl outline-none md:max-w-xl",
+                  hairline,
                   className,
                 )}
                 style={{ height: sheetHeight, y }}
@@ -149,17 +150,17 @@ export function BottomSheet({
                 {/* Drag handle area: grabber + header. */}
                 <div className="shrink-0 cursor-grab touch-none select-none active:cursor-grabbing" onPointerDown={(event) => drag.start(event)}>
                   <div className="flex justify-center pt-2 pb-1">
-                    <span aria-hidden="true" className="h-1 w-8 rounded-full bg-fill" />
+                    <span aria-hidden="true" className="h-[5px] w-9 rounded-full bg-fill" />
                   </div>
                   {(title || showClose) && (
                     <div className="flex items-start gap-3 px-5 pt-1 pb-3">
                       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                        {title && <Dialog.Title className="text-headline">{title}</Dialog.Title>}
+                        {title && <Dialog.Title className="text-title3">{title}</Dialog.Title>}
                         {description && <Dialog.Description className="text-footnote text-fg-muted">{description}</Dialog.Description>}
                       </div>
                       {showClose && (
-                        <Dialog.Close className={closeButton} aria-label={closeLabel}>
-                          <XIcon strokeWidth={2.5} />
+                        <Dialog.Close className={sheetCloseButton} aria-label={closeLabel}>
+                          <XIcon strokeWidth={3} />
                         </Dialog.Close>
                       )}
                     </div>
@@ -176,7 +177,7 @@ export function BottomSheet({
                 {footer && (
                   <motion.div
                     style={{ y: footerY }}
-                    className="shrink-0 border-t border-separator bg-elevated px-5 pt-3 pb-[calc(0.75rem+var(--pl-safe-bottom))]"
+                    className="shrink-0 border-t border-(--pl-hair) bg-elevated px-5 pt-3 pb-[calc(0.75rem+var(--pl-safe-bottom))]"
                   >
                     {footer}
                   </motion.div>

@@ -1,4 +1,4 @@
-// UsageMeter: how much of a plan is used. One stacked bar of segments against a max, a legend with mono figures and
+// UsageMeter: how much of a plan is used. One stacked bar of segments against a max, a legend with tabular figures and
 // a total line ("7.2 of 10 GB"). The first segment carries the accent, the rest step down a neutral ramp; past warnAt
 // or dangerAt the lead turns warning or danger. The bar grows from 0 the first time it is seen.
 "use client";
@@ -62,11 +62,11 @@ export function UsageMeter({ segments, max, label, unit, warnAt = 0.8, dangerAt 
 
   return (
     <div className={cn("flex w-full flex-col gap-2.5", className)}>
-      <div className="flex items-baseline justify-between gap-3 text-footnote">
-        <span id={id} className="font-medium text-fg">
+      <div className="flex items-baseline justify-between gap-3">
+        <span id={id} className="text-body text-fg">
           {label}
         </span>
-        <span className="pl-tabular shrink-0 font-mono text-fg-muted" aria-hidden="true">
+        <span className="pl-tabular shrink-0 text-subhead text-fg-muted" aria-hidden="true">
           <Odometer value={used} format={format} locale={locale} className={FIGURE[state]} /> of {fmt.format(max)}
           {u}
         </span>
@@ -79,7 +79,7 @@ export function UsageMeter({ segments, max, label, unit, warnAt = 0.8, dangerAt 
         aria-valuemax={max}
         aria-valuenow={Math.min(used, max)}
         aria-valuetext={`${fmt.format(used)} of ${fmt.format(max)}${u} used, ${Math.round(ratio * 100)}%`}
-        className="h-2 w-full overflow-hidden rounded-xs bg-fill"
+        className="h-3 w-full overflow-hidden rounded-[0.25rem] bg-fill-2"
       >
         <div
           className="flex h-full gap-px ease-out ltr:origin-left rtl:origin-right motion-safe:transition-transform motion-safe:duration-(--pl-duration-slow)"
@@ -90,12 +90,12 @@ export function UsageMeter({ segments, max, label, unit, warnAt = 0.8, dangerAt 
           ))}
         </div>
       </div>
-      <ul className="flex flex-wrap gap-x-4 gap-y-1 text-caption1">
+      <ul className="flex flex-wrap gap-x-4 gap-y-1 text-footnote">
         {segments.map((s, i) => (
           <li key={s.label} className="flex items-center gap-1.5">
-            <span aria-hidden="true" className={cn("size-2 shrink-0 rounded-[2px]", swatches[i])} />
+            <span aria-hidden="true" className={cn("size-2 shrink-0 rounded-full", swatches[i])} />
             <span className="text-fg-muted">{s.label}</span>
-            <span className="font-mono text-fg">
+            <span className="pl-tabular text-fg">
               <Odometer value={s.value} format={format} locale={locale} />
               {u}
             </span>

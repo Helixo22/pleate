@@ -79,7 +79,7 @@ export function ChatThread({ className, contentClassName, threshold = 80, latest
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.9 }}
             transition={reduced ? { duration: 0.1 } : spring.snap}
-            className="pl-focus-ring pl-hit absolute start-1/2 bottom-4 grid size-9 -translate-x-1/2 cursor-pointer place-items-center rounded-md bg-elevated text-fg shadow-lg [&_svg]:size-5"
+            className="pl-focus-ring pl-hit absolute start-1/2 bottom-4 grid size-9 -translate-x-1/2 cursor-pointer place-items-center rounded-full bg-elevated text-fg shadow-lg [&_svg]:size-5"
           >
             <ChevronDownIcon strokeWidth={2.5} />
           </motion.button>
@@ -101,8 +101,13 @@ export type MessageProps = Omit<HTMLAttributes<HTMLDivElement>, "role"> & {
   actions?: ReactNode;
   /** Attachments, sources or cards under the text. */
   footer?: ReactNode;
-  /** Groups consecutive messages: hides avatar/name and tightens the corner. */
+  /** Groups consecutive messages: hides avatar/name and pulls the bubble close to the one above. */
   continued?: boolean;
+  /** Bubble tail: the tight corner on the sender's side. Messages draws it on the last bubble of a group, so pass
+   *  `tail` there; defaults to the first bubble of a group (not `continued`). */
+  tail?: boolean;
+  /** Small line under a user bubble, like "Delivered" or "Read 9:42". */
+  receipt?: ReactNode;
   errorLabel?: ReactNode;
 };
 
@@ -116,6 +121,8 @@ export function Message({
   actions,
   footer,
   continued,
+  tail = !continued,
+  receipt,
   errorLabel = "Not delivered",
   className,
   children,
@@ -124,7 +131,7 @@ export function Message({
   const reduced = useReducedMotion();
   if (role === "system") {
     return (
-      <div className={cn("self-center rounded-md bg-fill-2 px-3 py-1 text-center text-footnote text-fg-muted", className)} {...props}>
+      <div className={cn("self-center rounded-full px-3 py-1 text-center text-caption1 text-fg-muted", className)} {...props}>
         {children}
       </div>
     );
@@ -137,7 +144,7 @@ export function Message({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={spring.soft}
       data-role={role}
-      className={cn("group/msg flex w-full gap-3", user ? "flex-row-reverse" : "flex-row", continued && "-mt-3.5", className)}
+      className={cn("group/msg flex w-full gap-3", user ? "flex-row-reverse" : "flex-row", continued && "-mt-4", className)}
       {...(props as object)}
     >
       {!user && avatar !== undefined && <div className={cn("w-8 shrink-0", continued && "invisible")}>{avatar}</div>}
@@ -154,9 +161,9 @@ export function Message({
             doc
               ? "w-full text-fg"
               : [
-                  "rounded-[1.25rem] px-3.5 py-2",
+                  "rounded-[1.125rem] px-3.5 py-2",
                   user ? "bg-accent text-on-accent" : "bg-fill-2 text-fg",
-                  !continued && (user ? "rounded-br-md" : "rounded-bl-md"),
+                  tail && (user ? "rounded-ee-[0.375rem]" : "rounded-es-[0.375rem]"),
                 ],
             status === "sending" && "opacity-70",
           )}
@@ -164,6 +171,7 @@ export function Message({
           {children}
         </div>
         {footer && <div className="w-full">{footer}</div>}
+        {receipt && status !== "error" && <span className="px-1 text-caption1 text-fg-muted">{receipt}</span>}
         {status === "error" && <span className="px-1 text-footnote font-medium text-danger-ink">{errorLabel}</span>}
         {actions && (
           <div className="flex items-center gap-0.5 opacity-100 transition-opacity duration-(--pl-duration-fast) md:opacity-0 md:group-hover/msg:opacity-100 md:group-focus-within/msg:opacity-100">
@@ -183,7 +191,7 @@ export function MessageAction({ label, className, children, ...props }: HTMLAttr
       aria-label={label}
       title={label}
       className={cn(
-        "pl-focus-ring grid size-8 cursor-pointer place-items-center rounded-lg text-fg-muted transition-colors hover:bg-fill-2 hover:text-fg [&_svg]:size-4",
+        "pl-focus-ring grid size-8 cursor-pointer place-items-center rounded-full text-fg-muted transition-colors hover:bg-fill-2 hover:text-fg [&_svg]:size-4",
         className,
       )}
       {...props}

@@ -46,7 +46,7 @@ export function SearchBar({
   loading = false,
   shortcut,
   size = "md",
-  variant = "surface",
+  variant = "filled",
   label = "Search",
   placeholder = "Search",
   className,

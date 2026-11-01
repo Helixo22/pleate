@@ -26,6 +26,8 @@ export type OAuthButtonsProps = {
   /** "stack": full-width rows; "row": side by side, icons only on small widths when there are three or more. */
   layout?: "stack" | "row";
   size?: "md" | "lg";
+  /** "filled" (default): iOS gray capsules, Apple in black or white; "outline": bordered capsules. */
+  appearance?: "filled" | "outline";
   labels?: { continueWith?: (name: string) => string };
   className?: string;
 };
@@ -63,7 +65,8 @@ export function OAuthButtons({
   loadingId,
   disabled,
   layout = "stack",
-  size = "md",
+  size = "lg",
+  appearance = "filled",
   labels,
   className,
 }: OAuthButtonsProps) {
@@ -85,11 +88,12 @@ export function OAuthButtons({
           </>
         );
         const common = {
-          variant: "outline" as const,
+          // Apple's guidelines ask for a black (or white on dark) button, so its mark gets the inverse fill.
+          variant: appearance === "outline" ? ("outline" as const) : provider.id === "apple" ? ("filled" as const) : ("gray" as const),
           tone: "neutral" as const,
           size,
           fullWidth: true,
-          className: "min-w-0 font-medium",
+          className: "min-w-0",
           "aria-label": layout === "row" ? label : undefined,
         };
         if (provider.href && !off && !busy) {

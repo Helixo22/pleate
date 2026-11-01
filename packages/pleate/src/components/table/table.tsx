@@ -36,7 +36,7 @@ export function Table({
       <div
         className={cn(
           "relative w-full overflow-auto",
-          surface && "pl-field [--pl-field-border:var(--pl-separator)] rounded-2xl bg-surface",
+          surface && "rounded-2xl bg-surface shadow-[var(--pl-edge)]",
           stackOnMobile && surface && "max-md:rounded-none max-md:bg-transparent max-md:shadow-none",
           wrapperClassName,
         )}
@@ -88,7 +88,7 @@ export function TableRow({ className, ...props }: HTMLAttributes<HTMLTableRowEle
         hoverable && "[tbody_&]:hover:bg-fill-3",
         "data-[state=selected]:bg-accent-soft",
         "[tbody_&:last-child_td]:border-b-0",
-        stackOnMobile && "max-md:flex max-md:flex-col max-md:rounded-2xl max-md:bg-surface max-md:p-1 max-md:pl-field max-md:[--pl-field-border:var(--pl-separator)]",
+        stackOnMobile && "max-md:flex max-md:flex-col max-md:rounded-2xl max-md:bg-surface max-md:p-1 max-md:shadow-[var(--pl-edge)]",
         className,
       )}
       {...props}

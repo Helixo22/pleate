@@ -8,7 +8,7 @@ import { Dialog } from "radix-ui";
 import type { ComponentProps, HTMLAttributes } from "react";
 import { cn } from "../../lib/cn.ts";
 import { XIcon } from "../../lib/icons.tsx";
-import { closeButton, overlayBackdrop } from "../../lib/overlay-styles.ts";
+import { hairline, overlayBackdrop, sheetCloseButton } from "../../lib/overlay-styles.ts";
 
 export const Drawer = Dialog.Root;
 export const DrawerTrigger = Dialog.Trigger;
@@ -20,7 +20,7 @@ const contentVariants = cva("fixed z-(--pl-z-modal) flex flex-col overflow-hidde
       // pl-drawer slides along --pl-drawer-from; flipped under RTL so the panel enters from its own edge.
       start: "pl-drawer inset-y-0 start-0 w-[calc(100%-2rem)] pt-(--pl-safe-top) pb-(--pl-safe-bottom) [--pl-drawer-from:-100%] rtl:[--pl-drawer-from:100%]",
       end: "pl-drawer inset-y-0 end-0 w-[calc(100%-2rem)] pt-(--pl-safe-top) pb-(--pl-safe-bottom) [--pl-drawer-from:100%] rtl:[--pl-drawer-from:-100%]",
-      bottom: "pl-dialog-sheet inset-x-0 bottom-0 rounded-t-xl pb-(--pl-safe-bottom)",
+      bottom: "pl-dialog-sheet inset-x-0 bottom-0 rounded-t-3xl pb-(--pl-safe-bottom)",
     },
     size: { sm: "", md: "", lg: "" },
   },
@@ -46,11 +46,11 @@ export function DrawerContent({ className, side, size, showClose = true, closeLa
   return (
     <Dialog.Portal>
       <Dialog.Overlay className={overlayBackdrop} />
-      <Dialog.Content className={cn(contentVariants({ side, size }), className)} {...props}>
+      <Dialog.Content className={cn(contentVariants({ side, size }), hairline, className)} {...props}>
         {children}
         {showClose && (
-          <Dialog.Close className={cn(closeButton, "absolute end-3 top-[calc(var(--pl-safe-top)+0.75rem)]", side === "bottom" && "top-3")} aria-label={closeLabel}>
-            <XIcon strokeWidth={2.5} />
+          <Dialog.Close className={cn(sheetCloseButton, "absolute end-4 top-[calc(var(--pl-safe-top)+1rem)]", side === "bottom" && "top-4")} aria-label={closeLabel}>
+            <XIcon strokeWidth={3} />
           </Dialog.Close>
         )}
       </Dialog.Content>
@@ -79,7 +79,7 @@ export function DrawerBody({ className, ...props }: DivProps) {
 export function DrawerFooter({ className, ...props }: DivProps) {
   return (
     <div
-      className={cn("flex shrink-0 flex-col-reverse gap-2 border-t border-separator bg-surface-2 px-5 py-3.5 sm:flex-row sm:justify-end [&>*]:max-sm:w-full", className)}
+      className={cn("flex shrink-0 flex-col-reverse gap-2 border-t border-(--pl-hair) px-5 pt-3 pb-5 sm:flex-row sm:justify-end [&>*]:max-sm:w-full", className)}
       {...props}
     />
   );

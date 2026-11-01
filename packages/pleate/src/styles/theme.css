@@ -39,6 +39,7 @@
   --color-fg-muted: var(--pl-fg-muted);
   --color-fg-subtle: var(--pl-fg-subtle);
   --color-separator: var(--pl-separator);
+  --color-separator-raised: var(--pl-separator-raised);
   --color-border: var(--pl-border);
   --color-border-strong: var(--pl-border-strong);
 
@@ -81,8 +82,9 @@
   --font-sans: var(--pl-font-sans);
   --font-display: var(--pl-font-display);
   --font-mono: var(--pl-font-mono);
+  --font-brand: var(--pl-font-brand);
 
-  /* Squared off: controls 6, inputs and rows 8, cards 10 to 12, panels 14 to 16. */
+  /* At the default roundness (1.5): controls 9, inputs and rows 12, cards 18, panels 21 to 24. */
   --radius-xs: calc(0.25rem * var(--pl-roundness));
   --radius-sm: calc(0.375rem * var(--pl-roundness));
   --radius-md: calc(0.5rem * var(--pl-roundness));
@@ -105,53 +107,53 @@
   --ease-spring: var(--pl-ease-spring);
 }
 
-/* Type scale: the names stay (components and apps use them), the values are Geist's. Hierarchy comes from size and
-   color; titles stop at 600, text at 400/500, and nothing under 16px gets negative tracking. */
+/* Type scale: the iOS Dynamic Type sizes at their default ("Large") setting. Body text is 17px, titles are bold and
+   headlines semibold; hierarchy comes from size and weight, color does the rest. */
 @theme {
   --text-display-xl: clamp(2.75rem, 1.9rem + 3.8vw, 4.75rem);
-  --text-display-xl--line-height: 1.04;
+  --text-display-xl--line-height: 1;
   --text-display-xl--letter-spacing: -0.035em;
-  --text-display-xl--font-weight: 600;
+  --text-display-xl--font-weight: 700;
   --text-display: clamp(2.25rem, 1.75rem + 2.2vw, 3.5rem);
-  --text-display--line-height: 1.06;
+  --text-display--line-height: 1.05;
   --text-display--letter-spacing: -0.03em;
-  --text-display--font-weight: 600;
+  --text-display--font-weight: 700;
   --text-display-sm: clamp(1.875rem, 1.55rem + 1.4vw, 2.625rem);
-  --text-display-sm--line-height: 1.12;
+  --text-display-sm--line-height: 1.1;
   --text-display-sm--letter-spacing: -0.025em;
-  --text-display-sm--font-weight: 600;
+  --text-display-sm--font-weight: 700;
 
-  --text-large-title: 2rem;
-  --text-large-title--line-height: 2.375rem;
-  --text-large-title--letter-spacing: -0.025em;
-  --text-large-title--font-weight: 600;
-  --text-title1: 1.625rem;
-  --text-title1--line-height: 2rem;
-  --text-title1--letter-spacing: -0.02em;
-  --text-title1--font-weight: 600;
-  --text-title2: 1.25rem;
+  --text-large-title: 2.125rem;
+  --text-large-title--line-height: 2.5625rem;
+  --text-large-title--letter-spacing: -0.02em;
+  --text-large-title--font-weight: 700;
+  --text-title1: 1.75rem;
+  --text-title1--line-height: 2.125rem;
+  --text-title1--letter-spacing: -0.018em;
+  --text-title1--font-weight: 700;
+  --text-title2: 1.375rem;
   --text-title2--line-height: 1.75rem;
   --text-title2--letter-spacing: -0.012em;
-  --text-title2--font-weight: 600;
-  --text-title3: 1.0625rem;
-  --text-title3--line-height: 1.5rem;
-  --text-title3--letter-spacing: -0.006em;
-  --text-title3--font-weight: 500;
-  --text-headline: 0.9375rem;
+  --text-title2--font-weight: 700;
+  --text-title3: 1.25rem;
+  --text-title3--line-height: 1.5625rem;
+  --text-title3--letter-spacing: -0.01em;
+  --text-title3--font-weight: 600;
+  --text-headline: 1.0625rem;
   --text-headline--line-height: 1.375rem;
-  --text-headline--font-weight: 500;
-  --text-body: 0.9375rem;
-  --text-body--line-height: 1.5rem;
-  --text-callout: 0.875rem;
-  --text-callout--line-height: 1.375rem;
-  --text-subhead: 0.875rem;
+  --text-headline--font-weight: 600;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.375rem;
+  --text-callout: 1rem;
+  --text-callout--line-height: 1.3125rem;
+  --text-subhead: 0.9375rem;
   --text-subhead--line-height: 1.25rem;
   --text-footnote: 0.8125rem;
   --text-footnote--line-height: 1.125rem;
   --text-caption1: 0.75rem;
   --text-caption1--line-height: 1rem;
   --text-caption2: 0.6875rem;
-  --text-caption2--line-height: 0.875rem;
+  --text-caption2--line-height: 0.8125rem;
   --text-caption2--letter-spacing: 0.01em;
 }
 

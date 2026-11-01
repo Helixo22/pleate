@@ -8,7 +8,7 @@ import { Dialog } from "radix-ui";
 import { createContext, useContext, type ComponentProps, type HTMLAttributes } from "react";
 import { cn } from "../../lib/cn.ts";
 import { XIcon } from "../../lib/icons.tsx";
-import { closeButton, overlayBackdrop } from "../../lib/overlay-styles.ts";
+import { overlayBackdrop, sheetCloseButton } from "../../lib/overlay-styles.ts";
 
 export const Modal = Dialog.Root;
 export const ModalTrigger = Dialog.Trigger;
@@ -21,8 +21,8 @@ const contentVariants = cva(
   {
     variants: {
       mobile: {
-        sheet: "max-md:pl-dialog-sheet inset-x-0 bottom-0 max-h-[94dvh] rounded-t-xl pb-(--pl-safe-bottom) md:pl-dialog",
-        center: "pl-dialog inset-x-4 top-1/2 max-h-[88dvh] -translate-y-1/2 rounded-xl",
+        sheet: "max-md:pl-dialog-sheet inset-x-0 bottom-0 max-h-[94dvh] rounded-t-3xl pb-(--pl-safe-bottom) md:pl-dialog",
+        center: "pl-dialog inset-x-4 top-1/2 max-h-[88dvh] -translate-y-1/2 rounded-2xl",
       },
       size: {
         sm: "md:max-w-sm",
@@ -37,7 +37,7 @@ const contentVariants = cva(
 );
 
 const desktop =
-  "md:inset-x-auto md:start-1/2 md:top-1/2 md:bottom-auto md:w-[calc(100%-3rem)] md:max-h-[85dvh] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-xl md:pb-0 rtl:md:translate-x-1/2";
+  "md:inset-x-auto md:start-1/2 md:top-1/2 md:bottom-auto md:w-[calc(100%-3rem)] md:max-h-[85dvh] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:pb-0 rtl:md:translate-x-1/2";
 
 const ModalContext = createContext<{ mobile: "sheet" | "center" }>({ mobile: "sheet" });
 
@@ -57,8 +57,8 @@ export function ModalContent({ className, size, mobile = "sheet", showClose = tr
           {mobile === "sheet" && <div aria-hidden="true" className="mx-auto mt-2 h-1 w-8 shrink-0 rounded-full bg-fill md:hidden" />}
           {children}
           {showClose && (
-            <Dialog.Close className={cn(closeButton, "absolute end-3 top-3")} aria-label={closeLabel}>
-              <XIcon strokeWidth={2.5} />
+            <Dialog.Close className={cn(sheetCloseButton, "absolute end-4 top-4")} aria-label={closeLabel}>
+              <XIcon strokeWidth={3} />
             </Dialog.Close>
           )}
         </ModalContext.Provider>
@@ -89,7 +89,7 @@ export function ModalBody({ className, ...props }: DivProps) {
 export function ModalFooter({ className, ...props }: DivProps) {
   return (
     <div
-      className={cn("mt-2 flex shrink-0 flex-col-reverse gap-2 border-t border-separator bg-surface-2 px-5 py-3.5 md:flex-row md:justify-end [&>*]:max-md:w-full", className)}
+      className={cn("flex shrink-0 flex-col-reverse gap-2 px-5 pt-3 pb-5 md:flex-row md:justify-end [&>*]:max-md:w-full", className)}
       {...props}
     />
   );

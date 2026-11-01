@@ -64,7 +64,7 @@ export function ActionBar({
             exit={{ opacity: 0, y: 24 }}
             transition={spring.sheet}
             className={cn(
-              "pointer-events-auto flex h-14 w-full items-center gap-3 rounded-lg bg-elevated ps-4 pe-2 text-fg shadow-lg sm:w-auto sm:min-w-96",
+              "pointer-events-auto flex h-14 w-full items-center gap-3 rounded-full bg-elevated ps-5 pe-2 text-fg shadow-[var(--pl-shadow-lg),var(--pl-edge)] sm:w-auto sm:min-w-96",
               className,
             )}
           >

@@ -5,7 +5,7 @@
 import { Form, FormField } from "../../components/form/form.tsx";
 import { PasswordInput, scorePassword, type PasswordScore } from "../../components/password-input/password-input.tsx";
 import { cn } from "../../lib/cn.ts";
-import { Footer, FormError, SubmitButton, text, useSubmitError, type AuthFormBaseProps } from "../shared.tsx";
+import { Footer, FormError, SubmitButton, text, useSubmitError, type AuthFormBaseProps, field } from "../shared.tsx";
 
 export type ResetPasswordValues = { password: string; confirmPassword: string };
 
@@ -70,7 +70,7 @@ export function ResetPasswordForm({
           validate={(value) => (minStrength !== undefined && typeof value === "string" && scorePassword(value) < minStrength ? l.passwordTooWeak : undefined)}
           error={fieldErrors?.password}
         >
-          <PasswordInput autoComplete="new-password" showStrength={showStrength} />
+          <PasswordInput {...field} autoComplete="new-password" showStrength={showStrength} />
         </FormField>
         <FormField
           name="confirmPassword"
@@ -79,7 +79,7 @@ export function ResetPasswordForm({
           validate={(value, values) => (value !== values.password ? l.mismatch : undefined)}
           error={fieldErrors?.confirmPassword}
         >
-          <PasswordInput autoComplete="new-password" />
+          <PasswordInput {...field} autoComplete="new-password" />
         </FormField>
         <div className="pt-1">
           <SubmitButton loading={loading}>{l.submit}</SubmitButton>

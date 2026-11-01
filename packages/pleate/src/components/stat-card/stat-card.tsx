@@ -80,13 +80,13 @@ export function StatCard({
 
   const good = delta === undefined ? null : invertTrend ? delta <= 0 : delta >= 0;
   return (
-    <div ref={ref} className={cn("flex flex-col gap-3 pl-field [--pl-field-border:var(--pl-separator)] rounded-2xl bg-surface p-5", className)}>
+    <div ref={ref} className={cn("flex flex-col gap-2 rounded-2xl bg-surface p-5 shadow-[var(--pl-edge)]", className)}>
       <div className="flex items-center justify-between gap-3">
         <span className="text-subhead font-medium text-fg-muted">{label}</span>
         {icon && <span className="grid size-8 place-items-center rounded-md bg-fill-2 text-fg-muted [&_svg]:size-[1.125rem]">{icon}</span>}
       </div>
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="pl-tabular text-large-title tracking-tight text-fg">
+        <span className="pl-tabular text-large-title font-semibold tracking-tight text-fg">
           {/* Screen readers get the final value, not every animation frame. */}
           <span aria-hidden="true">{format(shown)}</span>
           <span className="sr-only">{format(value)}</span>
@@ -95,8 +95,8 @@ export function StatCard({
           <span className="flex items-center gap-1 text-footnote">
             <span
               className={cn(
-                "pl-tabular inline-flex items-center gap-0.5 rounded-xs px-1.5 py-0.5 font-medium",
-                good ? "bg-success-soft text-success-ink" : "bg-danger-soft text-danger-ink",
+                "pl-tabular inline-flex items-center gap-1 font-medium",
+                good ? "text-success-ink" : "text-danger-ink",
               )}
             >
               <svg viewBox="0 0 12 12" className={cn("size-2.5", delta < 0 && "rotate-180")} aria-hidden="true">

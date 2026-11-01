@@ -4,7 +4,7 @@ import type { HTMLAttributes, Ref } from "react";
 import { cn } from "../../lib/cn.ts";
 
 export const badgeVariants = cva(
-  "pl-tabular inline-flex shrink-0 items-center justify-center gap-1 rounded-xs font-medium whitespace-nowrap",
+  "pl-tabular inline-flex shrink-0 items-center justify-center gap-1 rounded-full font-medium whitespace-nowrap",
   {
     variants: {
       variant: { solid: "", soft: "", outline: "bg-transparent" },

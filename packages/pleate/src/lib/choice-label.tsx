@@ -32,7 +32,7 @@ export function ChoiceLabel({ id, label, description, placement = "end", disable
       className={cn(
         "pl-touch flex cursor-pointer gap-2.5",
         description ? "items-start" : "items-center",
-        placement === "start" && "justify-between",
+        placement === "start" && "w-full justify-between",
         disabled && "cursor-not-allowed opacity-50",
         className,
       )}
