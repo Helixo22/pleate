@@ -9,6 +9,9 @@
   }
   body {
     background-color: var(--pl-bg);
+    /* A soft accent glow at the top of the page; the rest stays on the plain background. */
+    background-image: radial-gradient(ellipse 110% 420px at 50% -120px, var(--pl-bg-tint), transparent 72%);
+    background-repeat: no-repeat;
     color: var(--pl-fg);
     font-family: var(--pl-font-sans);
     -webkit-font-smoothing: antialiased;

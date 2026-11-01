@@ -1,5 +1,6 @@
 // Pricing: plans side by side with a monthly / yearly switch (prices roll to the new amount, the yearly saving is
-// shown). The highlighted plan gets an accent ring and a badge. Feature lists mark what's included and what isn't.
+// shown). Plans line up row by row (name, price, button, features) through a subgrid. The highlighted plan gets an
+// accent ring and a badge. Feature lists mark what's included and what isn't.
 // Prices are formatted with Intl for the given currency and locale.
 "use client";
 
@@ -103,23 +104,24 @@ export function Pricing({
               { value: "yearly", label: l.yearly },
             ]}
           />
-          {saving > 0 && <span className="rounded-sm bg-success-soft px-2 py-0.5 text-footnote font-medium text-success-ink">{l.save(saving)}</span>}
+          {saving > 0 && <span className="rounded-full bg-success-soft px-2.5 py-0.5 text-footnote font-medium text-success-ink">{l.save(saving)}</span>}
         </div>
       )}
-      <div className={cn("grid w-full items-stretch gap-4", plans.length === 2 ? "md:grid-cols-2" : plans.length >= 3 ? "md:grid-cols-2 lg:grid-cols-3" : "", plans.length === 4 && "xl:grid-cols-4")}>
+      <div className={cn("grid w-full gap-4", plans.length === 2 ? "md:grid-cols-2" : plans.length >= 3 ? "md:grid-cols-2 lg:grid-cols-3" : "", plans.length === 4 && "xl:grid-cols-4")}>
         {plans.map((plan) => (
           <div
             key={plan.id}
             className={cn(
-              "relative flex flex-col gap-6 rounded-xl bg-surface p-6 md:p-7",
-              plan.highlighted ? "shadow-[inset_0_0_0_2px_var(--pl-accent)]" : "pl-field [--pl-field-border:var(--pl-separator)]",
+              // Four rows shared with the sibling cards, so prices, buttons and lists start on the same line.
+              "relative row-span-4 grid grid-rows-subgrid gap-y-6 rounded-2xl bg-surface p-6 md:p-7",
+              plan.highlighted ? "shadow-[inset_0_0_0_2px_var(--pl-accent)]" : "shadow-[var(--pl-edge)]",
             )}
           >
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="text-title3">{plan.name}</h3>
                 {(plan.badge || plan.highlighted) && (
-                  <span className="rounded-sm bg-accent-soft px-2 py-0.5 text-caption1 font-medium text-accent-ink">{plan.badge ?? l.popular}</span>
+                  <span className="shrink-0 rounded-full bg-accent px-2.5 py-0.5 text-caption1 font-semibold text-on-accent">{plan.badge ?? l.popular}</span>
                 )}
               </div>
               {plan.description && <p className="text-subhead text-fg-muted">{plan.description}</p>}
@@ -138,11 +140,11 @@ export function Pricing({
                   </span>
                 </>
               ) : (
-                <span className="text-display-sm">{plan.customPrice ?? "Custom"}</span>
+                <span className="text-display-sm text-balance">{plan.customPrice ?? "Custom"}</span>
               )}
             </div>
-            <div className="[&>*]:w-full">{plan.cta}</div>
-            <ul className="flex flex-col gap-3 border-t border-separator pt-6">
+            <div className="self-end [&>*]:w-full">{plan.cta}</div>
+            <ul className="flex flex-col gap-3 self-start border-t border-separator pt-6">
               {plan.features.map((f, i) => {
                 const item = typeof f === "string" ? { label: f, included: true } : { included: true, ...f };
                 return (

@@ -1,5 +1,5 @@
-// Tabs: switch between views of the same context. Three looks, "underline" with a sliding bar, "pill" with a sliding
-// thumb, "soft" with tinted chips, all with Radix keyboard support (arrows, Home/End). Long lists scroll
+// Tabs: switch between views of the same context. Three looks, "underline" with a sliding bar, "pill" with the sliding
+// thumb of an iOS segmented control, "soft" with tinted chips, all with Radix keyboard support (arrows, Home/End). Long lists scroll
 // sideways on phones. Panels fade in.
 "use client";
 
@@ -38,7 +38,7 @@ export function TabsList({ className, ...props }: ComponentProps<typeof TabsPrim
       className={cn(
         "pl-no-scrollbar relative flex max-w-full overflow-x-auto",
         variant === "underline" && "gap-1 shadow-[inset_0_-1px_0_var(--pl-separator)]",
-        variant === "pill" && "pl-field w-fit gap-0.5 rounded-md bg-surface-2 p-0.5 [--pl-field-border:var(--pl-separator)]",
+        variant === "pill" && "w-fit gap-0.5 rounded-md bg-fill-2 p-0.5",
         variant === "soft" && "gap-1",
         className,
       )}
@@ -80,7 +80,7 @@ export function TabsTrigger({ className, value, children, ...props }: ComponentP
         <motion.span
           layoutId={`${id}-indicator`}
           transition={spring.snap}
-          className="absolute inset-0 rounded-[calc(var(--radius-md)-2px)] bg-surface shadow-[inset_0_0_0_1px_var(--pl-border),var(--pl-lip)] dark:bg-fill-2"
+          className="absolute inset-0 rounded-[calc(var(--radius-md)-2px)] bg-surface shadow-[0_3px_8px_rgb(0_0_0/0.12),0_3px_1px_rgb(0_0_0/0.04)] dark:bg-[#636366]"
           aria-hidden="true"
         />
       )}

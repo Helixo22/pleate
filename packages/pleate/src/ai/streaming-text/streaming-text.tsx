@@ -50,7 +50,7 @@ export function StreamingText({ text, streaming = false, animate = true, classNa
           {streaming && pi === paragraphs.length - 1 && (
             <span
               aria-hidden="true"
-              className="ms-0.5 inline-block h-[1.05em] w-[0.5em] translate-y-[0.15em] rounded-[0.15em] bg-accent-ink align-baseline motion-safe:animate-[pl-blink_1s_steps(1)_infinite]"
+              className="ms-0.5 inline-block h-[1.1em] w-[2px] translate-y-[0.2em] rounded-full bg-accent-ink align-baseline motion-safe:animate-[pl-blink_1s_steps(1)_infinite]"
             />
           )}
         </p>
@@ -59,9 +59,22 @@ export function StreamingText({ text, streaming = false, animate = true, classNa
   );
 }
 
-export function TypingIndicator({ className, label = "Assistant is typing" }: { className?: string; label?: string }) {
+export function TypingIndicator({
+  className,
+  label = "Assistant is typing",
+  bubble = false,
+}: {
+  className?: string;
+  label?: string;
+  /** Wrap the dots in a gray message bubble, as Messages does. */
+  bubble?: boolean;
+}) {
   return (
-    <span role="status" aria-label={label} className={cn("inline-flex items-center gap-1 py-1.5", className)}>
+    <span
+      role="status"
+      aria-label={label}
+      className={cn("inline-flex items-center gap-1 py-1.5", bubble && "h-9 self-start rounded-[1.125rem] rounded-es-[0.375rem] bg-fill-2 px-3.5", className)}
+    >
       {[0, 1, 2].map((i) => (
         <span
           key={i}

@@ -12,6 +12,7 @@ import { Badge } from "../badge/badge.tsx";
 import { Button } from "../button/button.tsx";
 import { EmptyState } from "../empty-state/empty-state.tsx";
 import { Skeleton } from "../skeleton/skeleton.tsx";
+import { Spinner } from "../spinner/spinner.tsx";
 
 export type Session = {
   id: string;
@@ -75,6 +76,10 @@ export type SessionListProps = {
   className?: string;
 };
 
+// iOS inset grouped row: the hairline starts where the text does (16px padding + 40px tile + 12px gap).
+const ROW =
+  "relative flex items-center gap-3 px-4 py-3 after:absolute after:inset-x-0 after:bottom-0 after:ms-[4.25rem] after:h-px after:bg-separator last:after:hidden";
+
 export function SessionList({
   sessions,
   onRevoke,
@@ -120,10 +125,10 @@ export function SessionList({
       <ul aria-busy="true" className="flex flex-col">
         <li className="sr-only">{l.loading}</li>
         {Array.from({ length: 3 }, (_, i) => (
-          <li key={i} className="flex items-center gap-3 px-4 py-3.5 shadow-[inset_0_-1px_0_var(--pl-separator)] last:shadow-none">
+          <li key={i} className={ROW}>
             <Skeleton className="size-10 rounded-xl" />
             <div className="flex flex-1 flex-col gap-2">
-              <Skeleton shape="text" width="45%" className="text-subhead" />
+              <Skeleton shape="text" width="45%" className="text-body" />
               <Skeleton shape="text" width="65%" className="text-footnote" />
             </div>
           </li>
@@ -139,7 +144,7 @@ export function SessionList({
           const recent = (now ?? new Date()).getTime() - toDate(s.lastSeenAt).getTime() < 5 * 60_000;
           const meta = [s.ip, s.location].filter(Boolean).join(" · ");
           return (
-            <li key={s.id} className="flex items-center gap-3 px-4 py-3.5 shadow-[inset_0_-1px_0_var(--pl-separator)] last:shadow-none">
+            <li key={s.id} className={ROW}>
               <span
                 aria-hidden="true"
                 className={cn("grid size-10 shrink-0 place-items-center rounded-xl [&_svg]:size-5", s.current ? "bg-accent-soft text-accent-ink" : "bg-fill-2 text-fg-muted")}
@@ -148,7 +153,7 @@ export function SessionList({
               </span>
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-                  <span className="min-w-0 text-subhead font-medium break-words text-fg">
+                  <span className="min-w-0 text-body break-words text-fg">
                     {s.browser} <span className="font-normal text-fg-muted">{l.on}</span> {s.os}
                   </span>
                   {s.current && (
@@ -176,17 +181,24 @@ export function SessionList({
 
   return (
     <section className={cn("flex w-full min-w-0 flex-col gap-2", className)} aria-label={showTitle ? undefined : l.title}>
-      {showTitle && <h3 className="px-4 text-footnote font-medium text-fg-muted">{l.title}</h3>}
-      <div className="overflow-hidden pl-field [--pl-field-border:var(--pl-separator)] rounded-2xl bg-surface">{body}</div>
+      {showTitle && <h3 className="px-4 text-footnote text-fg-muted">{l.title}</h3>}
+      <div className="overflow-hidden rounded-lg bg-surface shadow-[var(--pl-edge)]">{body}</div>
       {onRevokeOthers && others > 0 && (
-        <div className="flex justify-end pt-1">
+        <div className="pt-6">
           <AlertDialog
             open={confirming}
             onOpenChange={setConfirming}
             trigger={
-              <Button variant="plain" tone="danger" size="sm" loading={revokingOthers}>
+              // A destructive row in its own group, like Settings' "Sign Out".
+              <button
+                type="button"
+                disabled={revokingOthers}
+                aria-busy={revokingOthers || undefined}
+                className="pl-focus-ring pl-touch flex min-h-11 w-full cursor-pointer items-center justify-between gap-3 rounded-lg bg-surface px-4 py-2.5 text-start text-body text-danger-ink shadow-[var(--pl-edge)] outline-offset-[-2px] transition-colors hover:bg-fill-3 active:bg-fill-2 disabled:cursor-default disabled:opacity-60"
+              >
                 {l.revokeOthers}
-              </Button>
+                {revokingOthers && <Spinner size="sm" />}
+              </button>
             }
             title={l.confirmTitle}
             description={l.confirmDescription}

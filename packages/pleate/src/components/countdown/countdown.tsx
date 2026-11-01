@@ -24,7 +24,8 @@ export type CountdownProps = {
   className?: string;
 };
 
-const SIZE = { sm: "text-footnote", md: "text-title3", lg: "text-title1" } as const;
+// Sans with tabular figures, like the iOS Clock timer; the large size goes light.
+const SIZE = { sm: "text-footnote font-medium", md: "text-title3 font-medium", lg: "text-title1 font-light tracking-tight" } as const;
 const LABEL = { sm: "text-footnote", md: "text-subhead", lg: "text-body" } as const;
 const PAD: Intl.NumberFormatOptions = { minimumIntegerDigits: 2, useGrouping: false };
 const PLAIN: Intl.NumberFormatOptions = { useGrouping: false };
@@ -101,7 +102,7 @@ export function Countdown({ to, format = "mm:ss", onComplete, size = "md", label
   return (
     <span className={cn("inline-flex items-baseline gap-2", className)}>
       {label && <span className={cn("text-fg-muted", LABEL[size])}>{label}</span>}
-      <span aria-hidden="true" className={cn("pl-tabular font-mono font-medium text-fg", SIZE[size])}>
+      <span aria-hidden="true" className={cn("pl-tabular text-fg", SIZE[size])}>
         {seconds === null
           ? PLACEHOLDER[format]
           : parts(seconds, format).map((p, i) => (

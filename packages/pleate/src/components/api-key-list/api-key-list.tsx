@@ -348,7 +348,7 @@ export function ApiKeyList({
   let content: ReactNode;
   if (loading && keys.length === 0) {
     content = (
-      <div aria-busy="true" className="flex flex-col gap-4 pl-field [--pl-field-border:var(--pl-separator)] rounded-2xl bg-surface p-4">
+      <div aria-busy="true" className="flex flex-col gap-4 rounded-2xl bg-surface shadow-[var(--pl-edge)] p-4">
         <span className="sr-only">{l.loading}</span>
         {Array.from({ length: 3 }, (_, i) => (
           <div key={i} className="flex items-center gap-4">

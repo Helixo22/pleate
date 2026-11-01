@@ -1,5 +1,6 @@
 // ModelPicker: choose the AI model. A quiet pill trigger showing the current model; the menu lists models with an
-// icon, a one-line description, badges (Fast, Reasoning, New…) and a checkmark, optionally in groups.
+// icon, a one-line description, badges (Fast, Reasoning, New…) and a checkmark, optionally in groups. Laid out like
+// an iOS menu: checkmark on the leading edge, the icon trailing, sections split by a thick band.
 // Keyboard and screen readers get a radio menu (Radix DropdownMenu).
 "use client";
 
@@ -39,7 +40,7 @@ export function ModelPicker({ models, value, onValueChange, label = "Model", ali
         aria-label={`${label}: ${current?.name ?? ""}`}
         className={cn(
           "pl-focus-ring pl-touch inline-flex min-w-0 cursor-pointer items-center gap-1.5 text-subhead font-medium text-fg transition-colors [&_svg]:size-4",
-          variant === "ghost" ? "pl-hit relative h-9 rounded-md px-3 hover:bg-fill-2 data-[state=open]:bg-fill-2" : "h-11 rounded-lg bg-fill-2 px-3.5 hover:bg-fill",
+          variant === "ghost" ? "pl-hit relative h-9 rounded-full px-3 hover:bg-fill-2 data-[state=open]:bg-fill-2" : "h-11 rounded-lg bg-fill-2 px-3.5 hover:bg-fill",
           className,
         )}
       >
@@ -53,13 +54,13 @@ export function ModelPicker({ models, value, onValueChange, label = "Model", ali
           side={side}
           sideOffset={8}
           collisionPadding={8}
-          className="pl-pop z-(--pl-z-dropdown) w-[min(20rem,calc(100vw-1rem))] max-h-(--radix-dropdown-menu-content-available-height) overflow-y-auto rounded-2xl bg-elevated p-1.5 text-fg shadow-xl outline-none"
+          className="pl-pop z-(--pl-z-dropdown) w-[min(20rem,calc(100vw-1rem))] max-h-(--radix-dropdown-menu-content-available-height) overflow-y-auto rounded-2xl bg-elevated py-1 text-fg shadow-xl outline-none"
         >
           <DropdownMenu.RadioGroup value={value} onValueChange={onValueChange}>
             {groups.map((group, gi) => (
               <DropdownMenu.Group key={group || gi}>
-                {gi > 0 && <DropdownMenu.Separator className="-mx-1.5 my-1.5 h-px bg-separator" />}
-                {group && <DropdownMenu.Label className="px-3 pt-2 pb-1 text-footnote font-medium text-fg-muted">{group}</DropdownMenu.Label>}
+                {gi > 0 && <DropdownMenu.Separator className="my-1 h-2 bg-[color-mix(in_oklab,var(--pl-bg)_55%,transparent)]" />}
+                {group && <DropdownMenu.Label className="px-4 pt-2 pb-1 text-footnote text-fg-muted">{group}</DropdownMenu.Label>}
                 {models
                   .filter((m) => (m.group ?? "") === group)
                   .map((m) => (
@@ -67,9 +68,13 @@ export function ModelPicker({ models, value, onValueChange, label = "Model", ali
                       key={m.id}
                       value={m.id}
                       disabled={m.disabled}
-                      className="pl-touch relative flex cursor-pointer items-start gap-3 rounded-xl px-3 py-2.5 outline-none transition-colors data-disabled:pointer-events-none data-disabled:opacity-40 data-highlighted:bg-fill-2"
+                      className="pl-touch group/item relative flex cursor-pointer items-start gap-3 px-4 py-2.5 outline-none transition-colors data-disabled:pointer-events-none data-disabled:opacity-40 data-highlighted:bg-fill-2"
                     >
-                      {m.icon && <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-sm bg-fill-2 text-fg-muted [&_svg]:size-4">{m.icon}</span>}
+                      <span className="mt-0.5 flex size-5 shrink-0 justify-center text-accent-ink">
+                        <DropdownMenu.ItemIndicator>
+                          <CheckIcon className="size-4" strokeWidth={2.75} />
+                        </DropdownMenu.ItemIndicator>
+                      </span>
                       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                         <span className="flex flex-wrap items-center gap-1.5 text-subhead font-medium">
                           {m.name}
@@ -77,9 +82,7 @@ export function ModelPicker({ models, value, onValueChange, label = "Model", ali
                         </span>
                         {m.description && <span className="text-footnote text-fg-muted">{m.description}</span>}
                       </span>
-                      <DropdownMenu.ItemIndicator className="mt-1 shrink-0 text-accent-ink">
-                        <CheckIcon className="size-4" strokeWidth={2.75} />
-                      </DropdownMenu.ItemIndicator>
+                      {m.icon && <span className="mt-0.5 flex shrink-0 text-fg-muted [&_svg]:size-5">{m.icon}</span>}
                     </DropdownMenu.RadioItem>
                   ))}
               </DropdownMenu.Group>

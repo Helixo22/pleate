@@ -1,11 +1,12 @@
-// ActionSheet: the iOS action sheet, a short list of choices rising from the bottom, with a separate Cancel button.
-// Destructive actions are red. On wider screens it appears as a centered card. Radix Dialog underneath.
+// ActionSheet: the iOS action sheet. A short list of centered choices rising from the bottom, a small centered title
+// and message on top, and Cancel in its own group below. Destructive actions are red. On wider screens it appears as
+// a centered card. Radix Dialog underneath.
 "use client";
 
 import { Dialog } from "radix-ui";
 import type { ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";
-import { overlayBackdrop } from "../../lib/overlay-styles.ts";
+import { hairline, overlayBackdrop } from "../../lib/overlay-styles.ts";
 
 export type ActionSheetAction = {
   label: ReactNode;
@@ -27,8 +28,9 @@ export type ActionSheetProps = {
 };
 
 const row =
-  "pl-focus-ring pl-touch flex min-h-11 w-full cursor-pointer items-center gap-2.5 px-4 text-subhead text-fg " +
-  "outline-offset-[-2px] transition-colors hover:bg-fill-3 active:bg-fill-2 disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-4 [&_svg]:text-fg-subtle";
+  "pl-focus-ring pl-touch flex min-h-14 w-full cursor-pointer items-center justify-center gap-2.5 px-4 text-title3 font-normal tracking-normal text-accent-ink " +
+  "outline-offset-[-2px] transition-colors hover:bg-fill-3 active:bg-fill-2 disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-5";
+const group = "overflow-hidden rounded-lg bg-elevated shadow-xl";
 
 export function ActionSheet({ open, defaultOpen, onOpenChange, trigger, title, message, actions, cancelLabel = "Cancel" }: ActionSheetProps) {
   return (
@@ -44,15 +46,16 @@ export function ActionSheet({ open, defaultOpen, onOpenChange, trigger, title, m
             (event.currentTarget as HTMLElement | null)?.focus();
           }}
           className={cn(
-            "fixed inset-x-0 bottom-0 z-(--pl-z-modal) mx-auto flex w-full max-w-md flex-col px-2 pb-[max(0.5rem,var(--pl-safe-bottom))] outline-none",
+            "fixed inset-x-0 bottom-0 z-(--pl-z-modal) mx-auto flex w-full max-w-md flex-col px-2 pb-[max(0.5rem,var(--pl-safe-bottom))] outline-none md:max-w-sm",
+            hairline,
             "max-md:pl-dialog-sheet md:pl-dialog md:top-1/2 md:bottom-auto md:-translate-y-1/2",
           )}
         >
-          <div className="overflow-hidden rounded-xl bg-elevated shadow-xl">
+          <div className={group}>
             {(title || message) && (
-              <div className="flex flex-col gap-0.5 border-b border-separator px-4 py-3">
+              <div className="flex flex-col gap-0.5 border-b border-(--pl-hair) px-4 py-3.5 text-center">
                 {title ? (
-                  <Dialog.Title className="text-subhead font-medium text-fg">{title}</Dialog.Title>
+                  <Dialog.Title className="text-footnote font-semibold text-fg-muted">{title}</Dialog.Title>
                 ) : (
                   <Dialog.Title className="sr-only">Actions</Dialog.Title>
                 )}
@@ -60,21 +63,21 @@ export function ActionSheet({ open, defaultOpen, onOpenChange, trigger, title, m
               </div>
             )}
             {!title && !message && <Dialog.Title className="sr-only">Actions</Dialog.Title>}
-            <div className="flex flex-col divide-y divide-separator">
+            <div className="flex flex-col divide-y divide-(--pl-hair)">
               {actions.map((action, i) => (
                 <Dialog.Close
                   key={i}
                   disabled={action.disabled}
                   onClick={action.onSelect}
-                  className={cn(row, action.destructive && "text-danger-ink [&_svg]:text-danger-ink")}
+                  className={cn(row, action.destructive && "text-danger-ink")}
                 >
                   {action.icon}
                   {action.label}
                 </Dialog.Close>
               ))}
             </div>
-            <Dialog.Close className={cn(row, "justify-center border-t border-separator bg-surface-2 font-medium")}>{cancelLabel}</Dialog.Close>
           </div>
+          <Dialog.Close className={cn(group, row, "mt-2 font-semibold")}>{cancelLabel}</Dialog.Close>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

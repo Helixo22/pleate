@@ -69,7 +69,7 @@ export function ResultCard({ title, href, site, favicon, snippet, image, imageAl
           <div className="flex items-center gap-1.5 text-caption1 text-fg-muted">
             <SiteIcon src={favicon} label={host} />
             <span className="truncate">{host}</span>
-            {index !== undefined && <span className="ms-auto rounded-md bg-fill-2 px-1.5 font-medium pl-tabular">{index}</span>}
+            {index !== undefined && <span className="ms-auto grid h-5 min-w-5 place-items-center rounded-full bg-fill-2 px-1.5 font-medium pl-tabular">{index}</span>}
           </div>
         )}
         <Title
@@ -102,7 +102,7 @@ export function SourceChip({ index, href, site, title, className }: SourceChipPr
       title={[title, host].filter(Boolean).join(", ") || undefined}
       aria-label={`Source ${index}${host ? `: ${host}` : ""}`}
       className={cn(
-        "pl-focus-ring mx-0.5 inline-flex h-[1.15rem] min-w-[1.15rem] -translate-y-px items-center justify-center rounded-md bg-fill-2 px-1 align-middle text-caption2 font-medium text-fg-muted no-underline",
+        "pl-focus-ring mx-0.5 inline-flex h-[1.15rem] min-w-[1.15rem] -translate-y-px items-center justify-center rounded-full bg-fill-2 px-1 align-middle text-caption2 font-medium text-fg-muted no-underline",
         href && "transition-colors hover:bg-accent hover:text-on-accent",
         className,
       )}

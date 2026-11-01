@@ -1,4 +1,4 @@
-// Button: a squared control (pill on request) with six looks (filled, tinted, gray, surface, outline, plain) in four tones, five
+// Button: an iOS capsule (squared on request) with six looks (filled, tinted, gray, surface, outline, plain) in four tones, five
 // sizes and an icon-only mode (see IconButton). Presses scale down slightly; `loading` keeps the width and shows a
 // spinner. `asChild` renders the styles on your own element (a Next <Link>, an <a>…).
 import { cva, type VariantProps } from "class-variance-authority";
@@ -9,7 +9,7 @@ import { Spinner } from "../spinner/spinner.tsx";
 
 export const buttonVariants = cva(
   [
-    "pl-touch pl-focus-ring pl-hit relative inline-flex shrink-0 cursor-pointer items-center justify-center whitespace-nowrap font-medium",
+    "pl-touch pl-focus-ring pl-hit relative inline-flex shrink-0 cursor-pointer items-center justify-center whitespace-nowrap font-semibold",
     "transition-[background-color,color,box-shadow,opacity,scale] duration-(--pl-duration-fast) ease-out",
     "motion-safe:active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='opacity-'])]:opacity-85",
@@ -76,7 +76,7 @@ export const buttonVariants = cva(
       variant: "filled",
       tone: "accent",
       size: "md",
-      shape: "rounded",
+      shape: "pill",
       iconOnly: false,
       fullWidth: false,
     },

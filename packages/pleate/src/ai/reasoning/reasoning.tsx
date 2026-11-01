@@ -76,7 +76,7 @@ export function Reasoning({
   const seconds = duration ?? elapsed;
   return (
     <Collapsible.Root open={open} onOpenChange={setOpen} className={cn("flex flex-col", className)}>
-      <Collapsible.Trigger className="pl-focus-ring group -ms-1 inline-flex w-fit cursor-pointer items-center gap-1.5 rounded-md px-1 py-0.5 text-subhead font-medium">
+      <Collapsible.Trigger className="pl-focus-ring group -ms-1 inline-flex w-fit cursor-pointer items-center gap-1.5 rounded-full px-1 py-0.5 text-subhead font-medium">
         <svg viewBox="0 0 24 24" className={cn("size-4 shrink-0", active ? "text-accent-ink" : "text-fg-muted")} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
           <path d="M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3ZM9.5 19.5h5M10.5 22h3" />
         </svg>

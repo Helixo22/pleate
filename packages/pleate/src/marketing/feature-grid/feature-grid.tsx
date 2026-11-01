@@ -1,10 +1,10 @@
 // FeatureGrid: what a product does, in a grid. "cards" on solid surfaces, "plain" on the page, or "bento" where
 // items can span columns/rows and carry a visual. Each item: icon tile, title, text, optional link. Items enter
-// one after another as the grid scrolls in.
+// one after another as the grid scrolls in. Give an item a `tint` for an iOS style colored icon tile and a soft wash.
 "use client";
 
 import { motion } from "motion/react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";
 import { ChevronRightIcon } from "../../lib/icons.tsx";
 import { useReducedMotion } from "../../motion/use-reduced-motion.ts";
@@ -20,6 +20,8 @@ export type Feature = {
   /** Bento: columns / rows this item spans (on large screens). */
   span?: 1 | 2;
   rowSpan?: 1 | 2;
+  /** The item's own color (any CSS color): fills the icon tile (white glyph) and washes the card from the top corner. */
+  tint?: string;
 };
 
 export type FeatureGridProps = {
@@ -45,16 +47,29 @@ export function FeatureGrid({ features, columns = 3, variant = "cards", classNam
         <motion.li
           key={i}
           variants={{ hidden: { opacity: 0, y: 22 }, shown: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } } }}
+          style={f.tint ? ({ "--pl-feature-tint": f.tint } as CSSProperties) : undefined}
           className={cn(
             "group relative flex flex-col gap-3",
-            variant !== "plain" && "overflow-hidden pl-field [--pl-field-border:var(--pl-separator)] rounded-xl bg-surface p-6",
+            variant !== "plain" && "overflow-hidden rounded-2xl bg-surface p-6 shadow-[var(--pl-edge)]",
+            variant !== "plain" &&
+              f.tint &&
+              "bg-[linear-gradient(150deg,color-mix(in_srgb,var(--pl-feature-tint)_11%,transparent)_0%,transparent_75%)]",
             variant === "bento" && f.span === 2 && "lg:col-span-2",
             variant === "bento" && f.rowSpan === 2 && "lg:row-span-2",
-            f.href && "transition-[box-shadow] duration-(--pl-duration-base) hover:[--pl-field-border:var(--pl-border)]",
+            variant !== "plain" &&
+              f.href &&
+              "transition-[background-color,scale] duration-(--pl-duration-base) ease-out hover:bg-surface-2 motion-safe:active:scale-[0.985]",
           )}
         >
           {f.icon && (
-            <span className="grid size-10 place-items-center rounded-lg bg-fill-2 text-fg [&_svg]:size-5">{f.icon}</span>
+            <span
+              className={cn(
+                "grid size-11 place-items-center rounded-[0.75rem] [&_svg]:size-[1.3rem]",
+                f.tint ? "bg-(--pl-feature-tint) text-white" : "bg-fill-2 text-fg",
+              )}
+            >
+              {f.icon}
+            </span>
           )}
           <h3 className="text-headline text-fg">
             {f.href ? (
@@ -65,7 +80,7 @@ export function FeatureGrid({ features, columns = 3, variant = "cards", classNam
               f.title
             )}
           </h3>
-          {f.description && <p className="text-subhead text-pretty text-fg-muted">{f.description}</p>}
+          {f.description && <p className="text-callout text-pretty text-fg-muted">{f.description}</p>}
           {f.href && (
             <span aria-hidden="true" className="mt-auto inline-flex items-center gap-0.5 text-subhead font-medium text-accent-ink">
               {f.linkLabel ?? "Learn more"}

@@ -48,9 +48,9 @@ export function ContextMenuItem({
 }: ComponentProps<typeof ContextMenuPrimitive.Item> & { icon?: ReactNode; shortcut?: ReactNode; destructive?: boolean; inset?: boolean }) {
   return (
     <ContextMenuPrimitive.Item className={cn(menuItem, destructive && menuItemDestructive, inset && menuInset, className)} {...props}>
-      {icon}
       <span className="min-w-0 flex-1 truncate">{children}</span>
       {shortcut && <span className={menuShortcut}>{shortcut}</span>}
+      {icon}
     </ContextMenuPrimitive.Item>
   );
 }

@@ -5,7 +5,7 @@ import type { HTMLAttributes, ReactNode, Ref } from "react";
 import { cn } from "../../lib/cn.ts";
 import { XIcon } from "../../lib/icons.tsx";
 
-const alertVariants = cva("relative flex gap-3 rounded-lg p-4 text-subhead [&>svg]:mt-px [&>svg]:size-5 [&>svg]:shrink-0", {
+const alertVariants = cva("relative flex gap-3 rounded-xl p-4 text-subhead [&>svg]:-mt-px [&>svg]:size-6 [&>svg]:shrink-0", {
   variants: {
     tone: {
       info: "[--pl-a-ink:var(--pl-info-ink)] [--pl-a-soft:var(--pl-info-soft)]",
@@ -52,9 +52,9 @@ export function Alert({ className, tone = "info", variant, title, icon, actions,
       {icon === false
         ? null
         : (icon ?? (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="9.25" />
-              {ICONS[tone ?? "info"]}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" fill="currentColor" stroke="none" />
+              <g stroke="white">{ICONS[tone ?? "info"]}</g>
             </svg>
           ))}
       <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -67,9 +67,9 @@ export function Alert({ className, tone = "info", variant, title, icon, actions,
           type="button"
           aria-label={dismissLabel}
           onClick={onDismiss}
-          className="pl-focus-ring pl-hit absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-sm text-fg-muted transition-colors hover:bg-fill-2 hover:text-fg [&_svg]:size-4"
+          className="pl-focus-ring pl-hit absolute end-3 top-3 grid size-7 cursor-pointer place-items-center rounded-full bg-fill-2 text-fg-muted transition-colors hover:bg-fill hover:text-fg [&_svg]:size-3.5"
         >
-          <XIcon strokeWidth={2.5} />
+          <XIcon strokeWidth={3} />
         </button>
       )}
     </div>

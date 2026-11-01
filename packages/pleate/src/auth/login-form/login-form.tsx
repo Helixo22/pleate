@@ -10,7 +10,7 @@ import { Input } from "../../components/input/input.tsx";
 import { PasswordInput } from "../../components/password-input/password-input.tsx";
 import { cn } from "../../lib/cn.ts";
 import { AuthDivider } from "../auth-card/auth-card.tsx";
-import { checked, Footer, FormError, linkClass, SubmitButton, text, useSubmitError, type AuthFormBaseProps } from "../shared.tsx";
+import { checked, Footer, FormError, linkClass, SubmitButton, text, useSubmitError, type AuthFormBaseProps, field } from "../shared.tsx";
 
 export type LoginValues = { email: string; password: string; remember: boolean };
 
@@ -101,10 +101,10 @@ export function LoginForm({
           type={{ value: "email", message: l.emailInvalid }}
           error={fieldErrors?.email}
         >
-          <Input type="email" autoComplete="username" inputMode="email" placeholder={l.emailPlaceholder} defaultValue={defaultEmail} />
+          <Input {...field} type="email" autoComplete="username" inputMode="email" placeholder={l.emailPlaceholder} defaultValue={defaultEmail} />
         </FormField>
         <FormField name="password" label={l.password} required={{ value: true, message: l.passwordRequired }} error={fieldErrors?.password}>
-          <PasswordInput autoComplete="current-password" />
+          <PasswordInput {...field} autoComplete="current-password" />
         </FormField>
         {(showRemember || forgot) && (
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">

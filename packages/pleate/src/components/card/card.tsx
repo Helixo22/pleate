@@ -1,15 +1,16 @@
-// Card: a solid rounded surface for grouped content. Compose CardMedia (bleeds to the edges), CardHeader, CardTitle,
-// CardDescription, CardContent and CardFooter. `interactive` sharpens its border on hover and presses in; with asChild the whole
-// card can be a link.
+// Card: a solid rounded surface for grouped content. Compose CardMedia (bleeds to the edges), CardIcon, CardHeader,
+// CardTitle, CardDescription, CardContent and CardFooter. `interactive` lifts its fill on hover and presses in; with asChild
+// the whole card can be a link. `tint` gives the card its own color: a soft wash from the top corner, a filled CardIcon
+// and `text-(--pl-card-tint)` for its call to action.
 import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
-import type { HTMLAttributes, Ref } from "react";
+import type { CSSProperties, HTMLAttributes, Ref } from "react";
 import { cn } from "../../lib/cn.ts";
 
 export const cardVariants = cva("relative flex flex-col overflow-hidden text-fg [--pl-card-gap:calc(var(--pl-card-p)*0.75)]", {
   variants: {
     variant: {
-      elevated: "pl-field bg-surface [--pl-field-border:var(--pl-separator)]",
+      elevated: "bg-surface shadow-[var(--pl-edge)]",
       flat: "bg-surface",
       filled: "bg-surface-2",
       outline: "bg-transparent shadow-[inset_0_0_0_1px_var(--pl-separator)]",
@@ -30,8 +31,8 @@ export const cardVariants = cva("relative flex flex-col overflow-hidden text-fg 
     interactive: {
       true: [
         "pl-focus-ring pl-touch cursor-pointer",
-        "transition-[background-color,box-shadow,scale] duration-(--pl-duration-fast) ease-out",
-        "hover:[--pl-field-border:var(--pl-border)] hover:shadow-[inset_0_0_0_1px_var(--pl-border),var(--pl-lip)] motion-safe:active:scale-[0.99]",
+        "transition-[background-color,opacity,scale] duration-200 ease-out",
+        "hover:bg-surface-2 motion-safe:active:scale-[0.985] active:opacity-90",
       ],
       false: "",
     },
@@ -40,14 +41,39 @@ export const cardVariants = cva("relative flex flex-col overflow-hidden text-fg 
 });
 
 export type CardProps = HTMLAttributes<HTMLDivElement> &
-  VariantProps<typeof cardVariants> & { ref?: Ref<HTMLDivElement>; asChild?: boolean };
+  VariantProps<typeof cardVariants> & {
+    ref?: Ref<HTMLDivElement>;
+    asChild?: boolean;
+    /** The card's own color (any CSS color or token): a wash from the top corner and a filled CardIcon. */
+    tint?: string;
+  };
 
-export function Card({ className, variant, padding, radius, interactive, asChild, ...props }: CardProps) {
+export function Card({ className, variant, padding, radius, interactive, asChild, tint, style, ...props }: CardProps) {
   const Comp = asChild ? Slot.Root : "div";
   return (
     <Comp
       data-slot="card"
-      className={cn(cardVariants({ variant, padding, radius, interactive }), "gap-(--pl-card-gap) p-(--pl-card-p)", className)}
+      className={cn(
+        cardVariants({ variant, padding, radius, interactive }),
+        "gap-(--pl-card-gap) p-(--pl-card-p)",
+        tint && "bg-[linear-gradient(150deg,color-mix(in_srgb,var(--pl-card-tint)_11%,transparent)_0%,transparent_75%)]",
+        className,
+      )}
+      style={tint ? ({ "--pl-card-tint": tint, ...style } as CSSProperties) : style}
+      {...props}
+    />
+  );
+}
+
+/** A 44px tile with the card's icon: filled with the card's tint (white glyph), or the accent when it has none. */
+export function CardIcon({ className, ...props }: DivProps) {
+  return (
+    <div
+      aria-hidden="true"
+      className={cn(
+        "grid size-11 shrink-0 place-items-center rounded-[0.75rem] bg-(--pl-card-tint,var(--pl-accent)) text-white [&_svg]:size-[1.3rem]",
+        className,
+      )}
       {...props}
     />
   );

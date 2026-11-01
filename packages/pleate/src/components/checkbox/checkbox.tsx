@@ -1,4 +1,5 @@
-// Checkbox: square (default) or round, with a drawn-in checkmark and an indeterminate dash. Pass `label` and
+// Checkbox: a rounded square (default) or the iOS selection circle (shape="circle", as in Mail and Reminders), with a
+// 1.5px edge, a drawn-in checkmark and an indeterminate dash. Pass `label` and
 // `description` for a ready-made clickable row.
 "use client";
 
@@ -11,9 +12,9 @@ import { CheckIcon, MinusIcon } from "../../lib/icons.tsx";
 
 export const checkboxVariants = cva(
   [
-    "peer pl-focus-ring pl-field [--pl-field-border:var(--pl-border-strong)] relative grid shrink-0 cursor-pointer place-items-center bg-surface text-on-accent",
+    "peer pl-focus-ring [--pl-field-border:var(--pl-border-strong)] shadow-[inset_0_0_0_1.5px_var(--pl-field-border)] relative grid shrink-0 cursor-pointer place-items-center bg-transparent text-on-accent",
     "transition-[background-color,box-shadow] duration-(--pl-duration-fast) ease-out hover:[--pl-field-border:var(--pl-fg-muted)]",
-    "data-[state=checked]:bg-accent data-[state=checked]:pl-lift data-[state=indeterminate]:bg-accent data-[state=indeterminate]:pl-lift",
+    "data-[state=checked]:bg-accent data-[state=checked]:shadow-none data-[state=indeterminate]:bg-accent data-[state=indeterminate]:shadow-none",
     "aria-invalid:[--pl-field-border:var(--pl-danger-ink)] disabled:cursor-not-allowed disabled:opacity-50",
     "after:absolute after:-inset-2.5 after:content-['']",
   ],
@@ -21,12 +22,12 @@ export const checkboxVariants = cva(
     variants: {
       size: {
         sm: "size-4 [&_svg]:size-3",
-        md: "size-[1.125rem] [&_svg]:size-3",
-        lg: "size-5 [&_svg]:size-3.5",
+        md: "size-5 [&_svg]:size-3.5",
+        lg: "size-[1.375rem] [&_svg]:size-4",
       },
       shape: {
         circle: "rounded-full",
-        square: "rounded-xs",
+        square: "rounded-[30%]",
       },
     },
     defaultVariants: { size: "md", shape: "square" },
@@ -70,7 +71,7 @@ export function Checkbox({
         {...props}
       >
         <CheckboxPrimitive.Indicator className="grid place-items-center [&_path]:[stroke-dasharray:24] motion-safe:[&_path]:animate-[pl-check_var(--pl-duration-base)_var(--pl-ease-out)_both]">
-          {props.checked === "indeterminate" ? <MinusIcon strokeWidth={2.5} /> : <CheckIcon strokeWidth={2.5} />}
+          {props.checked === "indeterminate" ? <MinusIcon strokeWidth={3} /> : <CheckIcon strokeWidth={3} />}
         </CheckboxPrimitive.Indicator>
       </CheckboxPrimitive.Root>
     </ChoiceLabel>

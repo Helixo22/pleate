@@ -10,7 +10,7 @@ import { Input } from "../../components/input/input.tsx";
 import { PasswordInput, scorePassword, type PasswordScore } from "../../components/password-input/password-input.tsx";
 import { cn } from "../../lib/cn.ts";
 import { AuthDivider } from "../auth-card/auth-card.tsx";
-import { checked, Footer, FormError, SubmitButton, text, useSubmitError, type AuthFormBaseProps } from "../shared.tsx";
+import { checked, Footer, FormError, SubmitButton, text, useSubmitError, type AuthFormBaseProps, field } from "../shared.tsx";
 
 export type SignupValues = { name: string; email: string; password: string; acceptTerms: boolean };
 
@@ -110,7 +110,7 @@ export function SignupForm({
         <FormError error={shownError} />
         {showName && (
           <FormField name="name" label={l.name} required={{ value: true, message: l.nameRequired }} error={fieldErrors?.name}>
-            <Input autoComplete="name" placeholder={l.namePlaceholder} defaultValue={defaultValues?.name} />
+            <Input {...field} autoComplete="name" placeholder={l.namePlaceholder} defaultValue={defaultValues?.name} />
           </FormField>
         )}
         <FormField
@@ -120,7 +120,7 @@ export function SignupForm({
           type={{ value: "email", message: l.emailInvalid }}
           error={fieldErrors?.email}
         >
-          <Input type="email" autoComplete="email" inputMode="email" placeholder={l.emailPlaceholder} defaultValue={defaultValues?.email} />
+          <Input {...field} type="email" autoComplete="email" inputMode="email" placeholder={l.emailPlaceholder} defaultValue={defaultValues?.email} />
         </FormField>
         <FormField
           name="password"
@@ -131,7 +131,7 @@ export function SignupForm({
           validate={(value) => (minStrength !== undefined && typeof value === "string" && scorePassword(value) < minStrength ? l.passwordTooWeak : undefined)}
           error={fieldErrors?.password}
         >
-          <PasswordInput autoComplete="new-password" showStrength={showStrength} />
+          <PasswordInput {...field} autoComplete="new-password" showStrength={showStrength} />
         </FormField>
         {terms && (
           <FormField name="acceptTerms" required={{ value: true, message: l.termsRequired }} error={fieldErrors?.acceptTerms}>

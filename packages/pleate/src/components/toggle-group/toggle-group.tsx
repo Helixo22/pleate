@@ -1,4 +1,4 @@
-// ToggleGroup: pressable options on a bordered rail, one at a time (type="single", can be cleared) or several
+// ToggleGroup: pressable options on a gray rail (the iOS segmented look), one at a time (type="single", can be cleared) or several
 // (type="multiple"). Pressed items sit raised on the rail. Toggle is one pressable button on its own (bold, mute,
 // "show map"). Radix: arrow keys move between items, Space/Enter press, aria-pressed (or radio semantics) for free.
 "use client";
@@ -30,7 +30,7 @@ export function ToggleGroup({ className, size = "md", ...props }: ToggleGroupPro
     <SizeContext.Provider value={size}>
       <Primitive.Root
         className={cn(
-          "pl-field inline-flex w-fit max-w-full items-center gap-0.5 rounded-md bg-surface-2 p-0.5 [--pl-field-border:var(--pl-separator)] data-disabled:opacity-50",
+          "inline-flex w-fit max-w-full items-center gap-0.5 rounded-md bg-fill-2 p-0.5 data-disabled:opacity-50",
           RAIL[size],
           className,
         )}
@@ -53,7 +53,7 @@ export function ToggleGroupItem({ className, icon, children, ...props }: ToggleG
         ITEM[size],
         !children && ICON_ONLY[size],
         "rounded-[calc(var(--radius-md)-2px)] text-fg-muted hover:text-fg",
-        "data-[state=on]:bg-surface data-[state=on]:text-fg data-[state=on]:shadow-[inset_0_0_0_1px_var(--pl-border),var(--pl-lip)] dark:data-[state=on]:bg-fill-2",
+        "data-[state=on]:bg-surface data-[state=on]:text-fg data-[state=on]:shadow-[0_3px_8px_rgb(0_0_0/0.12),0_3px_1px_rgb(0_0_0/0.04)] dark:data-[state=on]:bg-[#636366]",
         className,
       )}
       {...props}
@@ -74,9 +74,9 @@ export function Toggle({ className, size = "md", icon, children, ...props }: Tog
     <TogglePrimitive.Root
       className={cn(
         item,
-        "pl-field bg-surface text-fg-muted hover:bg-surface-2 hover:text-fg",
-        "data-[state=on]:bg-accent-soft data-[state=on]:text-accent-ink data-[state=on]:[--pl-field-border:transparent] data-[state=on]:hover:bg-accent-soft-hover",
-        size === "sm" ? "h-8 rounded-sm px-2.5 text-footnote [&_svg]:size-3.5" : "h-9 rounded-md px-3 text-subhead [&_svg]:size-4",
+        "bg-fill-2 text-fg hover:bg-fill",
+        "data-[state=on]:bg-accent-soft data-[state=on]:text-accent-ink data-[state=on]:hover:bg-accent-soft-hover",
+        size === "sm" ? "h-8 rounded-full px-3 text-footnote [&_svg]:size-3.5" : "h-9 rounded-full px-3.5 text-subhead [&_svg]:size-4",
         !children && (size === "sm" ? "w-8 px-0" : "w-9 px-0"),
         className,
       )}

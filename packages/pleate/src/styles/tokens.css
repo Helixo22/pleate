@@ -12,37 +12,39 @@
 [data-theme="light"] {
   color-scheme: light;
 
-  /* Surfaces: page → card → raised (sheets, popovers). Fills are neutral wells (fields, quiet buttons, tracks). */
-  --pl-bg: #fafafa;
+  /* Surfaces: page → card → raised (sheets, popovers). iOS grouped backgrounds: a gray page, white cards. */
+  --pl-bg: #f2f2f7;
   --pl-surface: #ffffff;
-  --pl-surface-2: #f4f4f5;
+  --pl-surface-2: #e9e9ee;
   --pl-elevated: #ffffff;
-  /* Fills are graphite tints over whatever solid surface they sit on, so a field reads the same on the page, on a
+  /* Fills are iOS system fills over whatever solid surface they sit on, so a field reads the same on the page, on a
      card and inside a dialog. They are never layered over content. */
-  --pl-fill: rgb(23 23 23 / 0.12);
-  --pl-fill-2: rgb(23 23 23 / 0.07);
-  --pl-fill-3: rgb(23 23 23 / 0.04);
-  --pl-overlay: rgb(10 10 11 / 0.4);
+  --pl-fill: rgb(120 120 128 / 0.16);
+  --pl-fill-2: rgb(118 118 128 / 0.12);
+  --pl-fill-3: rgb(118 118 128 / 0.08);
+  --pl-overlay: rgb(0 0 0 / 0.4);
 
   /* Content: primary, secondary, muted (muted stays ≥ 4.5:1 on bg and surface) */
-  --pl-fg: #171717;
-  --pl-fg-muted: #525252;
-  --pl-fg-subtle: #6b6b6b;
-  --pl-separator: #e7e7e9;
-  --pl-border: #d4d4d8;
-  --pl-border-strong: #8e8e94; /* form-control edges: 3:1 on bg and surface */
+  --pl-fg: #000000;
+  --pl-fg-muted: #6e6e73;
+  --pl-fg-subtle: #6e6e73;
+  --pl-separator: #e5e5ea;
+  /* Hairlines on raised surfaces (sheets, alerts, menus), where --pl-separator would match the surface. */
+  --pl-separator-raised: rgb(60 60 67 / 0.18);
+  --pl-border: #d8d8dc;
+  --pl-border-strong: #8e8e93; /* form-control edges: 3:1 on bg and surface */
 
   /* Status: fill (white text on top, AA) · ink (text and icons on the page, AA) · soft (tinted wells) */
-  --pl-success: #15803d;
-  --pl-success-ink: #15803d;
-  --pl-warning: #b45309;
-  --pl-warning-ink: #a14a07;
-  --pl-danger: #dc2626;
-  --pl-danger-ink: #c81e1e;
+  --pl-success: #248a3d;
+  --pl-success-ink: #248a3d;
+  --pl-warning: #c93400;
+  --pl-warning-ink: #c93400;
+  --pl-danger: #d70015;
+  --pl-danger-ink: #d70015;
   --pl-info: #1d4ed8;
   --pl-info-ink: #1d4ed8;
   --pl-on-status: #ffffff;
-  --pl-success-vivid: #16a34a; /* live dots and "on" states that carry no text */
+  --pl-success-vivid: #34c759; /* live dots and "on" states that carry no text */
 
   /* Elevation: small and neutral. xs/sm are for controls, md+ for floating layers only. */
   --pl-shadow-xs: 0 1px 1px rgb(0 0 0 / 0.04);
@@ -52,6 +54,7 @@
   --pl-shadow-xl: 0 4px 8px rgb(0 0 0 / 0.04), 0 24px 56px -12px rgb(0 0 0 / 0.18);
   --pl-edge: inset 0 0 0 1px rgb(23 23 23 / 0.08); /* hairline on raised surfaces */
 
+  --pl-glow: 9%; /* how much accent tints the top of the page */
   --pl-mix: #000000; /* what hover and pressed states mix the accent with */
   /* Bordered controls (fields, outline buttons, checkboxes) sit on a 1px lip below; filled ones get a top highlight. */
   --pl-lip: 0 1px 0 rgb(0 0 0 / 0.04);
@@ -59,50 +62,52 @@
 
   /* Knobs (switch and slider thumbs) */
   --pl-knob: #ffffff;
-  --pl-knob-shadow: 0 0 0 1px rgb(23 23 23 / 0.12), 0 1px 2px rgb(0 0 0 / 0.08);
+  --pl-knob-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.04), 0 3px 8px rgb(0 0 0 / 0.15), 0 3px 1px rgb(0 0 0 / 0.06); /* UIKit knob */
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --pl-bg: #141415;
-  --pl-surface: #19191b;
-  --pl-surface-2: #1f1f21;
-  --pl-elevated: #232325;
-  --pl-fill: rgb(237 237 237 / 0.16);
-  --pl-fill-2: rgb(237 237 237 / 0.1);
-  --pl-fill-3: rgb(237 237 237 / 0.06);
+  --pl-bg: #000000;
+  --pl-surface: #1c1c1e;
+  --pl-surface-2: #2c2c2e;
+  --pl-elevated: #2c2c2e;
+  --pl-fill: rgb(120 120 128 / 0.36);
+  --pl-fill-2: rgb(118 118 128 / 0.24);
+  --pl-fill-3: rgb(118 118 128 / 0.14);
   --pl-overlay: rgb(0 0 0 / 0.6);
 
-  --pl-fg: #ededed;
-  --pl-fg-muted: #a1a1a6;
-  --pl-fg-subtle: #8b8b91;
-  --pl-separator: #2a2a2d;
-  --pl-border: #3a3a3e;
-  --pl-border-strong: #6b6b71;
+  --pl-fg: #ffffff;
+  --pl-fg-muted: #98989f;
+  --pl-fg-subtle: #8e8e93;
+  --pl-separator: #2c2c2e;
+  --pl-separator-raised: rgb(84 84 88 / 0.65); /* iOS dark separator */
+  --pl-border: #38383a;
+  --pl-border-strong: #636366;
 
-  --pl-success: #1d7a3f;
-  --pl-success-ink: #4cc38a;
-  --pl-warning: #a85a0c;
-  --pl-warning-ink: #f0a54a;
-  --pl-danger: #d13438;
-  --pl-danger-ink: #f07175;
+  --pl-success: #248a3d;
+  --pl-success-ink: #30d158;
+  --pl-warning: #c93400;
+  --pl-warning-ink: #ff9f0a;
+  --pl-danger: #d70015;
+  --pl-danger-ink: #ff453a;
   --pl-info: #2a5bd7;
   --pl-info-ink: #7ea2ff;
-  --pl-success-vivid: #4cc38a;
+  --pl-success-vivid: #30d158;
 
   --pl-shadow-xs: 0 1px 1px rgb(0 0 0 / 0.4);
   --pl-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --pl-shadow-md: 0 8px 20px rgb(0 0 0 / 0.4);
   --pl-shadow-lg: 0 12px 32px -6px rgb(0 0 0 / 0.55);
   --pl-shadow-xl: 0 24px 56px -12px rgb(0 0 0 / 0.65);
-  --pl-edge: inset 0 0 0 1px rgb(237 237 237 / 0.08);
+  --pl-edge: inset 0 0 0 1px rgb(255 255 255 / 0.06);
 
+  --pl-glow: 17%;
   --pl-mix: #ffffff;
   --pl-lip: inset 0 1px 0 rgb(255 255 255 / 0.05);
   --pl-highlight: inset 0 1px 0 rgb(255 255 255 / 0.12);
-  --pl-knob: #ededed;
-  --pl-knob-shadow: 0 0 0 1px rgb(0 0 0 / 0.3), 0 1px 2px rgb(0 0 0 / 0.4);
+  --pl-knob: #ffffff;
+  --pl-knob-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.2), 0 3px 8px rgb(0 0 0 / 0.3), 0 3px 1px rgb(0 0 0 / 0.12);
 }
 
 /* A pinned theme subtree also resets the text color, or it would inherit the outer theme's. */
@@ -123,19 +128,22 @@
   --pl-warning-soft: color-mix(in oklab, var(--pl-warning-ink) 15%, transparent);
   --pl-danger-soft: color-mix(in oklab, var(--pl-danger-ink) 13%, transparent);
   --pl-info-soft: color-mix(in oklab, var(--pl-info-ink) 13%, transparent);
+  --pl-bg-tint: color-mix(in oklab, var(--pl-accent) var(--pl-glow), transparent);
   --pl-fill-hover: color-mix(in oklab, var(--pl-fill) 85%, var(--pl-mix) 15%);
 }
 
 /* Non-color tokens: shared by both themes. */
 :root {
-  /* One knob for the whole library's corner radius: 1 = pleate default, 0.75 = tighter, 1.25 = rounder. */
-  --pl-roundness: 1;
+  /* One knob for the whole library's corner radius: 1.5 = pleate default, 1 = tighter, 0.75 = squared. */
+  --pl-roundness: 1.5;
 
   /* Geist for the interface, Geist Mono for figures, counts, keys and meta. Load them with next/font as --font-geist
      and --font-geist-mono; the system stacks are the fallback. */
   --pl-font-sans: var(--font-geist, ui-sans-serif), ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
   --pl-font-display: var(--pl-font-sans);
+  /* Wordmarks and hero titles: Space Mono (load it as --font-space-mono), any monospace as the fallback. */
+  --pl-font-brand: var(--font-space-mono, ui-monospace), ui-monospace, "SF Mono", Menlo, monospace;
   --pl-font-mono: var(--font-geist-mono, ui-monospace), ui-monospace, SFMono-Regular, Menlo, Consolas,
     "Liberation Mono", monospace;
 

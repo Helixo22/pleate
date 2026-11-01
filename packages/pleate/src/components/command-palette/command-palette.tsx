@@ -184,7 +184,7 @@ function PaletteBody({ groups, placeholder, emptyLabel, close }: Pick<CommandPal
                     onPointerMove={() => !isActive && setActive(flat.indexOf(item))}
                     onPointerDown={(e) => e.preventDefault() /* keep focus in the field */}
                     onClick={() => run(item)}
-                    className={cn(menuItem, "min-h-9")}
+                    className={cn(menuItem, "min-h-10 [&_svg]:text-fg-muted")}
                   >
                     {item.icon}
                     <span className="min-w-0 flex-1 truncate">{item.label}</span>

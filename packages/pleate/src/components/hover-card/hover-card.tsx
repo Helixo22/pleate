@@ -21,7 +21,7 @@ export function HoverCardContent({ className, sideOffset = 8, collisionPadding =
         collisionPadding={collisionPadding}
         align={align}
         className={cn(
-          "pl-pop z-(--pl-z-dropdown) w-72 max-w-[calc(100vw-1rem)] rounded-lg bg-elevated p-3 text-fg shadow-lg outline-none",
+          "pl-pop z-(--pl-z-dropdown) w-72 max-w-[calc(100vw-1rem)] rounded-xl bg-elevated p-4 text-fg shadow-[var(--pl-shadow-lg),var(--pl-edge)] outline-none",
           className,
         )}
         {...props}

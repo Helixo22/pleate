@@ -65,7 +65,7 @@ export function SegmentedControl<T extends string = string>({
       name={name}
       aria-label={props["aria-label"]}
       className={cn(
-        "pl-field relative inline-flex max-w-full rounded-md bg-surface-2 p-0.5 select-none [--pl-field-border:var(--pl-separator)]",
+        "relative inline-flex max-w-full rounded-md bg-fill-2 p-0.5 select-none",
         SIZE[size].root,
         fullWidth ? "flex w-full" : "w-fit",
         disabled && "opacity-50",
@@ -93,7 +93,7 @@ export function SegmentedControl<T extends string = string>({
                 layoutId={`${id}-thumb`}
                 transition={spring.snap}
                 aria-hidden="true"
-                className="absolute inset-0 rounded-[calc(var(--radius-md)-2px)] bg-surface shadow-[inset_0_0_0_1px_var(--pl-border),var(--pl-lip)] dark:bg-fill-2"
+                className="absolute inset-0 rounded-[calc(var(--radius-md)-2px)] bg-surface shadow-[0_3px_8px_rgb(0_0_0/0.12),0_3px_1px_rgb(0_0_0/0.04)] dark:bg-[#636366]"
               />
             )}
             <span className="relative flex min-w-0 items-center gap-1.5">

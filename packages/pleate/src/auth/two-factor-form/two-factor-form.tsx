@@ -9,7 +9,7 @@ import { Form, FormField } from "../../components/form/form.tsx";
 import { Input } from "../../components/input/input.tsx";
 import { OTPInput } from "../../components/otp-input/otp-input.tsx";
 import { cn } from "../../lib/cn.ts";
-import { Footer, FormError, SubmitButton, text, useSubmitError, type AuthFormBaseProps } from "../shared.tsx";
+import { Footer, FormError, SubmitButton, text, useSubmitError, type AuthFormBaseProps, field } from "../shared.tsx";
 
 export type TwoFactorValues = { code: string; method: "otp" | "backup" };
 
@@ -127,7 +127,7 @@ export function TwoFactorForm({
           </FormField>
         ) : (
           <FormField key="backup" name="code" label={l.backupCode} required={{ value: true, message: l.backupRequired }} error={fieldErrors?.code}>
-            <Input autoComplete="off" autoCapitalize="none" spellCheck={false} placeholder={l.backupPlaceholder} className="font-mono" autoFocus />
+            <Input {...field} autoComplete="off" autoCapitalize="none" spellCheck={false} placeholder={l.backupPlaceholder} className="font-mono" autoFocus />
           </FormField>
         )}
         <div ref={box} className="pt-1">

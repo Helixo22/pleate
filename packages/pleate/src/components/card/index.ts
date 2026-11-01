@@ -4,6 +4,7 @@ export {
   CardDescription,
   CardFooter,
   CardHeader,
+  CardIcon,
   CardMedia,
   CardTitle,
   cardVariants,
