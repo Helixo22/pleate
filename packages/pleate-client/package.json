@@ -1,6 +1,6 @@
 {
   "name": "pleate-client",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Typed client and React hooks that connect pleate components to pleate-backend.",
   "license": "MIT",
   "author": "Helixo22",

@@ -71,7 +71,7 @@ export default function Home() {
         <div className="grid grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-7 sm:px-10 sm:py-12 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           <div>
             <p className="mb-4 font-mono text-footnote text-fg-muted">
-              pleate 0.2 · React UI for Next.js
+              pleate 0.3 · React UI for Next.js
             </p>
             <h1 className="mb-3 font-brand text-[2.5rem] leading-[0.95] font-bold tracking-[-0.04em] sm:text-7xl">
               pleate<span className="text-accent-ink">.ui</span>
