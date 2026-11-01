@@ -1,0 +1,1 @@
+export { BG_GLSL, CanvasBackground, rgba, ShaderBackground, useCssColors, type BackgroundProps, type CanvasBackgroundProps, type CanvasFrame, type Rgb, type ShaderBackgroundProps } from "./background-kit.tsx";
