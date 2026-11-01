@@ -19,6 +19,7 @@ import { Testimonials } from "pleate/marketing/testimonial";
 import { Navbar, NavbarLink } from "pleate/navbar";
 import { Section } from "pleate/section";
 import { STATEMENT_CLASS, statCols } from "./codegen";
+import { ComponentView } from "./component-view";
 import type { Block, Props } from "./model";
 
 const ICONS: Record<string, LucideIcon> = { sparkles: Sparkles, zap: Zap, shield: Shield, globe: Globe, lock: Lock, heart: Heart, chart: ChartColumn, layers: Layers, clock: Clock, users: Users };
@@ -277,5 +278,7 @@ export function SectionView({ block, editing = false }: { block: Block; editing?
           </div>
         </Section>
       );
+    case "component":
+      return <ComponentView p={p} />;
   }
 }

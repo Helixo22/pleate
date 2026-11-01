@@ -68,7 +68,26 @@ export const STAT_COLS = ["sm:grid-cols-1", "sm:grid-cols-1", "sm:grid-cols-2", 
 export const statCols = (n: number) => STAT_COLS[Math.min(4, Math.max(1, n))];
 export const STATEMENT_CLASS = "max-w-4xl text-title1 leading-tight font-semibold md:text-[2.75rem] md:leading-[1.15]";
 
-function sectionCode(block: Block, use: (mod: string, name: string) => void): string {
+/** What codegen needs to know about docs components: the effect to use when a block is a section background. */
+export type CodegenContext = { backgrounds?: Record<string, { name: string; path: string }>; sources?: Record<string, string> };
+
+// Shared with sections.tsx so canvas and export use the same classes.
+export const COMPONENT_WIDTH = { full: "full", wide: "xl", narrow: "md" } as const;
+export const COMPONENT_BG: Record<string, string | undefined> = { none: undefined, surface: "bg-surface", bg: "bg-bg", accent: "bg-accent-soft" };
+export const BG_SECTION_CLASS = "relative isolate grid place-items-center overflow-hidden px-6 py-16";
+export const BG_LAYER_CLASS = "absolute inset-0 -z-10";
+export const BG_CONTENT_CLASS = "mx-auto flex max-w-3xl flex-col items-center gap-5 text-center";
+
+const pascal = (s: string) =>
+  s
+    .split(/[^a-zA-Z0-9]+/)
+    .filter(Boolean)
+    .map((w) => w[0].toUpperCase() + w.slice(1))
+    .join("");
+/** The exported file of a demo, and the name it is imported as. */
+export const demoFile = (slug: string, demo: string) => ({ path: `components/${slug}-${demo}.tsx`, module: `@/components/${slug}-${demo}`, name: pascal(`${slug}-${demo}`).replace(/^(\d)/, "C$1") });
+
+function sectionCode(block: Block, use: (mod: string, name: string) => void, ctx: CodegenContext): string {
   const p: Props = block.props;
   const section = (attrs: (string | null)[], children: string[]) => {
     use("pleate/section", "Section");
@@ -254,6 +273,36 @@ function sectionCode(block: Block, use: (mod: string, name: string) => void): st
         ]),
       ]);
     }
+    case "component": {
+      const bg = p.asBackground ? ctx.backgrounds?.[p.slug] : undefined;
+      if (bg) {
+        use(bg.path, bg.name);
+        const buttons = [p.primary && button(p.primary), p.secondary && button(p.secondary, [attr("variant", "tinted")])].filter(Boolean) as string[];
+        return el("section", [attr("className", BG_SECTION_CLASS), attr("style", raw(`{ minHeight: ${Number(p.height) || 560} }`))], [
+          el(bg.name, [attr("className", BG_LAYER_CLASS)]),
+          el("div", [attr("className", BG_CONTENT_CLASS)], [
+            ...(p.eyebrow ? [el("p", [attr("className", "text-subhead font-medium text-accent-ink")], [text(p.eyebrow)])] : []),
+            ...(p.heading ? [el("h2", [attr("className", "text-display text-balance")], [text(p.heading)])] : []),
+            ...(p.description ? [el("p", [attr("className", "text-title3 font-normal text-fg-muted")], [text(p.description)])] : []),
+            ...(buttons.length ? [el("div", [attr("className", "flex flex-wrap justify-center gap-3")], buttons)] : []),
+          ]),
+        ]);
+      }
+      const file = demoFile(p.slug, p.demo);
+      use(file.module, `default ${file.name}`);
+      return section(
+        [
+          attr("eyebrow", p.eyebrow),
+          attr("title", p.heading),
+          attr("description", p.description),
+          attr("align", p.align),
+          attr("size", COMPONENT_WIDTH[p.width as keyof typeof COMPONENT_WIDTH]),
+          attr("spacing", p.padding),
+          attr("className", COMPONENT_BG[p.background]),
+        ],
+        [el("div", [attr("className", p.align === "center" ? "grid justify-items-center" : "grid")], [el(file.name, [])])],
+      );
+    }
   }
 }
 
@@ -287,17 +336,21 @@ function rootAttrs(theme: SiteTheme, use: (mod: string, name: string) => void): 
 }
 
 /** The whole page file. */
-export function generatePage(page: Page, theme: SiteTheme): string {
+export function generatePage(page: Page, theme: SiteTheme, ctx: CodegenContext = {}): string {
   const imports: Imports = new Map();
   const use = (mod: string, name: string) => {
     if (!imports.has(mod)) imports.set(mod, new Set());
     imports.get(mod)!.add(name);
   };
-  const body = page.blocks.map((b) => sectionCode(b, use));
+  const body = page.blocks.map((b) => sectionCode(b, use, ctx));
   const root = el("main", rootAttrs(theme, use), body.length ? body : ["{/* Add sections in the composer */}"]);
   const importLines = [...imports.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([mod, names]) => `import { ${[...names].sort((a, b) => a.replace("type ", "").localeCompare(b.replace("type ", ""))).join(", ")} } from "${mod}";`);
+    .map(([mod, names]) => {
+      const def = [...names].find((n) => n.startsWith("default "));
+      if (def) return `import ${def.slice(8)} from "${mod}";`;
+      return `import { ${[...names].sort((a, b) => a.replace("type ", "").localeCompare(b.replace("type ", ""))).join(", ")} } from "${mod}";`;
+    });
   return [
     `"use client";`,
     "",
@@ -312,16 +365,27 @@ export function generatePage(page: Page, theme: SiteTheme): string {
   ].join("\n");
 }
 
-/** Every page as { "app/.../page.tsx": source }. */
-export function generateProject(project: Project): Record<string, string> {
-  const used = new Set<string>();
-  return Object.fromEntries(
-    project.pages.map((page, i) => {
-      let path = i === 0 ? "app/page.tsx" : `app/${slugify(page.name)}/page.tsx`;
-      for (let n = 2; used.has(path); n++) path = `app/${slugify(page.name)}-${n}/page.tsx`;
-      used.add(path);
-      return [path, generatePage(page, project.theme)];
-    }),
+/** Demo files the project's component blocks import, as "slug/demo" keys. */
+export function demoKeysOf(project: Project, ctx: CodegenContext = {}): string[] {
+  const keys = project.pages.flatMap((pg) =>
+    pg.blocks.filter((b) => b.type === "component" && !(b.props.asBackground && ctx.backgrounds?.[b.props.slug])).map((b) => `${b.props.slug}/${b.props.demo}`),
   );
+  return [...new Set(keys)];
+}
+
+/** Every page as { "app/.../page.tsx": source }, plus each used demo verbatim as components/<slug>-<demo>.tsx. */
+export function generateProject(project: Project, ctx: CodegenContext = {}): Record<string, string> {
+  const used = new Set<string>();
+  const pages = project.pages.map((page, i) => {
+    let path = i === 0 ? "app/page.tsx" : `app/${slugify(page.name)}/page.tsx`;
+    for (let n = 2; used.has(path); n++) path = `app/${slugify(page.name)}-${n}/page.tsx`;
+    used.add(path);
+    return [path, generatePage(page, project.theme, ctx)];
+  });
+  const demos = demoKeysOf(project, ctx).map((key) => {
+    const [slug, demo] = key.split("/");
+    return [demoFile(slug, demo).path, ctx.sources?.[key] ?? `// Source of ${key} was not loaded.\n`];
+  });
+  return Object.fromEntries([...pages, ...demos]);
 }
 

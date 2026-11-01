@@ -1,19 +1,19 @@
-// The composer canvas: a frame at the chosen device width, scaled down to fit, with its own theme, and the page's
-// sections inside. Sections are selected by click or focus, reordered by dragging their handle (pointer events)
+// The composer canvas content (rendered inside the preview iframe, see frame.tsx): the page's sections.
+// Sections are selected by click or focus, reordered by dragging their handle (pointer events)
 // or with the move buttons, and new ones dropped in from the library (native drag and drop).
 "use client";
 
 import { ArrowDown, ArrowUp, Copy, GripVertical, Trash2 } from "lucide-react";
 import { cn, IconButton } from "pleate";
 import { createPalette, paletteStyle } from "pleate/theme";
-import { Fragment, useLayoutEffect, useRef, useState, type CSSProperties, type DragEvent, type ReactNode } from "react";
+import { Fragment, useRef, useState, type CSSProperties, type DragEvent } from "react";
 import { SECTIONS, type Block, type SiteTheme } from "./model";
 import { SectionView } from "./sections";
 
 export type Device = "desktop" | "tablet" | "mobile";
 export const DEVICE_WIDTH: Record<Device, number> = { desktop: 1280, tablet: 834, mobile: 390 };
 export const DRAG_TYPE = "application/x-pleate-composer";
-export type DragPayload = { kind: "new"; item: string } | { kind: "move"; id: string };
+export type DragPayload = { kind: "new"; item: string } | { kind: "component"; slug: string; demo: string; background: boolean } | { kind: "move"; id: string };
 
 /** The theme of the canvas only: data-theme / data-palette / roundness on the frame, never on the docs. */
 export function themeProps(theme: SiteTheme): { "data-theme": string; "data-palette"?: string; style: CSSProperties } {
@@ -25,36 +25,10 @@ export function themeProps(theme: SiteTheme): { "data-theme": string; "data-pale
   };
 }
 
-/** Renders children at `width` px and scales them down to the available width. */
-export function ScaledFrame({ width, theme, children, className }: { width: number; theme: SiteTheme; children: ReactNode; className?: string }) {
-  const outer = useRef<HTMLDivElement>(null);
-  const inner = useRef<HTMLDivElement>(null);
-  const [box, setBox] = useState({ avail: width, height: 0 });
-  useLayoutEffect(() => {
-    const ro = new ResizeObserver(() => setBox({ avail: outer.current?.clientWidth ?? width, height: inner.current?.offsetHeight ?? 0 }));
-    if (outer.current) ro.observe(outer.current);
-    if (inner.current) ro.observe(inner.current);
-    return () => ro.disconnect();
-  }, [width]);
-  const scale = Math.min(1, box.avail / width);
-  return (
-    <div ref={outer} className="w-full">
-      <div className="mx-auto" style={{ width: width * scale, height: box.height * scale }}>
-        <div
-          ref={inner}
-          {...themeProps(theme)}
-          style={{ ...themeProps(theme).style, width, transform: `scale(${scale})`, transformOrigin: "top left", ["--composer-scale" as string]: scale }}
-          className={cn("min-h-[40rem] overflow-hidden bg-bg text-fg", className)}
-        >
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-type CanvasProps = {
+export type CanvasProps = {
   blocks: Block[];
+  /** Display name per block id (component blocks are named after their component). */
+  names: Record<string, string>;
   selected: string | null;
   onSelect: (id: string | null) => void;
   onDrop: (payload: DragPayload, index: number) => void;
@@ -63,7 +37,7 @@ type CanvasProps = {
   onDelete: (id: string) => void;
 };
 
-export function CanvasBlocks({ blocks, selected, onSelect, onDrop, onMove, onDuplicate, onDelete }: CanvasProps) {
+export function CanvasBlocks({ blocks, names, selected, onSelect, onDrop, onMove, onDuplicate, onDelete }: CanvasProps) {
   const list = useRef<HTMLDivElement>(null);
   const [dropAt, setDropAt] = useState<number | null>(null);
   const [dragging, setDragging] = useState<string | null>(null);
@@ -120,7 +94,7 @@ export function CanvasBlocks({ blocks, selected, onSelect, onDrop, onMove, onDup
         </div>
       )}
       {blocks.map((block, i) => {
-        const name = SECTIONS[block.type].name;
+        const name = names[block.id] ?? SECTIONS[block.type].name;
         const active = selected === block.id;
         return (
           <Fragment key={block.id}>

@@ -1,9 +1,11 @@
 // Self-check for the composer's pure parts. Run: node --test apps/docs/components/composer/composer.test.ts
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { attr, generatePage, generateProject, text } from "./codegen.ts";
+import { attr, demoFile, generatePage, generateProject, text } from "./codegen.ts";
+import { backgrounds, demoKeys } from "./gen-loaders.mjs";
+import { BACKGROUND_LOADERS, DEMO_LOADERS } from "./loaders.ts";
 import { HISTORY_LIMIT, historyReducer, initHistory } from "./history.ts";
-import { createBlock, defaultProject, LIBRARY, sanitizeProject } from "./model.ts";
+import { componentBlock, componentFields, createBlock, defaultProject, LIBRARY, sanitizeProject } from "./model.ts";
 
 test("history: set, undo, redo, merge and cap", () => {
   let h = initHistory(0);
@@ -81,4 +83,49 @@ test("sanitize: rejects junk, drops unknown sections, coerces props", () => {
   assert.equal(p.pages[0].blocks[0].props.layout, "split");
   assert.equal(typeof p.pages[0].blocks[0].props.title, "string");
   assert.equal("extra" in p.pages[0].blocks[0].props, false);
+});
+
+test("codegen: component blocks import their demo file, or the effect when used as a background", () => {
+  const theme = { palette: "blue", custom: "#ff2d55", mode: "light" as const, roundness: 1.5 };
+  const demo = componentBlock("split-text", "basic", false);
+  demo.props.heading = "Kinetic type";
+  const bg = componentBlock("aurora", "basic", true);
+  const project = { ...defaultProject(), pages: [{ id: "h", name: "Home", blocks: [demo, bg] }] };
+  const ctx = { backgrounds: { aurora: { name: "Aurora", path: "pleate/effects/aurora" } }, sources: { "split-text/basic": "export default function Demo() {}\n" } };
+  const files = generateProject(project, ctx);
+  assert.deepEqual(Object.keys(files), ["app/page.tsx", "components/split-text-basic.tsx"]);
+  assert.equal(files["components/split-text-basic.tsx"], ctx.sources["split-text/basic"], "demo exported verbatim");
+  const page = files["app/page.tsx"];
+  assert.match(page, /import SplitTextBasic from "@\/components\/split-text-basic";/);
+  assert.match(page, /<SplitTextBasic \/>/);
+  assert.match(page, /title="Kinetic type"/);
+  assert.match(page, /import \{ Aurora \} from "pleate\/effects\/aurora";/);
+  assert.match(page, /<Aurora className="absolute inset-0 -z-10" \/>/);
+  assert.match(page, /minHeight: 560/);
+  assert.equal(demoFile("3d-effects", "tilt").name, "C3dEffectsTilt");
+  // Without background info the block falls back to its demo.
+  assert.ok(Object.keys(generateProject(project, {})).includes("components/aurora-basic.tsx"));
+});
+
+test("model: component fields follow the background switch", () => {
+  const keys = (bg: boolean, can: boolean) => componentFields({ asBackground: bg }, can).map((f) => f.key);
+  assert.ok(keys(true, true).includes("primary") && !keys(true, true).includes("width"));
+  assert.ok(keys(false, true).includes("width") && keys(false, true).includes("asBackground"));
+  assert.ok(!keys(true, false).includes("asBackground") && keys(true, false).includes("width"));
+});
+
+test("sanitize: component blocks need a known slug; a bad demo falls back to the first", () => {
+  const raw = (slug: string, demo: string) => ({ pages: [{ name: "Home", blocks: [{ type: "component", props: { slug, demo } }] }] });
+  const index = { aurora: ["basic", "dense"] };
+  assert.equal(sanitizeProject(raw("nope", "basic"), index)!.pages[0].blocks.length, 0, "unknown slug dropped");
+  assert.equal(sanitizeProject(raw("aurora", "missing"), index)!.pages[0].blocks[0].props.demo, "basic");
+  assert.equal(sanitizeProject(raw("../etc", "basic"))!.pages[0].blocks.length, 0, "malformed slug dropped without an index");
+  // Old projects (no component blocks) still load unchanged.
+  const old = defaultProject();
+  assert.deepEqual(sanitizeProject(JSON.parse(JSON.stringify(old)), index), old);
+});
+
+test("loaders.ts is in sync with demos/ (rerun gen-loaders.mjs if this fails)", () => {
+  assert.deepEqual(Object.keys(DEMO_LOADERS).sort(), demoKeys());
+  assert.deepEqual(Object.keys(BACKGROUND_LOADERS).sort(), backgrounds().map((b) => b.slug));
 });
