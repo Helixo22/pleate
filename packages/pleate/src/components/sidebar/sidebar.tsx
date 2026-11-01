@@ -110,7 +110,7 @@ export function Sidebar({
           style={sticky ? { top, height: `calc(100dvh - ${top})` } : undefined}
           className={cn(
             sticky && "sticky",
-            "hidden shrink-0 flex-col overflow-hidden text-fg transition-[width] duration-(--pl-duration-slow) ease-out motion-reduce:transition-none",
+            "hidden shrink-0 flex-col overflow-hidden text-fg [--pl-sidebar-bg:var(--pl-bg)] transition-[width] duration-(--pl-duration-slow) ease-out motion-reduce:transition-none",
             SHOW[breakpoint],
             collapsed ? "w-[4.25rem]" : "w-[17.5rem]",
             variant === "surface" && "border-e border-separator bg-bg",
@@ -134,7 +134,7 @@ export function Sidebar({
               }
             }}
             className={cn(
-              "pl-drawer fixed inset-y-0 start-0 z-(--pl-z-modal) flex w-[min(20rem,85vw)] flex-col bg-bg text-fg shadow-xl",
+              "pl-drawer fixed inset-y-0 start-0 z-(--pl-z-modal) flex w-[min(20rem,85vw)] flex-col bg-bg text-fg shadow-xl [--pl-sidebar-bg:var(--pl-bg)]",
               "pt-(--pl-safe-top) pb-(--pl-safe-bottom) ps-(--pl-safe-left) outline-none",
             )}
           >
@@ -200,11 +200,33 @@ export type SidebarContentProps = DivProps & {
   emptyLabel?: ReactNode;
 };
 
-export function SidebarContent({ className, children, emptyLabel, ...props }: SidebarContentProps) {
+/** Up/Down (and Home/End) move between the visible rows and fold buttons, like a list. */
+function moveFocus(event: KeyboardEvent<HTMLElement>) {
+  const keys = ["ArrowDown", "ArrowUp", "Home", "End"];
+  if (!keys.includes(event.key) || event.altKey || event.metaKey || event.ctrlKey) return;
+  const target = event.target as HTMLElement;
+  if (target.matches("input, textarea, [contenteditable]")) return;
+  const rows = [...event.currentTarget.querySelectorAll<HTMLElement>("a[href], button:not([disabled])")].filter(
+    (el) => !el.closest("[inert], [hidden]"),
+  );
+  const at = rows.indexOf(target.closest<HTMLElement>("a[href], button") ?? target);
+  if (!rows.length) return;
+  event.preventDefault();
+  const next =
+    event.key === "Home" ? 0 : event.key === "End" ? rows.length - 1 : Math.min(rows.length - 1, Math.max(0, at + (event.key === "ArrowDown" ? 1 : -1)));
+  rows[next]?.focus();
+  rows[next]?.scrollIntoView({ block: "nearest" });
+}
+
+export function SidebarContent({ className, children, emptyLabel, onKeyDown, ...props }: SidebarContentProps) {
   const { query } = useContext(SidebarContext);
   return (
     <nav
       className={cn("group/nav flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain px-3 py-2", className)}
+      onKeyDown={(event) => {
+        onKeyDown?.(event as unknown as KeyboardEvent<HTMLDivElement>);
+        if (!event.defaultPrevented) moveFocus(event);
+      }}
       {...(props as HTMLAttributes<HTMLElement>)}
     >
       {children}
@@ -242,6 +264,12 @@ export type SidebarGroupProps = DivProps & {
   onOpenChange?: (open: boolean) => void;
   /** false: chrome, not results; the group hides while a filter is active. */
   filterable?: boolean;
+  /** Quiet figure after the label, usually the number of rows. */
+  count?: ReactNode;
+  /** Small mark after the label (e.g. a "New" badge for a section that is mostly new). */
+  badge?: ReactNode;
+  /** The label stays pinned at the top of the scrolling sidebar while you scroll through a long group. */
+  stickyLabel?: boolean;
 };
 
 export function SidebarGroup({
@@ -255,6 +283,9 @@ export function SidebarGroup({
   open: openProp,
   onOpenChange,
   filterable = true,
+  count,
+  badge,
+  stickyLabel = false,
   children,
   ...props
 }: SidebarGroupProps) {
@@ -294,10 +325,19 @@ export function SidebarGroup({
             aria-expanded={open}
             aria-controls={listId}
             onClick={() => setOpen(!open)}
-            className="pl-focus-ring pl-touch group/label flex h-8 w-full cursor-pointer items-center gap-2 rounded-md px-2.5 text-start [&_svg]:size-4 [&_svg]:shrink-0"
+            className={cn(
+              "pl-focus-ring pl-touch group/label flex h-8 w-full cursor-pointer items-center gap-2 rounded-md px-2.5 text-start transition-colors hover:bg-fill-3 [&_svg]:size-4 [&_svg]:shrink-0",
+              stickyLabel && open && [
+                "sticky top-0 z-10 bg-(--pl-sidebar-bg) hover:bg-(--pl-sidebar-bg)",
+                "before:pointer-events-none before:absolute before:inset-x-0 before:-top-2 before:h-2 before:bg-(--pl-sidebar-bg)",
+              ],
+            )}
           >
-            {icon && <span className="flex text-fg-muted">{icon}</span>}
-            <span className="min-w-0 flex-1 truncate text-footnote font-semibold text-fg-muted transition-colors group-hover/label:text-fg">{label}</span>
+            {icon && <span className="flex text-fg-muted transition-colors group-hover/label:text-fg">{icon}</span>}
+            <span className="min-w-0 truncate text-footnote font-semibold text-fg-muted transition-colors group-hover/label:text-fg">{label}</span>
+            {badge}
+            <span className="flex-1" />
+            {count !== undefined && <span className="pl-tabular text-caption1 text-fg-subtle">{count}</span>}
             <ChevronRightIcon
               aria-hidden="true"
               strokeWidth={2.4}
@@ -314,6 +354,8 @@ export function SidebarGroup({
           >
             {icon}
             {label}
+            {badge}
+            {count !== undefined && <span className="ms-auto pl-tabular text-caption1 font-normal text-fg-subtle">{count}</span>}
           </p>
         ))}
       {/* Folding animates the row track from 0fr to 1fr; the closed list is inert, so it leaves the tab order. */}

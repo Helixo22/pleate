@@ -9,12 +9,12 @@ import { BACKEND_NAV, NAV } from "@/lib/nav";
 
 function groups(navigate: (href: string) => void): CommandGroup[] {
   const sections = [
-    ...NAV.map((s) => ({ ...s, area: "Frontend" })),
+    ...NAV.map((s) => ({ ...s, area: s.area === "effects" ? "Effects" : "Frontend" })),
     ...BACKEND_NAV.map((s) => ({ ...s, area: "Backend" })),
   ];
   return sections
     .map((s) => ({
-      heading: s.area === "Backend" ? `Backend · ${s.title}` : s.title,
+      heading: s.area === "Frontend" ? s.title : `${s.area} · ${s.title}`,
       items: s.items
         .filter((i) => i.ready)
         .map((i) => ({ id: `${s.area}:${i.href}`, label: i.name, keywords: [s.title, s.area], onSelect: () => navigate(i.href) })),
