@@ -10,8 +10,21 @@ import { NAV_BACKGROUNDS_B } from "./nav-bits/backgrounds-b";
 import { NAV_BACKGROUNDS_C } from "./nav-bits/backgrounds-c";
 import { NAV_ASCII } from "./nav-bits/ascii";
 
-export type NavItem = { name: string; href: string; ready: boolean };
-export type NavSection = { title: string; items: NavItem[] };
+export type NavItem = {
+  name: string;
+  href: string;
+  ready: boolean;
+  /** Added in 0.3: the sidebar marks it (on the row, or once on the section label when most of it is new). */
+  isNew?: boolean;
+};
+export type NavSection = { title: string; items: NavItem[]; area?: Area };
+
+/** The 0.3 effect pages: sorted A to Z (the merged lists come from several files) and flagged new. */
+const effects = (...lists: NavItem[][]): NavItem[] =>
+  lists
+    .flat()
+    .map((item) => ({ ...item, isNew: true }))
+    .sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }));
 
 const c = (name: string, ready = false): NavItem => ({
   name,
@@ -27,7 +40,7 @@ export const NAV: NavSection[] = [
       { name: "Tokens", href: "/tokens", ready: true },
       { name: "Theming", href: "/theming", ready: true },
       { name: "All components", href: "/components", ready: true },
-      { name: "Composer", href: "/composer", ready: true },
+      { name: "Composer", href: "/composer", ready: true, isNew: true },
     ],
   },
   {
@@ -71,12 +84,12 @@ export const NAV: NavSection[] = [
       c("Result Card", true), c("Model Picker", true), c("Reasoning", true),
     ],
   },
-  { title: "Effects", items: [c("Animated Text", true), c("Reveal", true), c("Page Transition", true), c("Hover Effects", true), c("Motion Graphics", true), c("Scroll Effects", true), c("3D Effects", true)] },
+  { title: "Effects", area: "effects", items: [c("Animated Text", true), c("Reveal", true), c("Page Transition", true), c("Hover Effects", true), c("Motion Graphics", true), c("Scroll Effects", true), c("3D Effects", true)] },
   { title: "Marketing", items: [c("Hero", true), c("Feature Grid", true), c("Pricing", true), c("Testimonial", true), c("CTA", true), { name: "Contact Form", href: "/components/contact", ready: true }, c("Logo Marquee", true)] },
-  { title: "Text Animations", items: NAV_TEXT },
-  { title: "Animations", items: [...NAV_ANIMATIONS, ...NAV_ANIMATIONS_B] },
-  { title: "Interactive", items: [...NAV_COMPONENTS_A, ...NAV_COMPONENTS_B] },
-  { title: "Backgrounds", items: [...NAV_BACKGROUNDS_A, ...NAV_BACKGROUNDS_B, ...NAV_BACKGROUNDS_C, ...NAV_ASCII] },
+  { title: "Text Animations", area: "effects", items: effects(NAV_TEXT) },
+  { title: "Animations", area: "effects", items: effects(NAV_ANIMATIONS, NAV_ANIMATIONS_B) },
+  { title: "Interactive", area: "effects", items: effects(NAV_COMPONENTS_A, NAV_COMPONENTS_B) },
+  { title: "Backgrounds", area: "effects", items: effects(NAV_BACKGROUNDS_A, NAV_BACKGROUNDS_B, NAV_BACKGROUNDS_C, NAV_ASCII) },
   { title: "Examples", items: [{ name: "Landing page", href: "/examples/landing", ready: true }] },
 ];
 
@@ -106,8 +119,26 @@ export const BACKEND_NAV: NavSection[] = [
   items: group.slugs.map(backendItem).filter((item): item is NavItem => item !== null),
 }));
 
-export type Area = "frontend" | "backend";
+// Three areas, each with its own sidebar: the component library, the effects (all under /components/<slug> too, so
+// the area comes from the section that lists the page) and the backend docs.
+export type Area = "frontend" | "effects" | "backend";
 
-export const areaOf = (pathname: string): Area => (pathname.startsWith("/backend") ? "backend" : "frontend");
+export const AREA_LABEL: Record<Area, string> = { frontend: "Components", effects: "Effects", backend: "Backend" };
 
-export const AREA_HOME: Record<Area, string> = { frontend: "/", backend: "/backend/overview" };
+const EFFECT_HREFS = new Set(NAV.filter((s) => s.area === "effects").flatMap((s) => s.items.map((i) => i.href)));
+
+export const areaOf = (pathname: string): Area =>
+  pathname.startsWith("/backend") ? "backend" : EFFECT_HREFS.has(pathname) ? "effects" : "frontend";
+
+/** The sections each area's sidebar shows. NAV itself keeps every frontend section (index, search, prev/next). */
+export const AREA_NAV: Record<Area, NavSection[]> = {
+  frontend: NAV.filter((s) => s.area !== "effects"),
+  effects: NAV.filter((s) => s.area === "effects"),
+  backend: BACKEND_NAV,
+};
+
+export const AREA_HOME: Record<Area, string> = {
+  frontend: "/",
+  effects: AREA_NAV.effects.find((s) => s.title === "Text Animations")?.items[0]?.href ?? "/components",
+  backend: "/backend/overview",
+};
