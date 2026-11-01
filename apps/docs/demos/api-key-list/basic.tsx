@@ -22,7 +22,7 @@ export default function Demo() {
   const [keys, setKeys] = useState(KEYS);
   return (
     <ApiKeyList
-      className="w-full"
+      className="w-full rounded-xl bg-bg p-4"
       keys={keys}
       scopes={SCOPES}
       defaultScopes={["recipes:read"]}

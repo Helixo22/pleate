@@ -17,6 +17,7 @@ export default function Demo() {
     <div className="grid w-full gap-8">
       <PromptSuggestions suggestions={ITEMS} onSelect={pick} />
       <PromptSuggestions suggestions={ITEMS} onSelect={pick} variant="chips" />
+      <PromptSuggestions suggestions={ITEMS} onSelect={pick} variant="list" className="max-w-md" />
     </div>
   );
 }

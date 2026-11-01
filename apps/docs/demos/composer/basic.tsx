@@ -40,7 +40,8 @@ export default function Demo() {
           </>
         }
       />
-      <Composer placeholder="Minimal: no attachments, no voice" onSubmit={({ text }) => toast(text)} />
+      <Composer variant="capsule" accept="image/*" placeholder="Message" onVoice={() => toast("Voice input")} onSubmit={({ text }) => toast(text || "Photo sent")} />
+      <Composer placeholder="Ask about your itinerary" onSubmit={({ text }) => toast(text)} />
     </div>
   );
 }

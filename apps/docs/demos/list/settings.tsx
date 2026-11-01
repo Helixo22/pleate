@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, Bell, Bluetooth, Globe, Moon, Plane, Trash2, Wifi } from "lucide-react";
+import { Archive, Bell, Bluetooth, HardDrive, Moon, Plane, Trash2, Wifi } from "lucide-react";
 import { Avatar } from "pleate/avatar";
 import { Badge } from "pleate/badge";
 import { List, ListItem, ListSection } from "pleate/list";
@@ -27,26 +27,27 @@ export default function Demo() {
         <ListSection header="Connectivity">
           <ListItem
             icon={<Plane />}
-            iconColor="var(--pl-warning)"
+            iconColor="#ff9500"
             title="Airplane Mode"
             trailing={<Switch aria-label="Airplane Mode" tone="success" checked={airplane} onCheckedChange={setAirplane} />}
           />
-          <ListItem icon={<Wifi />} iconColor="var(--pl-info)" title="Wi-Fi" value={airplane ? "Off" : "Home"} href="#settings" />
-          <ListItem icon={<Bluetooth />} iconColor="var(--pl-info)" title="Bluetooth" value="On" href="#settings" />
+          <ListItem icon={<Wifi />} iconColor="#007aff" title="Wi-Fi" value={airplane ? "Off" : "Home"} href="#settings" />
+          <ListItem icon={<Bluetooth />} iconColor="#007aff" title="Bluetooth" value="On" href="#settings" />
         </ListSection>
 
-        <ListSection header="General" footer="Notifications from trips you follow appear on the Lock Screen.">
-          <ListItem icon={<Bell />} iconColor="var(--pl-danger)" title="Notifications" trailing={<Badge variant="solid" tone="danger">2</Badge>} href="#settings" />
-          <ListItem icon={<Moon />} iconColor="var(--pl-accent)" title="Focus" subtitle="Silence notifications while you travel" href="#settings" />
+        <ListSection header="General" footer="Notifications from trips you follow appear on the Lock Screen">
+          <ListItem icon={<Bell />} iconColor="#ff3b30" title="Notifications" trailing={<Badge variant="solid" tone="danger">2</Badge>} href="#settings" />
+          <ListItem icon={<Moon />} iconColor="#5e5ce6" title="Focus" subtitle="Silence notifications while you travel" href="#settings" />
+          <ListItem icon={<HardDrive />} iconColor="#8e8e93" title="Offline maps" value="2.4 GB" href="#settings" />
         </ListSection>
 
         <ListSection header="Language">
           {["English", "Español", "Italiano"].map((l) => (
-            <ListItem key={l} icon={<Globe />} iconColor="var(--pl-success)" title={l} selected={lang === l} onClick={() => setLang(l)} />
+            <ListItem key={l} title={l} selected={lang === l} onClick={() => setLang(l)} />
           ))}
         </ListSection>
 
-        <ListSection header="Trips" footer="Swipe a trip left, or Tab to its actions.">
+        <ListSection header="Trips" footer="Swipe a trip left, or Tab to its actions">
           {trips.map((t) => (
             <ListItem
               key={t}

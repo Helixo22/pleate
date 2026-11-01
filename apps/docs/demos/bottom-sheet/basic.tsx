@@ -30,13 +30,16 @@ export default function Demo() {
         showClose
         footer={<Button fullWidth size="lg" onClick={() => setOpen(false)}>Start</Button>}
       >
-        <ul className="grid gap-2">
+        <p className="px-1 pb-2 text-footnote text-fg-muted">Leave now, arrive by 11:40</p>
+        <ul className="overflow-hidden rounded-xl bg-fill-3">
           {[...ROUTES, ...ROUTES].map((route, i) => (
-            <li key={i} className="flex items-center gap-3 rounded-xl bg-fill-3 p-3">
-              <span className="grid size-10 place-items-center rounded-md bg-fill-2 text-fg-muted [&_svg]:size-5">{route.icon}</span>
-              <span className="flex-1 text-body">{route.name}</span>
-              <span className="text-subhead text-fg-muted">{route.time}</span>
-              <span className="w-14 text-end text-subhead font-semibold">{route.price}</span>
+            <li key={i} className="flex min-h-14 items-center gap-3 ps-3">
+              <span className="grid size-8 place-items-center rounded-md bg-accent text-on-accent [&_svg]:size-4.5">{route.icon}</span>
+              <span className="flex flex-1 items-center gap-3 self-stretch border-b border-fg/10 pe-4 in-[li:last-child]:border-0">
+                <span className="flex-1 text-body">{route.name}</span>
+                <span className="text-subhead text-fg-muted pl-tabular">{route.time}</span>
+                <span className="w-14 text-end text-body pl-tabular">{route.price}</span>
+              </span>
             </li>
           ))}
         </ul>

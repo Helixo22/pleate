@@ -12,7 +12,7 @@ export default function Demo() {
       </LogoMarquee>
       <LogoMarquee reverse duration={40} gap="1rem">
         {NAMES.map((n) => (
-          <span key={n} className="rounded-md bg-fill-2 px-4 py-2 text-subhead font-medium whitespace-nowrap">{n}</span>
+          <span key={n} className="rounded-full bg-fill-2 px-4 py-2 text-subhead font-medium whitespace-nowrap">{n}</span>
         ))}
       </LogoMarquee>
     </div>
