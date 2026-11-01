@@ -18,11 +18,6 @@ import {
   ModalHeader,
   ModalTitle,
   SegmentedControl,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   SidebarGroup,
   SidebarItem,
   Slider,
@@ -32,11 +27,30 @@ import { useMediaQuery } from "pleate/lib";
 import { createPalette, PALETTES } from "pleate/theme";
 import { toast } from "pleate/toast";
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { CanvasBlocks, DEVICE_WIDTH, DRAG_TYPE, ScaledFrame, themeProps, type Device, type DragPayload } from "./canvas";
-import { generatePage, generateProject } from "./codegen";
+import { DEVICE_WIDTH, DRAG_TYPE, themeProps, type Device, type DragPayload } from "./canvas";
+import { ComponentLibrary } from "./component-library";
+import { demoKeysOf, generateProject, type CodegenContext } from "./codegen";
+import { canBackground } from "./component-view";
+import { FrameHost } from "./frame";
 import { historyReducer, initHistory } from "./history";
 import { Inspector, move } from "./inspector";
-import { createBlock, defaultProject, LIBRARY, sanitizeProject, SECTIONS, slugify, uid, type Block, type Page, type Project, type SiteTheme } from "./model";
+import {
+  componentBlock,
+  componentFields,
+  createBlock,
+  defaultProject,
+  LIBRARY,
+  sanitizeProject,
+  SECTIONS,
+  slugify,
+  uid,
+  type Block,
+  type CatalogItem,
+  type ComponentIndex,
+  type Page,
+  type Project,
+  type SiteTheme,
+} from "./model";
 import { SectionView } from "./sections";
 
 const STORAGE_KEY = "pleate-composer:v1";
@@ -48,10 +62,10 @@ function download(name: string, content: string, type = "text/plain") {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function loadSaved(): Project | null {
+function loadSaved(index: ComponentIndex): Project | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? sanitizeProject(JSON.parse(raw)) : null;
+    return raw ? sanitizeProject(JSON.parse(raw), index) : null;
   } catch {
     return null;
   }
@@ -59,7 +73,14 @@ function loadSaved(): Project | null {
 
 const GROUPS = [...new Set(LIBRARY.map((l) => l.group))];
 
-export function Composer() {
+export function Composer({ catalog }: { catalog: CatalogItem[] }) {
+  const bySlug = useMemo(() => new Map(catalog.map((c) => [c.slug, c])), [catalog]);
+  const index = useMemo<ComponentIndex>(() => Object.fromEntries(catalog.map((c) => [c.slug, c.demos.map((d) => d.id)])), [catalog]);
+  const codegen = useMemo<CodegenContext>(
+    () => ({ backgrounds: Object.fromEntries(catalog.flatMap((c) => (c.background ? [[c.slug, c.background]] : []))) }),
+    [catalog],
+  );
+  const [tab, setTab] = useState<"sections" | "components">("sections");
   const [history, dispatch] = useReducer(historyReducer<Project>, undefined, () => initHistory(defaultProject()));
   const project = history.present;
   const [ready, setReady] = useState(false);
@@ -70,12 +91,13 @@ export function Composer() {
   const wide = useMediaQuery("(min-width: 1024px)");
 
   useEffect(() => {
-    const saved = loadSaved();
+    const saved = loadSaved(index);
     if (saved) {
       dispatch({ type: "reset", value: saved });
       setPageId(saved.pages[0].id);
     }
     setReady(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -108,8 +130,14 @@ export function Composer() {
     const at = index ?? (block ? page.blocks.indexOf(block) + 1 : page.blocks.length);
     insert(createBlock(item), at);
   };
+  const addComponent = (slug: string, demo: string, background: boolean, index?: number) => {
+    if (!bySlug.has(slug)) return;
+    insert(componentBlock(slug, demo, background && canBackground(slug)), index ?? (block ? page.blocks.indexOf(block) + 1 : page.blocks.length));
+  };
+  const nameOf = (b: Block) => (b.type === "component" ? (bySlug.get(b.props.slug)?.name ?? "Component") : SECTIONS[b.type].name);
   const onDrop = (payload: DragPayload, index: number) => {
     if (payload.kind === "new") return addFromLibrary(payload.item, index);
+    if (payload.kind === "component") return addComponent(payload.slug, payload.demo, payload.background, index);
     const from = page.blocks.findIndex((b) => b.id === payload.id);
     if (from === -1) return;
     setBlocks((bs) => move(bs, from, from < index ? index - 1 : index));
@@ -118,8 +146,6 @@ export function Composer() {
   const moveBlock = (id: string, by: -1 | 1) => {
     const i = page.blocks.findIndex((b) => b.id === id);
     setBlocks((bs) => move(bs, i, i + by));
-    // keep keyboard focus on the moved section's toolbar
-    requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-block="${id}"] [aria-label^="Move"]:not(:disabled)`)?.focus());
   };
   const duplicate = (id: string) => {
     const i = page.blocks.findIndex((b) => b.id === id);
@@ -170,7 +196,7 @@ export function Composer() {
   const fileInput = useRef<HTMLInputElement>(null);
   const importFile = async (file: File) => {
     try {
-      const next = sanitizeProject(JSON.parse(await file.text()));
+      const next = sanitizeProject(JSON.parse(await file.text()), index);
       if (!next) throw new Error("not a project");
       commit(next);
       setPageId(next.pages[0].id);
@@ -258,8 +284,20 @@ export function Composer() {
               New page
             </SidebarItem>
           </SidebarGroup>
-          <p className="px-2.5 text-caption1 text-fg-subtle">Drag a section onto the canvas, or press it to add it after the selected one.</p>
-          {GROUPS.map((group) => (
+          <SegmentedControl<"sections" | "components">
+            aria-label="Library"
+            size="sm"
+            fullWidth
+            value={tab}
+            onValueChange={setTab}
+            options={[
+              { value: "sections", label: "Sections" },
+              { value: "components", label: "Components" },
+            ]}
+          />
+          <p className="px-2.5 text-caption1 text-fg-subtle">Drag onto the canvas, or press to add after the selected section.</p>
+          {tab === "components" && <ComponentLibrary catalog={catalog} onAdd={(c) => addComponent(c.slug, c.demos[0]?.id ?? "", Boolean(c.background))} />}
+          {tab === "sections" && GROUPS.map((group) => (
             <SidebarGroup key={group} label={group}>
               {LIBRARY.filter((l) => l.group === group).map((item) => (
                 <SidebarItem
@@ -282,32 +320,35 @@ export function Composer() {
           ))}
         </aside>
 
-        <main className="min-w-0 flex-1 overflow-y-auto bg-fill-3 p-6" aria-label="Canvas">
-          <ScaledFrame width={DEVICE_WIDTH[device]} theme={project.theme} className="rounded-lg shadow-[0_0_0_1px_var(--pl-separator)]">
-            <CanvasBlocks
-              blocks={page.blocks}
-              selected={selected}
-              onSelect={setSelected}
-              onDrop={onDrop}
-              onMove={moveBlock}
-              onDuplicate={duplicate}
-              onDelete={remove}
-            />
-          </ScaledFrame>
+        <main className="min-w-0 flex-1 overflow-hidden bg-fill-3 p-6" aria-label="Canvas">
+          <FrameHost
+            width={DEVICE_WIDTH[device]}
+            state={{ blocks: page.blocks, names: Object.fromEntries(page.blocks.map((b) => [b.id, nameOf(b)])), selected, theme: project.theme }}
+            handlers={{
+              onSelect: setSelected,
+              onDrop,
+              onMove: moveBlock,
+              onDuplicate: duplicate,
+              onDelete: remove,
+              onUndo: () => dispatch({ type: "undo" }),
+              onRedo: () => dispatch({ type: "redo" }),
+            }}
+          />
         </main>
 
         <aside aria-label="Properties" className="w-80 shrink-0 overflow-y-auto border-s border-separator">
           {block ? (
             <div className="grid gap-4 p-4">
               <div className="flex items-center gap-2">
-                <h2 className="flex-1 text-headline">{SECTIONS[block.type].name}</h2>
+                <h2 className="min-w-0 flex-1 truncate text-headline">{nameOf(block)}</h2>
                 <Button size="sm" variant="plain" onClick={() => setSelected(null)}>
                   Done
                 </Button>
               </div>
               <Inspector
                 key={block.id}
-                fields={SECTIONS[block.type].fields}
+                fields={block.type === "component" ? componentFields(block.props, canBackground(block.props.slug)) : SECTIONS[block.type].fields}
+                demoOptions={bySlug.get(block.props.slug)?.demos.map((d) => ({ value: d.id, label: d.title }))}
                 props={block.props}
                 scope={block.id}
                 onChange={(key, value, merge) => setBlocks((bs) => bs.map((b) => (b.id === block.id ? { ...b, props: { ...b.props, [key]: value } } : b)), merge)}
@@ -326,7 +367,7 @@ export function Composer() {
         </aside>
       </div>
 
-      <ExportDialog open={exportOpen} onOpenChange={setExportOpen} project={project} pageId={page.id} />
+      <ExportDialog open={exportOpen} onOpenChange={setExportOpen} project={project} pageId={page.id} ctx={codegen} />
     </div>
   );
 }
@@ -431,45 +472,87 @@ function PageSettings({
   );
 }
 
-function ExportDialog({ open, onOpenChange, project, pageId }: { open: boolean; onOpenChange: (o: boolean) => void; project: Project; pageId: string }) {
-  const [current, setCurrent] = useState(pageId);
+function ExportDialog({
+  open,
+  onOpenChange,
+  project,
+  pageId,
+  ctx,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  project: Project;
+  pageId: string;
+  ctx: CodegenContext;
+}) {
+  const [sources, setSources] = useState<Record<string, string>>({});
+  const [current, setCurrent] = useState<string | null>(null);
+  const needed = useMemo(() => (open ? demoKeysOf(project, ctx) : []), [open, project, ctx]);
+  const missing = needed.filter((k) => !(k in sources));
+
+  // Demo sources come from the docs on demand, only for the components used.
   useEffect(() => {
-    if (open) setCurrent(pageId);
-  }, [open, pageId]);
-  const files = useMemo(() => (open ? generateProject(project) : {}), [open, project]);
-  const index = Math.max(0, project.pages.findIndex((p) => p.id === current));
-  const [path, code] = Object.entries(files)[index] ?? ["app/page.tsx", open ? generatePage(project.pages[0], project.theme) : ""];
+    if (!missing.length) return;
+    let cancelled = false;
+    Promise.all(
+      missing.map((k) =>
+        fetch(`/composer/source/${k}`)
+          .then((r) => (r.ok ? r.text() : `// Could not load the source of ${k}.\n`))
+          .catch(() => `// Could not load the source of ${k}.\n`)
+          .then((code) => [k, code] as const),
+      ),
+    ).then((pairs) => !cancelled && setSources((s) => ({ ...s, ...Object.fromEntries(pairs) })));
+    return () => {
+      cancelled = true;
+    };
+  }, [missing.join("|")]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const files = useMemo(() => (open ? generateProject(project, { ...ctx, sources }) : {}), [open, project, ctx, sources]);
+  const paths = Object.keys(files);
+  const pagePath = paths[Math.max(0, project.pages.findIndex((p) => p.id === pageId))];
+  const path = current && current in files ? current : pagePath;
+  const code = files[path] ?? "";
   return (
-    <Modal open={open} onOpenChange={onOpenChange}>
+    <Modal open={open} onOpenChange={(o) => (onOpenChange(o), setCurrent(null))}>
       <ModalContent size="xl">
         <ModalHeader>
           <ModalTitle>Export code</ModalTitle>
-          <ModalDescription>A Next.js page per composer page. Install pleate and lucide-react, then paste the file at the path shown.</ModalDescription>
+          <ModalDescription>
+            One Next.js page per composer page, and each component example as its own file under components/. Install pleate and lucide-react, then copy the files to the paths shown.
+          </ModalDescription>
         </ModalHeader>
-        <ModalBody className="grid gap-3">
-          <div className="flex items-center gap-3">
-            <Select value={project.pages[index]?.id} onValueChange={setCurrent}>
-              <SelectTrigger size="sm" className="w-56" aria-label="Page">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {project.pages.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>
-                    {p.name || "Untitled"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <code className="truncate font-mono text-footnote text-fg-muted">{path}</code>
-          </div>
-          <Snippet code={code} language="tsx" maxHeight="55dvh" />
+        {/* A list, not a Select: menus open under the modal overlay. */}
+        <ModalBody className="grid grid-cols-[16rem_minmax(0,1fr)] gap-4">
+          <ul aria-label="Files" className="grid content-start gap-0.5">
+            {paths.map((p) => (
+              <li key={p}>
+                <button
+                  type="button"
+                  aria-current={p === path || undefined}
+                  onClick={() => setCurrent(p)}
+                  className={cn(
+                    "pl-focus-ring w-full truncate rounded-sm px-2.5 py-1.5 text-start font-mono text-caption1",
+                    p === path ? "bg-accent-soft text-accent-ink" : "text-fg-muted hover:bg-fill-3",
+                  )}
+                  title={p}
+                >
+                  {p}
+                </button>
+              </li>
+            ))}
+          </ul>
+          <Snippet code={missing.length ? "// Loading component sources" : code} language="tsx" maxHeight="55dvh" />
         </ModalBody>
         <ModalFooter>
-          <Button variant="gray" startIcon={<Download />} onClick={() => download(path.split("/").slice(-2).join("-"), code)}>
-            Download this page
+          <Button variant="gray" startIcon={<Download />} disabled={!code} onClick={() => download(path.split("/").slice(-2).join("-"), code)}>
+            Download this file
           </Button>
-          <Button startIcon={<Download />} onClick={() => download(`${slugify(project.name)}-pages.json`, JSON.stringify(files, null, 2), "application/json")}>
-            Download all pages
+          <Button
+            startIcon={<Download />}
+            disabled={missing.length > 0}
+            onClick={() => download(`${slugify(project.name)}-files.json`, JSON.stringify(files, null, 2), "application/json")}
+          >
+            Download all files
           </Button>
         </ModalFooter>
       </ModalContent>

@@ -4,7 +4,7 @@
 export type Option = { value: string; label: string };
 
 export type Field =
-  | { key: string; label: string; kind: "text" | "textarea" | "url"; hint?: string }
+  | { key: string; label: string; kind: "text" | "textarea" | "url" | "demo"; hint?: string }
   | { key: string; label: string; kind: "select"; options: Option[] }
   | { key: string; label: string; kind: "switch" }
   | { key: string; label: string; kind: "number"; min?: number; max?: number; step?: number }
@@ -27,7 +27,8 @@ export type SectionType =
   | "footer"
   | "rotating"
   | "statement"
-  | "globe";
+  | "globe"
+  | "component";
 
 export type Block = { id: string; type: SectionType; props: Props };
 export type Page = { id: string; name: string; blocks: Block[] };
@@ -374,7 +375,64 @@ export const SECTIONS: Record<SectionType, SectionDef> = {
       tone: "dark",
     },
   },
+  // Any docs component dropped from the Components tab: renders one of its demos, or, for the Backgrounds set, the
+  // effect itself behind a headline. `slug` and `demo` are checked against the catalog on load.
+  component: {
+    type: "component",
+    name: "Component",
+    fields: [
+      { key: "slug", label: "Component", kind: "text" },
+      { key: "demo", label: "Example", kind: "demo" },
+      { key: "asBackground", label: "Use as section background", kind: "switch" },
+      { key: "height", label: "Height in px", kind: "number", min: 240, max: 1200, step: 20 },
+      { key: "eyebrow", label: "Eyebrow", kind: "text" },
+      { key: "heading", label: "Heading", kind: "text", hint: "Optional" },
+      { key: "description", label: "Description", kind: "textarea" },
+      { key: "primary", label: "Primary button", kind: "text" },
+      { key: "secondary", label: "Secondary button", kind: "text" },
+      { key: "width", label: "Width", kind: "select", options: opts("full", "wide", "narrow") },
+      { key: "padding", label: "Padding", kind: "select", options: [{ value: "none", label: "None" }, { value: "sm", label: "Small" }, { value: "md", label: "Medium" }, { value: "lg", label: "Large" }] },
+      {
+        key: "background",
+        label: "Background",
+        kind: "select",
+        options: [{ value: "none", label: "None" }, { value: "surface", label: "Surface" }, { value: "bg", label: "Page" }, { value: "accent", label: "Accent, soft" }],
+      },
+      align,
+    ],
+    defaults: {
+      slug: "",
+      demo: "",
+      asBackground: false,
+      height: 560,
+      eyebrow: "",
+      heading: "",
+      description: "",
+      primary: "",
+      secondary: "",
+      width: "wide",
+      padding: "md",
+      background: "none",
+      align: "center",
+    },
+  },
 };
+
+/** Fields the panel shows for a component block: background mode swaps layout options for headline and buttons. */
+export function componentFields(p: Props, canBackground: boolean): Field[] {
+  const hidden = new Set(["slug", ...(canBackground ? [] : ["asBackground"])]);
+  for (const k of p.asBackground && canBackground ? ["demo", "width", "padding", "background", "align"] : ["height", "primary", "secondary"]) hidden.add(k);
+  return SECTIONS.component.fields.filter((f) => !hidden.has(f.key));
+}
+
+export function componentBlock(slug: string, demo: string, background: boolean): Block {
+  return createBlock({
+    type: "component",
+    props: background
+      ? { slug, demo, asBackground: true, heading: "Your headline here", description: "Edit this text in the panel on the right.", primary: "Get started", secondary: "Learn more" }
+      : { slug, demo },
+  });
+}
 
 export type LibraryItem = { id: string; group: string; name: string; description: string; type: SectionType; props?: Props };
 
@@ -459,8 +517,22 @@ function cleanProps(fields: Field[], props: Record<string, unknown>, defaults: P
   return Object.fromEntries(fields.map((f) => [f.key, cleanValue(f, props[f.key], clone(defaults[f.key]))]));
 }
 
+/** slug -> demo ids, from the docs registry. */
+export type ComponentIndex = Record<string, string[]>;
+const SLUG = /^[a-z0-9-]{1,64}$/;
+
+/** A component block survives only with a known slug (or a well formed one when no index is given). */
+function cleanComponent(block: Block, components?: ComponentIndex): Block | null {
+  const { slug, demo } = block.props;
+  if (!SLUG.test(slug)) return null;
+  if (!components) return SLUG.test(demo) ? block : null;
+  const demos = components[slug];
+  if (!demos?.length) return null;
+  return demos.includes(demo) ? block : { ...block, props: { ...block.props, demo: demos[0] } };
+}
+
 /** Validates untrusted JSON (localStorage, imported file). Returns null when it is not a composer project at all. */
-export function sanitizeProject(input: unknown): Project | null {
+export function sanitizeProject(input: unknown, components?: ComponentIndex): Project | null {
   if (!isObj(input) || !Array.isArray(input.pages)) return null;
   const t = isObj(input.theme) ? input.theme : {};
   const pages = input.pages.filter(isObj).slice(0, 50).map((p) => ({
@@ -471,8 +543,10 @@ export function sanitizeProject(input: unknown): Project | null {
       .slice(0, 100)
       .map((b) => {
         const def = SECTIONS[b.type as SectionType];
-        return { id: str(b.id, "", 64) || uid(), type: def.type, props: cleanProps(def.fields, isObj(b.props) ? b.props : {}, def.defaults) };
-      }),
+        const block = { id: str(b.id, "", 64) || uid(), type: def.type, props: cleanProps(def.fields, isObj(b.props) ? b.props : {}, def.defaults) };
+        return def.type === "component" ? cleanComponent(block, components) : block;
+      })
+      .filter((b): b is Block => b !== null),
   }));
   if (pages.length === 0) return null;
   const palette = t.palette === "custom" || PALETTE_NAMES.includes(t.palette as string) ? (t.palette as string) : "blue";
@@ -484,3 +558,14 @@ export function sanitizeProject(input: unknown): Project | null {
     pages,
   };
 }
+
+/** One docs component as the Components tab lists it (built on the server from the docs registry and nav). */
+export type CatalogItem = {
+  slug: string;
+  name: string;
+  section: string;
+  description: string;
+  demos: { id: string; title: string }[];
+  /** Backgrounds only: the effect to place behind a section. */
+  background?: { name: string; path: string };
+};

@@ -4,7 +4,7 @@
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import { Button, IconButton, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch, Textarea } from "pleate";
 import { useId } from "react";
-import type { Field, Props } from "./model";
+import type { Field, Option, Props } from "./model";
 
 type Change = (key: string, value: unknown, merge?: string) => void;
 
@@ -127,10 +127,26 @@ function ItemsControl({ field, value, onChange, scope }: { field: Extract<Field,
   );
 }
 
-export function Inspector({ fields, props, scope, onChange }: { fields: Field[]; props: Props; scope: string; onChange: Change }) {
+export function Inspector({
+  fields,
+  props,
+  scope,
+  onChange,
+  demoOptions,
+}: {
+  fields: Field[];
+  props: Props;
+  scope: string;
+  onChange: Change;
+  /** Choices for a "demo" field (the examples of a component); hidden when there is only one. */
+  demoOptions?: Option[];
+}) {
+  const shown = fields.flatMap((f): Field[] =>
+    f.kind !== "demo" ? [f] : demoOptions && demoOptions.length > 1 ? [{ key: f.key, label: f.label, kind: "select", options: demoOptions }] : [],
+  );
   return (
     <div className="grid gap-4">
-      {fields.map((f) => (
+      {shown.map((f) => (
         <Control key={f.key} field={f} value={props[f.key]} onChange={onChange} scope={scope} />
       ))}
     </div>
