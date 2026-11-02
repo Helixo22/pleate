@@ -1,5 +1,5 @@
-// True when animations should stop: the system "reduce motion" setting, or data-motion="off" on <html>
-// (set through ThemeProvider's setMotion). Server render assumes motion is allowed.
+// True when animations should stop: data-motion="off" on <html> (set through ThemeProvider's setMotion), or the system
+// "reduce motion" setting unless the app set data-motion="on" (its own setting wins). Server render assumes motion is allowed.
 "use client";
 
 import { useSyncExternalStore } from "react";
@@ -19,7 +19,9 @@ function subscribe(onChange: () => void) {
 
 export function prefersReducedMotion() {
   if (typeof window === "undefined") return false;
-  return window.matchMedia(QUERY).matches || document.documentElement.getAttribute("data-motion") === "off";
+  const choice = document.documentElement.getAttribute("data-motion");
+  if (choice === "on" || choice === "off") return choice === "off";
+  return window.matchMedia(QUERY).matches;
 }
 
 export function useReducedMotion() {
