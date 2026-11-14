@@ -1,7 +1,7 @@
 // Palette generation from one brand color. The seed becomes, for light and dark:
 // - accent: the fill behind on-accent text (buttons, switches, selected states), AA with on-accent;
 // - accent-ink: the accent used as text and icons on the page, AA on the page background and on cards;
-// - a 50–950 tonal scale (OKLCH lightness ramp, chroma tapered at the ends) for charts and tints.
+// - a 50 to 950 tonal scale (OKLCH lightness ramp, chroma tapered at the ends) for charts and tints.
 // Hover, pressed, soft and focus-ring shades are derived in CSS (tokens.css), so they follow any palette.
 import { contrast, hexToOklch, oklchToHex, shiftUntil } from "./color.ts";
 

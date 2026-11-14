@@ -5,17 +5,17 @@ import { ContactForm } from "pleate/marketing/contact";
 
 const INFO = [
   { icon: <Mail />, label: "Email", value: "hello@plate.app" },
-  { icon: <Clock />, label: "Hours", value: "Mon to Fri, 9:00 to 18:00 CET" },
+  { icon: <Clock />, label: "Hours", value: "Mon to Fri, 9 to 18 CET" },
   { icon: <MapPin />, label: "Office", value: "Via Tortona 31, Milan" },
 ];
 
 export default function Demo() {
   return (
     <section className="grid w-full gap-8 rounded-3xl bg-bg p-6 md:grid-cols-[1fr_1.4fr] md:p-10">
-      <div className="flex flex-col gap-6">
+      <div className="flex min-w-0 flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <h2 className="text-title1">Talk to the Plate team</h2>
-          <p className="text-body text-fg-muted">Questions about plans, partnerships or a recipe that went wrong. We answer within a working day.</p>
+          <h2 className="text-title2 text-balance">Talk to the Plate team</h2>
+          <p className="text-body text-fg-muted">Questions about plans, partnerships or a booking that went wrong. We answer within a working day.</p>
         </div>
         {/* An inset grouped list: rows share one surface, hairlines start after the icon. */}
         <ul className="overflow-hidden rounded-2xl bg-surface shadow-[var(--pl-edge)]">
@@ -32,7 +32,7 @@ export default function Demo() {
           ))}
         </ul>
       </div>
-      <div className="rounded-2xl bg-surface p-5 shadow-[var(--pl-edge)] md:p-6">
+      <div className="min-w-0 rounded-2xl bg-surface p-5 shadow-[var(--pl-edge)] md:p-6">
         <ContactForm
           onSubmit={async (values) => {
             if (values.website) return; // a bot filled the honeypot: pretend it worked

@@ -194,7 +194,7 @@ export function DataTable<T>({
         density={density}
         aria-label={aria["aria-label"]}
         aria-busy={loading || undefined}
-        wrapperClassName="min-w-0"
+        wrapperClassName="min-w-0 pl-scroll-x"
       >
         {caption && <TableCaption>{caption}</TableCaption>}
         <TableHeader>

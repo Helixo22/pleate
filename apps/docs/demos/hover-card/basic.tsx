@@ -5,7 +5,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "pleate/hover-card
 
 export default function Demo() {
   return (
-    <p className="max-w-sm text-subhead text-fg-muted">
+    <p className="max-w-md text-center text-subhead text-fg-muted">
       Planned by{" "}
       <HoverCard>
         <HoverCardTrigger asChild>
@@ -24,7 +24,7 @@ export default function Demo() {
           </div>
         </HoverCardContent>
       </HoverCard>{" "}
-      with three travellers, 14 to 18 May.
+      with three friends, 14 to 18 May.
     </p>
   );
 }

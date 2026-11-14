@@ -21,7 +21,7 @@ export type MagnetProps = {
   children: ReactNode;
   /** How far beyond the element the pull starts (px). */
   padding?: number;
-  /** 0–1: how much of the distance it follows. */
+  /** 0 to 1: how much of the distance it follows. */
   strength?: number;
   className?: string;
 };

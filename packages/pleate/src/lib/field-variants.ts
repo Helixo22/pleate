@@ -18,13 +18,15 @@ export const fieldVariants = cva(
       variant: {
         filled: "bg-fill-2 [--pl-field-border:transparent] hover:bg-fill",
         outline: "bg-surface [--pl-field-border:var(--pl-border-strong)] hover:[--pl-field-border:var(--pl-fg-muted)]",
-        surface: "bg-surface [--pl-field-border:var(--pl-separator)] hover:[--pl-field-border:var(--pl-fg-muted)]",
+        surface: "bg-surface [--pl-field-border:var(--pl-border)] hover:[--pl-field-border:var(--pl-fg-muted)]",
         plain: "rounded-none! bg-transparent px-0! [--pl-field-border:transparent] [box-shadow:none] has-[:focus-visible]:shadow-none!",
       },
       size: {
+        xs: "min-h-7 gap-1.5 rounded-sm px-2 text-[1rem] md:text-footnote [&_svg]:size-3.5",
         sm: "min-h-8 gap-2 rounded-sm px-2.5 text-[1rem] md:text-footnote [&_svg]:size-3.5",
         md: "min-h-9 gap-2 rounded-md px-3 text-[1rem] md:text-subhead [&_svg]:size-4",
         lg: "min-h-11 gap-2.5 rounded-lg px-3.5 text-[1rem] md:text-callout [&_svg]:size-[1.125rem]",
+        xl: "min-h-12 gap-2.5 rounded-lg px-4 text-[1rem] md:text-headline [&_svg]:size-5",
       },
     },
     defaultVariants: { variant: "filled", size: "md" },

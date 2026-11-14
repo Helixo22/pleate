@@ -1,6 +1,6 @@
 // FeatureGrid: what a product does, in a grid. "cards" on solid surfaces, "plain" on the page, or "bento" where
 // items can span columns/rows and carry a visual. Each item: icon tile, title, text, optional link. Items enter
-// one after another as the grid scrolls in. Give an item a `tint` for an iOS style colored icon tile and a soft wash.
+// one after another on mount (never hidden waiting for a scroll). Give an item a `tint` to color its icon tile.
 "use client";
 
 import { motion } from "motion/react";
@@ -20,7 +20,7 @@ export type Feature = {
   /** Bento: columns / rows this item spans (on large screens). */
   span?: 1 | 2;
   rowSpan?: 1 | 2;
-  /** The item's own color (any CSS color): fills the icon tile (white glyph) and washes the card from the top corner. */
+  /** The item's own color (any CSS color): fills the icon tile (white glyph). */
   tint?: string;
 };
 
@@ -39,8 +39,7 @@ export function FeatureGrid({ features, columns = 3, variant = "cards", classNam
     <motion.ul
       className={cn("grid gap-4", COLS[columns], variant === "bento" && "lg:auto-rows-[minmax(12rem,auto)]", variant === "plain" && "gap-x-8 gap-y-10", className)}
       initial={reduced ? false : "hidden"}
-      whileInView="shown"
-      viewport={{ once: true, amount: 0.15 }}
+      animate="shown"
       variants={{ hidden: {}, shown: { transition: { staggerChildren: 0.07 } } }}
     >
       {features.map((f, i) => (
@@ -51,9 +50,6 @@ export function FeatureGrid({ features, columns = 3, variant = "cards", classNam
           className={cn(
             "group relative flex flex-col gap-3",
             variant !== "plain" && "overflow-hidden rounded-2xl bg-surface p-6 shadow-[var(--pl-edge)]",
-            variant !== "plain" &&
-              f.tint &&
-              "bg-[linear-gradient(150deg,color-mix(in_srgb,var(--pl-feature-tint)_11%,transparent)_0%,transparent_75%)]",
             variant === "bento" && f.span === 2 && "lg:col-span-2",
             variant === "bento" && f.rowSpan === 2 && "lg:row-span-2",
             variant !== "plain" &&
@@ -65,7 +61,7 @@ export function FeatureGrid({ features, columns = 3, variant = "cards", classNam
             <span
               className={cn(
                 "grid size-11 place-items-center rounded-[0.75rem] [&_svg]:size-[1.3rem]",
-                f.tint ? "bg-(--pl-feature-tint) text-white" : "bg-fill-2 text-fg",
+                f.tint ? "bg-(--pl-feature-tint) text-white" : "bg-accent-soft text-accent-ink",
               )}
             >
               {f.icon}

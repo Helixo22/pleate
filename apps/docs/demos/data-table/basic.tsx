@@ -86,7 +86,7 @@ export default function Demo() {
   }, [search, role, sort, page]);
 
   return (
-    <div className="w-full rounded-xl bg-bg p-4">
+    <div className="w-full min-w-0">
     <DataTable
       aria-label="Household members"
       columns={columns}

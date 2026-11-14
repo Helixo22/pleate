@@ -84,7 +84,7 @@ export function CommandPalette({
         <Dialog.Content
           aria-describedby={undefined}
           className={cn(
-            "pl-dialog fixed inset-x-4 top-[12dvh] z-(--pl-z-modal) mx-auto flex max-h-[min(30rem,76dvh)] max-w-xl flex-col overflow-hidden rounded-xl bg-elevated text-fg shadow-xl outline-none",
+            "pl-dialog fixed inset-x-4 top-[12dvh] z-(--pl-z-modal) mx-auto flex max-h-[min(30rem,76dvh)] max-w-xl flex-col overflow-hidden rounded-xl bg-elevated text-fg shadow-[var(--pl-shadow-xl),var(--pl-edge)] outline-none",
             className,
           )}
         >

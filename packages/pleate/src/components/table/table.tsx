@@ -6,6 +6,8 @@
 import { createContext, useContext, type HTMLAttributes, type ReactNode, type TdHTMLAttributes, type ThHTMLAttributes } from "react";
 import { cn } from "../../lib/cn.ts";
 import { ChevronUpIcon } from "../../lib/icons.tsx";
+import { EmptyState } from "../empty-state/empty-state.tsx";
+import { Skeleton } from "../skeleton/skeleton.tsx";
 
 type TableOptions = { density: "comfortable" | "compact"; striped: boolean; hoverable: boolean; stackOnMobile: boolean };
 const TableContext = createContext<TableOptions>({ density: "comfortable", striped: false, hoverable: true, stackOnMobile: false });
@@ -18,6 +20,12 @@ export type TableProps = HTMLAttributes<HTMLTableElement> &
     wrapperClassName?: string;
     /** Wrapper surface: a card, or none when the table sits inside your own card. */
     surface?: boolean;
+    /** Replace the body rows with skeleton rows while data loads (set `columns` to the number of columns). */
+    loading?: boolean;
+    columns?: number;
+    skeletonRows?: number;
+    /** Shown instead of the body rows when there is nothing to list. */
+    empty?: { icon?: ReactNode; title: ReactNode; description?: ReactNode; actions?: ReactNode };
   };
 
 export function Table({
@@ -29,8 +37,14 @@ export function Table({
   stackOnMobile = false,
   stickyHeader = false,
   surface = true,
+  loading = false,
+  columns = 4,
+  skeletonRows = 4,
+  empty,
+  children,
   ...props
 }: TableProps) {
+  const replaced = loading || Boolean(empty);
   return (
     <TableContext.Provider value={{ density, striped, hoverable, stackOnMobile }}>
       <div
@@ -46,10 +60,37 @@ export function Table({
           className={cn(
             "w-full caption-bottom border-separate border-spacing-0 text-start text-subhead text-fg",
             stackOnMobile && "max-md:block",
+            replaced && "[&>tbody:not([data-replacement])]:hidden",
             className,
           )}
+          aria-busy={loading || undefined}
           {...props}
-        />
+        >
+          {children}
+          {loading ? (
+            <tbody data-replacement>
+              {Array.from({ length: skeletonRows }, (_, i) => (
+                <tr key={i}>
+                  {Array.from({ length: columns }, (_, c) => (
+                    <td key={c} className={cn("border-b border-separator px-4 align-middle", density === "compact" ? "h-10" : "h-13")}>
+                      <Skeleton shape="text" className="inline-block text-subhead" width={`${[70, 55, 40, 60, 50][(i + c) % 5]}%`} />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          ) : (
+            empty && (
+              <tbody data-replacement>
+                <tr>
+                  <td colSpan={999}>
+                    <EmptyState size="sm" icon={empty.icon} title={empty.title} description={empty.description} actions={empty.actions} />
+                  </td>
+                </tr>
+              </tbody>
+            )
+          )}
+        </table>
       </div>
     </TableContext.Provider>
   );

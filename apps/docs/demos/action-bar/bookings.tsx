@@ -17,7 +17,7 @@ export default function Demo() {
   const [selected, setSelected] = useState<string[]>(["lis", "opo"]);
   const toggle = (id: string, on: boolean) => setSelected((s) => (on ? [...s, id] : s.filter((x) => x !== id)));
   return (
-    <div className="flex h-[24rem] w-full max-w-xl flex-col justify-between overflow-hidden rounded-xl bg-bg shadow-[inset_0_0_0_1px_var(--pl-separator)]">
+    <div className="mx-auto flex h-[24rem] w-full max-w-xl flex-col justify-between overflow-hidden rounded-xl bg-bg shadow-[inset_0_0_0_1px_var(--pl-separator)]">
       <ul className="divide-y divide-separator px-4 pt-2">
         {BOOKINGS.map((b) => (
           <li key={b.id} className="py-3">

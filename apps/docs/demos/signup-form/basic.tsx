@@ -20,7 +20,7 @@ export default function Demo() {
     <div className="grid w-full place-items-center rounded-xl sm:bg-bg sm:px-4 sm:py-10">
       <AuthCard
         title="Create your Plate account"
-        description="Free for households up to six people."
+        description="Free for groups of up to four travellers."
         footer={
           <>
             Already have an account? <a href="#signin">Sign in</a>

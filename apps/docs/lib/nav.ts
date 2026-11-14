@@ -59,7 +59,7 @@ export const NAV: NavSection[] = [
   },
   {
     title: "Navigation",
-    items: [c("Tabs", true), c("Segmented Control", true), c("Breadcrumb", true), c("Pagination", true), c("Menu", true), c("Dropdown", true), c("Fab", true), c("Stepper", true), c("Command Palette", true)],
+    items: [c("Tabs", true), c("Segmented Control", true), c("Breadcrumb", true), c("Pagination", true), c("Menu", true), c("Context Menu", true), c("Dropdown", true), c("Fab", true), c("Stepper", true), c("Command Palette", true)],
   },
   {
     title: "Overlay",
@@ -68,8 +68,8 @@ export const NAV: NavSection[] = [
       c("Tooltip", true), c("Toast", true), c("Alert", true), c("Action Bar", true), c("Drawer", true), c("Hover Card", true)],
   },
   { title: "Feedback", items: [c("Skeleton", true), c("Progress", true), c("Empty State", true), c("Notification Center", true), c("Banner", true)] },
-  { title: "Data", items: [c("Table", true), c("List", true), c("Accordion", true), c("Timeline", true), c("Stat Card", true), c("Data Table", true), c("Session List", true), { name: "API Key List", href: "/components/api-key-list", ready: true }, c("Snippet", true), c("Usage Meter", true), c("Countdown", true)] },
-  { title: "Forms", items: [c("Form Field", true), c("Date Picker", true), c("Search Bar", true), c("File Upload", true), c("Password Input", true), c("OTP Input", true), c("Number Field", true), c("Rating", true)] },
+  { title: "Data", items: [c("Table", true), c("List", true), c("Accordion", true), c("Collapsible", true), c("Timeline", true), c("Stat Card", true), c("Data Table", true), c("Session List", true), { name: "API Key List", href: "/components/api-key-list", ready: true }, c("Snippet", true), c("Usage Meter", true), c("Countdown", true)] },
+  { title: "Forms", items: [c("Form Field", true), c("Combobox", true), c("Multi Select", true), c("Date Picker", true), c("Date Range Picker", true), c("Time Picker", true), c("Calendar", true), c("Search Bar", true), c("File Upload", true), c("Password Input", true), c("OTP Input", true), c("Number Field", true), c("Rating", true), c("Input Group", true), c("Tag Input", true)] },
   {
     title: "Auth",
     items: [

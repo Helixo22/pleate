@@ -50,7 +50,7 @@ export default function Demo() {
       >
         <DatePicker mode="range" min={today} placeholder="Check-in to check-out" />
       </FormField>
-      <FormField name="guests" label="Guests" required min={{ value: 1, message: "At least one guest." }} max={8} hint="1–8">
+      <FormField name="guests" label="Guests" required min={{ value: 1, message: "At least one guest." }} max={8} hint="1 to 8">
         <Input type="number" inputMode="numeric" defaultValue={2} className="max-w-32" />
       </FormField>
       <FormField name="notes" label="Notes" hint="Optional" maxLength={200}>

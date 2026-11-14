@@ -20,7 +20,7 @@ export function TooltipContent({ className, sideOffset = 6, collisionPadding = 8
         sideOffset={sideOffset}
         collisionPadding={collisionPadding}
         className={cn(
-          "pl-pop z-(--pl-z-tooltip) max-w-64 rounded-md bg-fg px-2.5 py-1.5 text-footnote font-medium text-bg shadow-md select-none",
+          "pl-pop z-(--pl-z-tooltip) max-w-64 rounded-md bg-[#1c1c1e] px-2.5 py-1.5 text-footnote font-medium text-white shadow-md ring-1 ring-white/10 select-none dark:bg-[#3a3a3c]",
           className,
         )}
         {...props}

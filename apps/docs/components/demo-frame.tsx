@@ -96,7 +96,7 @@ export function DemoFrame({
             role="tabpanel"
             className={cn(
               "flex gap-4 p-6 md:p-10",
-              full ? "flex-1" : replay ? "min-h-80" : "min-h-56",
+              full ? "flex-1" : replay ? "min-h-80" : "min-h-48",
               align === "center" && "flex-wrap items-center justify-center",
               align === "start" && "flex-wrap items-start justify-start",
               // No wrap here: a wrapping column sizes itself to its widest child instead of the frame.

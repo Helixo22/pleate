@@ -2,11 +2,20 @@
 
 import { Calendar, type DateRange } from "pleate/calendar";
 import { DatePicker } from "pleate/date-picker";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 const fromToday = (n: number) => addDays(new Date(), n);
 const saturday = () => fromToday((6 - new Date().getDay() + 7) % 7);
+
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="grid gap-1.5">
+      <span className="text-subhead font-medium">{label}</span>
+      {children}
+    </div>
+  );
+}
 
 export default function Demo() {
   // The page is prerendered: read the clock only after mount so the markup hydrates.
@@ -21,9 +30,9 @@ export default function Demo() {
   }, []);
   return (
     <div className="grid w-full gap-8 md:grid-cols-2">
-      <div className="grid content-start gap-4">
-        <DatePicker aria-label="Departure" value={date} onValueChange={setDate} min={today} placeholder="Departure" />
-        <DatePicker
+      <div className="grid content-start gap-5">
+        <Field label="Departure"><DatePicker aria-label="Departure" value={date} onValueChange={setDate} min={today} placeholder="Pick a date" /></Field>
+        <Field label="Stay"><DatePicker
           mode="range"
           aria-label="Stay"
           value={range}
@@ -35,8 +44,8 @@ export default function Demo() {
             { label: "Next 7 days", value: () => ({ from: fromToday(0), to: fromToday(6) }) },
             { label: "Next month", value: () => ({ from: fromToday(30), to: fromToday(37) }) },
           ]}
-        />
-        <DatePicker aria-label="Weekdays only" variant="outline" isDisabled={(d) => d.getDay() === 0 || d.getDay() === 6} placeholder="Weekdays only" />
+        /></Field>
+        <Field label="Meeting day"><DatePicker aria-label="Meeting day" isDisabled={(d) => d.getDay() === 0 || d.getDay() === 6} placeholder="Weekdays only" /></Field>
       </div>
       <div className="rounded-2xl bg-fill-3 p-3">
         <Calendar value={day} onValueChange={setDay} />

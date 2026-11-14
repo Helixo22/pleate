@@ -22,7 +22,7 @@ export function PageHeader({ eyebrow, eyebrowHref, title, children }: { eyebrow?
 export function CodeLine({ children }: { children: string }) {
   return (
     <div className="pl-field relative flex items-start rounded-lg bg-surface [--pl-field-border:var(--pl-separator)]">
-      <pre className="min-w-0 flex-1 overflow-x-auto py-3 ps-4 pe-3 font-mono text-[0.8125rem] leading-relaxed">
+      <pre className="min-w-0 flex-1 overflow-x-auto py-3 ps-4 pe-3 font-mono text-[0.8125rem] leading-relaxed whitespace-pre-wrap break-words">
         <code>{children}</code>
       </pre>
       <CopyButton text={children} className="me-2 mt-1.5 shrink-0 self-start" />

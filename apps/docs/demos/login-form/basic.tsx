@@ -22,7 +22,7 @@ export default function Demo() {
       <AuthCard
         logo={<span className="grid size-16 place-items-center rounded-[1.125rem] bg-accent font-brand text-title1 text-on-accent shadow-md">P</span>}
         title="Sign in to Plate"
-        description="Welcome back. Your recipes missed you."
+        description="Welcome back. Your next trip is waiting."
       >
         <LoginForm
           onSubmit={signIn}

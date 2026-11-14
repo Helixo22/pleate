@@ -10,7 +10,7 @@ export default function Demo() {
       <AuthCard
         logo={<span className="grid size-16 place-items-center rounded-[1.125rem] bg-accent font-brand text-title1 text-on-accent shadow-md">P</span>}
         title="Welcome to Plate"
-        description="Plan the week's meals with your household and shop from one list."
+        description="Plan trips with friends, split costs and keep every booking in one place."
         footer={
           <>
             Already have an account? <a href="#">Sign in</a>

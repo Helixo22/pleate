@@ -21,7 +21,7 @@ export default function Demo() {
           actions={
             <>
               <Button size="lg">Start planning</Button>
-              <Button size="lg" variant="tinted" startIcon={<Play />}>Watch the film</Button>
+              <Button size="lg" variant="gray" tone="neutral" startIcon={<Play />}>Watch the film</Button>
             </>
           }
           footnote="Free for up to 4 travellers · No card needed"

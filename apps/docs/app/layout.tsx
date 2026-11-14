@@ -33,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <MotionProvider>
             <Shell>{children}</Shell>
-            <Toaster />
+            <Toaster position="bottom-right" />
           </MotionProvider>
         </ThemeProvider>
       </body>

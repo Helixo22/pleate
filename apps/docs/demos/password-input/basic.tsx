@@ -7,7 +7,7 @@ import { useState } from "react";
 export default function Demo() {
   const [value, setValue] = useState("");
   return (
-    <div className="grid w-full max-w-sm gap-8">
+    <div className="mx-auto grid w-full max-w-xs gap-8">
       <FormField label="Password">
         <PasswordInput placeholder="Your password" />
       </FormField>

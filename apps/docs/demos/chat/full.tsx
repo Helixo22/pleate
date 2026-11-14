@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Compass, Copy, Map, Paperclip, Plane, RefreshCw, Sparkles, ThumbsUp, Utensils, Zap } from "lucide-react";
+import { Check, Compass, Copy, Map, Paperclip, Plane, RefreshCw, Brain, ThumbsUp, Utensils, Zap } from "lucide-react";
 import { BotFace, type BotState } from "pleate/ai/bot-face";
 import { ChatThread, Message, MessageAction } from "pleate/ai/chat";
 import { Composer } from "pleate/ai/composer";
@@ -34,12 +34,12 @@ Day 3: Sintra. Take the train from Rossio (about 40 min), see Pena Palace early 
 const SOURCES = [
   { href: "https://www.visitlisboa.com", title: "Visit Lisboa, official tourism guide", site: "visitlisboa.com" },
   { href: "https://www.parquesdesintra.pt", title: "Parques de Sintra: tickets and hours", site: "parquesdesintra.pt" },
-  { href: "https://www.cp.pt", title: "CP trains Lisbon–Sintra timetable", site: "cp.pt" },
+  { href: "https://www.cp.pt", title: "CP trains Lisbon to Sintra timetable", site: "cp.pt" },
 ];
 
 const MODELS = [
   { id: "swift", name: "Swift", description: "Fast answers for everyday questions", icon: <Zap />, badges: <Badge size="sm" tone="success">Fast</Badge> },
-  { id: "atlas", name: "Atlas", description: "Plans, compares and reasons step by step", icon: <Sparkles />, badges: <Badge size="sm">Reasoning</Badge> },
+  { id: "atlas", name: "Atlas", description: "Plans, compares and reasons step by step", icon: <Brain />, badges: <Badge size="sm">Reasoning</Badge> },
 ];
 
 export default function Demo() {

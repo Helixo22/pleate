@@ -7,6 +7,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Avatar as AvatarPrimitive } from "radix-ui";
 import { Children, createContext, useContext, type CSSProperties, type HTMLAttributes, type ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";
+import { UserIcon } from "../../lib/icons.tsx";
 
 export const avatarVariants = cva(
   "relative inline-flex shrink-0 items-center justify-center align-middle font-medium select-none",
@@ -130,7 +131,7 @@ export function Avatar({
           style={fallbackBackground(name, color)}
           aria-hidden="true"
         >
-          {icon ?? (name ? initials(name) : null)}
+          {icon ?? (name ? initials(name) : <UserIcon />)}
         </AvatarPrimitive.Fallback>
       </AvatarPrimitive.Root>
       {status && (

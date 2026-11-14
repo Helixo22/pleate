@@ -29,6 +29,7 @@ export const ChevronDownIcon = (p: IconProps) => <Icon {...p}><path d="M6.5 9.5L
 export const ChevronUpIcon = (p: IconProps) => <Icon {...p}><path d="M6.5 14.5L12 9l5.5 5.5" /></Icon>;
 export const ChevronRightIcon = (p: IconProps) => <Icon {...p}><path d="M9.5 6.5L15 12l-5.5 5.5" /></Icon>;
 export const ChevronUpDownIcon = (p: IconProps) => <Icon {...p}><path d="M8 9.5l4-4 4 4M8 14.5l4 4 4-4" /></Icon>;
+export const UserIcon = (p: IconProps) => <Icon {...p} strokeWidth={1.75}><circle cx="12" cy="8.5" r="3.5" /><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6" /></Icon>;
 export const PlusIcon = (p: IconProps) => <Icon {...p}><path d="M12 5.5v13M5.5 12h13" /></Icon>;
 export const EyeIcon = (p: IconProps) => (
   <Icon {...p}>

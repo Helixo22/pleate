@@ -47,7 +47,7 @@ export function Stepper({ steps, current, orientation = "horizontal", onStepClic
                 <button
                   type="button"
                   onClick={() => onStepClick(i, step)}
-                  className="pl-focus-ring cursor-pointer rounded-xs text-start hover:[&>span:first-child]:text-accent-ink"
+                  className="pl-focus-ring block cursor-pointer rounded-xs text-start hover:[&>span:first-child]:text-accent-ink"
                 >
                   {text}
                 </button>

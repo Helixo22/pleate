@@ -86,6 +86,9 @@ import ReasoningBasic from "./reasoning/basic";
 import ResultCardBasic from "./result-card/basic";
 import StreamingTextBasic from "./streaming-text/basic";
 import DatePickerBasic from "./date-picker/basic";
+import DateRangePickerBasic from "./date-range-picker/basic";
+import TimePickerBasic from "./time-picker/basic";
+import CalendarBasic from "./calendar/basic";
 import FileUploadBasic from "./file-upload/basic";
 import FormFieldBooking from "./form-field/booking";
 import SearchBarBasic from "./search-bar/basic";
@@ -96,6 +99,7 @@ import ProgressBasic from "./progress/basic";
 import SkeletonBasic from "./skeleton/basic";
 import StatCardBasic from "./stat-card/basic";
 import TableBasic from "./table/basic";
+import TableStates from "./table/states";
 import TimelineBasic from "./timeline/basic";
 import ActionSheetBasic from "./action-sheet/basic";
 import AlertBasic from "./alert/basic";
@@ -140,9 +144,21 @@ import IconButtonVariants from "./icon-button/variants";
 import InputAdornments from "./input/adornments";
 import InputSizes from "./input/sizes";
 import InputVariants from "./input/variants";
+import InputGroupBasic from "./input-group/basic";
+import InputGroupSizes from "./input-group/sizes";
+import TagInputBasic from "./tag-input/basic";
+import TagInputSizes from "./tag-input/sizes";
+import CollapsibleBasic from "./collapsible/basic";
 import LabelBasic from "./label/basic";
 import RadioBasic from "./radio/basic";
 import SelectBasic from "./select/basic";
+import ComboboxBasic from "./combobox/basic";
+import ComboboxStates from "./combobox/states";
+import MultiSelectBasic from "./multi-select/basic";
+import MultiSelectSizes from "./multi-select/sizes";
+import SelectSizes from "./select/sizes";
+import SelectStates from "./select/states";
+import ContextMenuBasic from "./context-menu/basic";
 import SliderBasic from "./slider/basic";
 import SpinnerBasic from "./spinner/basic";
 import SwitchBasic from "./switch/basic";
@@ -214,7 +230,7 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
   },
   testimonial: {
     name: "Testimonial",
-    description: "Quotes with people behind them: a big featured quote, balanced columns, or a swipeable carousel with snap.",
+    description: "Quotes with people behind them: a big featured quote, equal-height columns, or a swipeable carousel with snap.",
     importName: "Testimonials, TestimonialCard",
     importPath: "pleate/marketing/testimonial",
     demos: [{ id: "layouts", title: "Featured, grid, carousel", align: "stretch", Component: TestimonialLayouts }],
@@ -400,7 +416,9 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
       { name: "Drawer", type: "open, defaultOpen, onOpenChange", description: "Radix Dialog root." },
       { name: "DrawerContent side", type: '"start" | "end" | "bottom"', default: '"end"', description: "Edge it slides from. Start and end follow the text direction." },
       { name: "DrawerContent size", type: '"sm" | "md" | "lg"', default: '"md"', description: "Width for side panels, max height for bottom." },
-      { name: "showClose / closeLabel", type: "boolean / string", default: "true", description: "Corner close button." },
+      { name: "ModalContent showClose", type: "boolean", default: "true", description: "Round close button in the corner." },
+      { name: "ModalContent closeLabel", type: "string", default: "\"Close\"", description: "Its accessible name." },
+      { name: "ModalHeader icon / danger", type: "ReactNode / boolean", description: "Soft round icon tile before the title, like AlertDialog; danger turns it red." },
     ],
     a11y: ["Focus is trapped inside and returns to the trigger.", "Escape and backdrop click close it; the page behind can't scroll.", "Labelled by DrawerTitle, described by DrawerDescription."],
   },
@@ -411,9 +429,13 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
     importPath: "pleate/hover-card",
     demos: [{ id: "basic", title: "Traveller preview", Component: HoverCardBasic }],
     props: [
-      { name: "HoverCard", type: "openDelay, closeDelay, open, onOpenChange", default: "400 / 150", description: "Radix HoverCard root." },
-      { name: "HoverCardContent", type: "side, align, sideOffset", default: '"center", 8', description: "Placement." },
-      { name: "arrow", type: "boolean", default: "false", description: "Small arrow toward the trigger." },
+      { name: "HoverCard openDelay", type: "number", default: "400", description: "Milliseconds the pointer rests before the card opens." },
+      { name: "HoverCard closeDelay", type: "number", default: "150", description: "Milliseconds before it closes after the pointer leaves." },
+      { name: "HoverCard open / onOpenChange", type: "boolean / (open) => void", description: "Controlled state (Radix HoverCard root)." },
+      { name: "HoverCardContent side", type: '"top" | "right" | "bottom" | "left"', default: '"bottom"', description: "Which edge of the trigger it opens on." },
+      { name: "HoverCardContent align", type: '"start" | "center" | "end"', default: '"center"', description: "Alignment along that edge." },
+      { name: "HoverCardContent sideOffset", type: "number", default: "8", description: "Gap to the trigger in px." },
+      { name: "HoverCardContent arrow", type: "boolean", default: "false", description: "Small arrow toward the trigger." },
     ],
     a11y: ["Opens on hover and on keyboard focus, never on touch: the trigger must work without it.", "Content is supplementary; don't put the only copy of information there."],
   },
@@ -452,7 +474,8 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
       { name: "prompt", type: "string", description: "Drawn before every line, never copied, e.g. \"$\"." },
       { name: "maxHeight", type: "number | string", description: "Height after which the code scrolls." },
       { name: "wrap", type: "boolean", default: "false", description: "Wrap long lines instead of scrolling sideways." },
-      { name: "copyLabel / copiedLabel", type: "string / string", default: "\"Copy\" / \"Copied\"", description: "Copy button name and its confirmation." },
+      { name: "copyLabel", type: "string", default: "\"Copy\"", description: "Accessible name of the copy button." },
+      { name: "copiedLabel", type: "string", default: "\"Copied\"", description: "Label after copying." },
     ],
     a11y: [
       "The copy button sits in the header, so code never scrolls under it.",
@@ -498,7 +521,8 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
       { name: "max", type: "number", description: "The plan limit." },
       { name: "label", type: "ReactNode", description: "Heading. It also names the meter." },
       { name: "unit", type: "string", description: "Unit after the figures, e.g. \"GB\"." },
-      { name: "warnAt / dangerAt", type: "number / number", default: "0.8 / 0.95", description: "Share of max where the lead segment and the total turn warning or danger." },
+      { name: "warnAt", type: "number", default: "0.8", description: "Share of max where the lead segment and the total turn warning." },
+      { name: "dangerAt", type: "number", default: "0.95", description: "Share of max where they turn danger." },
       { name: "format / locale", type: "Intl.NumberFormatOptions / string", default: "{ maximumFractionDigits: 1 }", description: "Number formatting." },
     ],
     a11y: [
@@ -626,7 +650,7 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
     props: [
       { name: "effect", type: '"fade" | "up" | "down" | "left" | "right" | "zoom" | "blur"', default: '"up"', description: "Entrance." },
       { name: "distance / delay / duration", type: "number", description: "Motion amounts." },
-      { name: "once / amount", type: "boolean / 0–1", default: "true / 0.25", description: "Replay and visibility threshold." },
+      { name: "once / amount", type: "boolean / 0 to 1", default: "true / 0.25", description: "Replay and visibility threshold." },
       { name: "RevealGroup stagger", type: "number", default: "0.08", description: "Seconds between RevealItems." },
       { name: "ScrollProgress target / position / fixed", type: "ref / top | bottom / boolean", description: "Page or element progress." },
       { name: "Parallax speed", type: "-1…1", default: "0.2", description: "Drift relative to scroll." },
@@ -671,7 +695,7 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
     props: [
       { name: "state", type: '"idle" | "listening" | "thinking" | "speaking" | "waiting" | "happy" | "error" | "offline"', default: '"idle"', description: "Expression." },
       { name: "size", type: "number", default: "64", description: "Pixels." },
-      { name: "level", type: "number | MotionValue<number>", description: "0–1 loudness for listening/speaking." },
+      { name: "level", type: "number | MotionValue<number>", description: "Loudness from 0 to 1 for listening/speaking." },
       { name: "track", type: "boolean", description: "Follow the pointer while idle." },
       { name: "seed / color / eyeColor", type: "string", description: "Body shape; colors (accent and on-accent by default)." },
       { name: "dot / decorative / labels / animated", type: "", description: "Status dot, hide from AT, state labels, still mode." },
@@ -798,14 +822,59 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
     importName: "DatePicker",
     demos: [{ id: "basic", title: "Single, range with presets, standalone calendar", align: "stretch", Component: DatePickerBasic }],
     props: [
-      { name: "mode", type: '"single" | "range"', default: '"single"', description: "One day or from–to." },
+      { name: "mode", type: '"single" | "range"', default: '"single"', description: "One day or a from and to pair." },
       { name: "value / defaultValue / onValueChange", type: "Date | null  ·  { from, to }", description: "Selection." },
       { name: "min / max / isDisabled", type: "Date / Date / (date) => boolean", description: "Limits." },
       { name: "presets", type: "{ label, value: () => V }[]", description: "Quick picks." },
-      { name: "locale / weekStartsOn / formatOptions", type: "string / 0–6 / Intl options", description: "Localization." },
+      { name: "locale / weekStartsOn / formatOptions", type: "string / 0 to 6 / Intl options", description: "Localization." },
       { name: "name", type: "string", description: "Hidden ISO value for forms (yyyy-mm-dd or yyyy-mm-dd/yyyy-mm-dd)." },
     ],
     a11y: ["The calendar is a grid: arrows, Page Up/Down (Shift for years), Home/End, Enter.", "Every day has its full date as label; today is aria-current=\"date\"."],
+  },
+  calendar: {
+    name: "Calendar",
+    description: "A month grid to pick a day or a range, with full keyboard support. DatePicker is built on it.",
+    importName: "Calendar",
+    demos: [{ id: "basic", title: "Single day and range", align: "stretch", Component: CalendarBasic }],
+    props: [
+      { name: "mode", type: '"single" | "range"', default: '"single"', description: "One day or from to." },
+      { name: "value / onValueChange", type: "Date | null  ·  { from, to }", description: "Selection." },
+      { name: "min / max / isDisabled", type: "Date / Date / (date) => boolean", description: "Limits." },
+      { name: "defaultMonth", type: "Date", description: "Month shown first." },
+      { name: "locale / weekStartsOn", type: "string / 0 to 6", description: "Localization." },
+    ],
+    a11y: ["A grid: arrows move by day or week, Page Up/Down by month (Shift for years), Home/End, Enter or Space selects.", "Every day has its full date as label; today is aria-current=\"date\"."],
+  },
+  "date-range-picker": {
+    name: "Date Range Picker",
+    description: "A field showing the trip dates (\"12 Jun · 15 Jun\") that opens two months side by side, one on phones, with range highlight, hover preview and presets.",
+    importName: "DateRangePicker",
+    demos: [{ id: "basic", title: "Presets, locale and limits, sizes", align: "stretch", Component: DateRangePickerBasic }],
+    props: [
+      { name: "value / defaultValue / onValueChange", type: "{ from: Date | null, to: Date | null }", description: "Controlled or uncontrolled range." },
+      { name: "presets", type: "{ label, value: () => DateRange }[]", description: "Quick picks listed beside the months." },
+      { name: "min / max / isDisabled", type: "Date / Date / (date) => boolean", description: "Limits." },
+      { name: "locale / weekStartsOn", type: "string / 0 to 6", description: "Month names, weekday names and the first weekday." },
+      { name: "variant / size", type: "filled | outline | surface | plain  ·  sm | md | lg", description: "Same as Input." },
+      { name: "name", type: "string", description: "Hidden ISO interval for forms (yyyy-mm-dd/yyyy-mm-dd)." },
+      { name: "clearable", type: "boolean", default: "true", description: "Show the clear button once a date is set." },
+    ],
+    a11y: ["Each month is a grid: arrows, Page Up/Down (Shift for years), Home/End; Enter picks.", "Every day has its full date as label; today is aria-current=\"date\".", "The first click sets the start, the second the end; Escape closes."],
+  },
+  "time-picker": {
+    name: "Time Picker",
+    description: "A time field you can type into (\"930\", \"9:30 pm\") or pick from a list every few minutes. 12 or 24 hour from the locale.",
+    importName: "TimePicker",
+    demos: [{ id: "basic", title: "Pickup, reservation window, 24 hour", align: "stretch", Component: TimePickerBasic }],
+    props: [
+      { name: "value / defaultValue / onValueChange", type: "string | null", description: "\"HH:mm\" in 24 hour." },
+      { name: "minuteStep", type: "number", default: "15", description: "Minutes between the times in the list." },
+      { name: "min / max", type: "\"HH:mm\"", description: "Limit the list and clamp typed times." },
+      { name: "hour12 / locale", type: "boolean / string", description: "Display; defaults to the locale's clock." },
+      { name: "variant / size", type: "filled | outline | surface | plain  ·  sm | md | lg", description: "Same as Input." },
+      { name: "name", type: "string", description: "Hidden input with the value for forms." },
+    ],
+    a11y: ["A real text input: type a time, Enter or blur commits it, an invalid text reverts.", "Arrow Down opens the list; arrows, Page Up/Down, Home/End move, Enter picks, Escape returns to the input."],
   },
   "search-bar": {
     name: "Search Bar",
@@ -833,8 +902,8 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
     props: [
       { name: "value / defaultValue / onValueChange", type: "File[]", description: "Selected files." },
       { name: "accept / maxSize / maxFiles / multiple", type: "string / bytes / number / boolean", description: "Checks; rejections are listed and sent to onReject." },
-      { name: "progress", type: "Record<fileName, 0–100>", description: "Upload bars (simple form; see uploads)." },
-      { name: "uploads", type: 'Record<fileKey(file) | fileName, { status: "uploading" | "done" | "error", progress?: 0–1, error? }>', description: "Per file state. Key entries with fileKey(file) (name-size-lastModified), or the file name when names are unique." },
+      { name: "progress", type: "Record<fileName, 0 to 100>", description: "Upload bars (simple form; see uploads)." },
+      { name: "uploads", type: 'Record<fileKey(file) | fileName, { status: "uploading" | "done" | "error", progress?: 0 to 1, error? }>', description: "Per file state. Key entries with fileKey(file) (name-size-lastModified), or the file name when names are unique." },
       { name: "onRetry / onRemove / retryLabel", type: "(file) => void / (file) => void / string", default: 'none / none / "Retry"', description: "Retry button on failed files; removal callback (e.g. cancel the upload)." },
       { name: "variant", type: '"dropzone" | "button"', default: '"dropzone"', description: "Look." },
       { name: "name", type: "string", description: "Include the files in the form submission." },
@@ -850,7 +919,8 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
     props: [
       { name: "shape", type: '"rect" | "circle" | "text"', default: '"rect"', description: "Form." },
       { name: "width / height", type: "CSS length", description: "Size (text follows the font size)." },
-      { name: "SkeletonText lines / lastLineWidth", type: "number / string", default: '3 / "60%"', description: "Paragraph placeholder." },
+      { name: "SkeletonText lines", type: "number", default: "3", description: "Lines in the paragraph placeholder." },
+      { name: "SkeletonText lastLineWidth", type: "string", default: '"60%"', description: "Width of the last, shorter line." },
     ],
     a11y: ["Skeletons are aria-hidden; put aria-busy and a visually hidden label on the loading region."],
   },
@@ -860,10 +930,13 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
     importName: "Progress, ProgressCircle",
     demos: [{ id: "basic", title: "Bars and rings", align: "stretch", Component: ProgressBasic }],
     props: [
-      { name: "value / max", type: "number | null / number", default: "none / 100", description: "null = indeterminate." },
+      { name: "value", type: "number | null", default: "none", description: "Current amount; null shows an indeterminate bar." },
+      { name: "max", type: "number", default: "100", description: "Value that counts as complete." },
       { name: "tone", type: '"accent" | "success" | "warning" | "danger" | "neutral"', default: '"accent"', description: "Fill color." },
       { name: "Progress size / label / valueLabel", type: '"sm" | "md" | "lg" / ReactNode / ReactNode | true', description: "Bar height, caption, value text." },
-      { name: "ProgressCircle size / thickness / children", type: "number / number / ReactNode", default: "48 / 4", description: "Ring geometry and center content." },
+      { name: "ProgressCircle size", type: "number", default: "48", description: "Diameter in px." },
+      { name: "ProgressCircle thickness", type: "number", default: "4", description: "Ring stroke in px." },
+      { name: "ProgressCircle children", type: "ReactNode", description: "Content in the center." },
     ],
   },
   "empty-state": {
@@ -883,10 +956,19 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
     name: "Table",
     description: "Rows and columns on a rounded surface: sortable headers, density, stripes, sticky header, and cards on phones.",
     importName: "Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption, TableFooter",
-    demos: [{ id: "basic", title: "Sortable, stacks on phones", align: "stretch", Component: TableBasic }],
+    demos: [
+      { id: "basic", title: "Sortable, stacks on phones", align: "stretch", Component: TableBasic },
+      { id: "states", title: "Loading and empty", align: "stretch", Component: TableStates },
+    ],
     props: [
       { name: "density", type: '"comfortable" | "compact"', default: '"comfortable"', description: "Row height." },
-      { name: "striped / hoverable / stickyHeader", type: "boolean", default: "false / true / false", description: "Row styling." },
+      { name: "striped", type: "boolean", default: "false", description: "Tint every other row." },
+      { name: "hoverable", type: "boolean", default: "true", description: "Highlight the row under the pointer." },
+      { name: "stickyHeader", type: "boolean", default: "false", description: "Keep the header visible while the body scrolls." },
+      { name: "loading", type: "boolean", default: "false", description: "Skeleton rows in place of the body while data loads." },
+      { name: "columns", type: "number", default: "4", description: "Cells per skeleton row, to match your columns." },
+      { name: "skeletonRows", type: "number", default: "4", description: "How many skeleton rows." },
+      { name: "empty", type: "{ icon?, title, description?, actions? }", description: "Empty state shown instead of the body rows." },
       { name: "stackOnMobile", type: "boolean", description: "Rows become cards below md; set TableCell label." },
       { name: "TableHead sort / onSort / align", type: '"asc" | "desc" | false / () => void / "start" | "center" | "end"', description: "Sortable column." },
     ],
@@ -940,7 +1022,8 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
       { name: "label / value / format", type: "ReactNode / number / (v) => string", description: "The metric." },
       { name: "delta / deltaLabel / invertTrend", type: "number / ReactNode / boolean", description: "Change (0.12 = +12%); invert when down is good." },
       { name: "trend", type: "number[]", description: "Sparkline data." },
-      { name: "icon / animated", type: "ReactNode / boolean", default: "none / true", description: "Tile icon; count-up animation." },
+      { name: "icon", type: "ReactNode", description: "Icon tile." },
+      { name: "animated", type: "boolean", default: "true", description: "Count up into view." },
     ],
     a11y: ["Screen readers read the final value, not the animation.", "No count-up with reduced motion."],
   },
@@ -966,15 +1049,17 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
     props: [
       { name: "open / onOpenChange", type: "boolean", description: "Controlled state." },
       { name: "snapPoints", type: "number[]", default: "[0.92]", description: "Heights as fractions of the viewport." },
-      { name: "defaultSnap / onSnapChange", type: "number", default: "0", description: "Opening snap point / settled index." },
+      { name: "defaultSnap", type: "number", default: "0", description: "Index of the snap point the sheet opens at." },
+      { name: "onSnapChange", type: "(index: number) => void", description: "Called with the snap point the sheet settled on." },
       { name: "title / description / footer", type: "ReactNode", description: "Header and pinned footer." },
-      { name: "dismissible / showClose", type: "boolean", default: "true / false", description: "Drag-to-close and close button." },
+      { name: "dismissible", type: "boolean", default: "true", description: "Drag down, tap the backdrop or press Escape to close." },
+      { name: "showClose", type: "boolean", default: "false", description: "Round close button in the header." },
     ],
     a11y: ["Modal dialog: focus trap, Escape closes (when dismissible).", "Without motion the sheet appears without the spring."],
   },
   "action-sheet": {
     name: "Action Sheet",
-    description: "The iOS action sheet: centered choices in one group, a small title on top and Cancel in its own group below. A centered panel on wide screens.",
+    description: "A short list of choices in one panel: optional title and message on top, left-aligned rows with leading icons, Cancel last. Rises from the bottom on phones, a centered panel on wide screens.",
     importName: "ActionSheet",
     demos: [{ id: "basic", title: "Photo actions", Component: ActionSheetBasic }],
     props: [
@@ -986,13 +1071,16 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
   },
   "alert-dialog": {
     name: "Alert Dialog",
-    description: "The iOS alert for decisions that need an answer: centered text, buttons as text rows under a hairline, side by side for two and stacked for more. Cancel is bold and focused first.",
+    description: "A small confirmation dialog for decisions that need an answer: left-aligned title and message, cancel and the main action at the bottom right. Cancel is focused first; destructive actions are red.",
     importName: "AlertDialog",
     demos: [{ id: "basic", title: "Destructive and three-way", Component: AlertDialogBasic }],
     props: [
       { name: "title / description", type: "ReactNode", description: "Question and context." },
+      { name: "icon", type: "ReactNode", description: "Shown in a round tile beside the title; red when an action is destructive." },
+      { name: "showClose", type: "boolean", default: "true", description: "Round × in the corner; cancels like Escape." },
+      { name: "closeLabel", type: "string", default: "\"Close\"", description: "Its accessible name." },
       { name: "actions", type: '{ label, onSelect?, role?: "default" | "cancel" | "destructive" }[]', description: "Buttons, in order." },
-      { name: "buttons", type: '"auto" | "row" | "stack"', default: '"auto"', description: "Two buttons side by side, three or more stacked." },
+      { name: "buttons", type: '"auto" | "row" | "stack"', default: '"auto"', description: "A row at the bottom right that stacks full width on phones; row never stacks, stack always does." },
       { name: "trigger / open / onOpenChange", type: "", description: "Uncontrolled or controlled." },
       { name: "children", type: "ReactNode", description: "Extra content (e.g. a text field)." },
     ],
@@ -1004,8 +1092,12 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
     importName: "Popover, PopoverTrigger, PopoverContent, PopoverClose",
     demos: [{ id: "basic", title: "Filters", Component: PopoverBasic }],
     props: [
-      { name: "PopoverContent", type: "side, align, sideOffset, arrow", description: "Placement and optional arrow." },
-      { name: "Popover", type: "open, onOpenChange, modal", description: "Radix Popover root." },
+      { name: "PopoverContent side", type: '"top" | "right" | "bottom" | "left"', default: '"bottom"', description: "Which edge of the trigger it opens on." },
+      { name: "PopoverContent align", type: '"start" | "center" | "end"', default: '"center"', description: "Alignment along that edge." },
+      { name: "PopoverContent sideOffset", type: "number", default: "8", description: "Gap to the trigger in px." },
+      { name: "PopoverContent arrow", type: "boolean", default: "false", description: "Small arrow toward the trigger." },
+      { name: "Popover open / onOpenChange", type: "boolean / (open) => void", description: "Controlled state." },
+      { name: "Popover modal", type: "boolean", default: "false", description: "Trap focus and block the page behind." },
     ],
   },
   tooltip: {
@@ -1015,21 +1107,26 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
     demos: [{ id: "basic", title: "On icon buttons", Component: TooltipBasic }],
     props: [
       { name: "content", type: "ReactNode", description: "The label." },
-      { name: "side / align", type: "string", default: '"top" / "center"', description: "Placement." },
+      { name: "side", type: '"top" | "right" | "bottom" | "left"', default: '"top"', description: "Which edge of the trigger it appears on (flips when there is no room)." },
+      { name: "align", type: '"start" | "center" | "end"', default: '"center"', description: "Alignment along that edge." },
       { name: "delayDuration", type: "number", default: "400", description: "Hover delay in ms." },
+      { name: "TooltipProvider delayDuration", type: "number", default: "400", description: "Wrap several tooltips in one provider so moving between them skips the delay." },
       { name: "disabled", type: "boolean", description: "Render the child without a tooltip." },
     ],
   },
   toast: {
     name: "Toast",
-    description: "Brief notifications from anywhere with toast(): capsules that drop in from the top like the iOS HUD, pause on hover and can be swiped away.",
+    description: "Brief notifications from anywhere with toast(): compact cards that slide in from a corner of the screen, pause on hover and can be swiped away.",
     importName: "Toaster, toast",
     demos: [{ id: "basic", title: "Tones, action, promise", Component: ToastBasic }],
     props: [
       { name: "toast(title, options)", type: "→ id", description: "Also toast.success / error / warning / info / loading / promise / update / dismiss." },
       { name: "options", type: "description, action, duration, icon, dismissible, id", description: "Per toast." },
-      { name: "<Toaster position>", type: '"top-center" | "top-right" | "bottom-center" | "bottom-right"', default: '"top-center"', description: "Mount once." },
-      { name: "<Toaster visible / duration>", type: "number", default: "3 / 4000", description: "Stack size and default time." },
+      { name: "Toaster position", type: '"top-center" | "top-right" | "bottom-center" | "bottom-right"', default: '"top-center"', description: "Where the stack sits. Mount one Toaster in the root layout." },
+      { name: "Toaster visible", type: "number", default: "3", description: "How many toasts show at once; the rest wait." },
+      { name: "Toaster duration", type: "number", default: "4000", description: "Default time in ms before a toast closes." },
+      { name: "Toaster label", type: "string", default: "\"Notifications\"", description: "Accessible name of the region." },
+      { name: "Toaster closeLabel", type: "string", default: "\"Dismiss\"", description: "Accessible name of the dismiss button." },
     ],
     a11y: ["Polite live region; error toasts use role=alert.", "Timers pause while hovered or focused."],
   },
@@ -1097,8 +1194,8 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
       { name: "onPageChange / getHref", type: "function", description: "Buttons, or links for crawlable pages." },
       { name: "variant", type: '"pages" | "compact" | "dots"', default: '"pages"', description: "Look." },
       { name: "siblings", type: "number", default: "1", description: "Pages on each side of the current one." },
-      { name: "size", type: '"sm" | "md"', default: '"md"', description: "Button size." },
-      { name: "total / pageSize", type: "number", description: "Show a \"21–40 of 134\" summary before the controls." },
+      { name: "size", type: '"sm" | "md" | "lg"', default: '"md"', description: "Same heights as Button (32, 36, 44px)." },
+      { name: "total / pageSize", type: "number", description: "Show a \"21 to 40 of 134\" summary before the controls." },
       { name: "formatRange", type: "(start, end, total) => ReactNode", description: "Text of the summary." },
     ],
   },
@@ -1117,6 +1214,20 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
       { name: "MenuContent", type: "align, side, sideOffset", description: "Placement (Radix)." },
     ],
     a11y: ["menu / menuitem roles, arrow keys, typeahead, Escape.", "Focus returns to the trigger on close."],
+  },
+  "context-menu": {
+    name: "Context Menu",
+    description: "The Menu opened by right click on desktop and long press on touch screens, anchored to the pointer.",
+    importName: "ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, …",
+    demos: [{ id: "basic", title: "Right click or long press", Component: ContextMenuBasic }],
+    props: [
+      { name: "ContextMenuTrigger", type: "asChild, disabled", description: "The area that listens for right click and long press." },
+      { name: "ContextMenuItem", type: "icon, shortcut, destructive, inset, disabled, onSelect", description: "One action." },
+      { name: "ContextMenuCheckboxItem / ContextMenuRadioItem", type: "checked / value", description: "Toggles and single choice." },
+      { name: "ContextMenuSub, ContextMenuSubTrigger, ContextMenuSubContent", type: "", description: "Nested menu." },
+      { name: "ContextMenuLabel / ContextMenuSeparator", type: "", description: "Heading and divider between groups." },
+    ],
+    a11y: ["menu / menuitem roles, arrow keys, typeahead, Escape.", "Offer the same actions elsewhere (a Menu button): right click and long press are not discoverable."],
   },
   dropdown: {
     name: "Dropdown",
@@ -1301,10 +1412,10 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
       { id: "full-width", title: "Full width", description: "The bottom of a phone sheet or form.", align: "stretch", Component: ButtonFullWidth },
     ],
     props: [
-      { name: "variant", type: '"filled" | "tinted" | "gray" | "surface" | "outline" | "plain"', default: '"filled"', description: "Visual weight." },
+      { name: "variant", type: '"filled" | "tinted" | "gray" | "surface" | "outline" | "plain"', default: '"filled"', description: "Visual weight. \"soft\" is an alias of \"tinted\"." },
       { name: "tone", type: '"accent" | "neutral" | "danger" | "success"', default: '"accent"', description: "Color role." },
       SIZE('"xs" | "sm" | "md" | "lg" | "xl"'),
-      { name: "shape", type: '"pill" | "rounded"', default: '"rounded"', description: "Rounded rectangle or capsule." },
+      { name: "shape", type: '"pill" | "rounded"', default: '"pill"', description: "Capsule (default) or rounded rectangle." },
       { name: "loading", type: "boolean", default: "false", description: "Spinner in place of the content; the button is disabled and aria-busy." },
       { name: "startIcon / endIcon", type: "ReactNode", description: "Icons sized automatically." },
       { name: "fullWidth", type: "boolean", default: "false", description: "Stretch to the container." },
@@ -1334,11 +1445,59 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
     ],
     props: [
       { name: "variant", type: '"filled" | "outline" | "surface" | "plain"', default: '"filled"', description: "Field look; plain has no box, for grouped rows." },
-      SIZE('"sm" | "md" | "lg"'),
+      SIZE('"xs" | "sm" | "md" | "lg" | "xl"'),
       { name: "startAdornment / endAdornment", type: "ReactNode", description: "Content before and after the text." },
       { name: "invalid", type: "boolean", description: "Red edge and aria-invalid." },
       { name: "className / inputClassName", type: "string", description: "Field box / the <input> itself (the ref points at the input)." },
     ],
+  },
+  "input-group": {
+    name: "Input Group",
+    description: "An input with attached boxes: text like https:// or .com, icons, a Button or a Select on either side. One border, one radius, one focus ring.",
+    importName: "InputGroup, InputGroupInput, InputGroupAddon, InputGroupButton",
+    demos: [
+      { id: "basic", title: "Text, icon, button and select", align: "stretch", Component: InputGroupBasic },
+      { id: "sizes", title: "Sizes and invalid", align: "stretch", Component: InputGroupSizes },
+    ],
+    props: [
+      { name: "variant", type: '"filled" | "outline" | "surface" | "plain"', default: '"filled"', description: "Same looks as Input." },
+      SIZE('"sm" | "md" | "lg"'),
+      { name: "invalid", type: "boolean", description: "Red edge and aria-invalid on the group." },
+      { name: "InputGroupAddon bare", type: "boolean", description: "Drops the tinted well, for a plain icon." },
+      { name: "InputGroupButton", type: "ButtonProps", description: "A Button flush with the edge; defaults to the plain variant, sized to the group." },
+      { name: "inputGroupSlot", type: "string", description: "className for a SelectTrigger (variant plain) or any custom child so it sits flush with a divider." },
+    ],
+    a11y: ["The group has role=group; name each input with a label or aria-label.", "Addon text is decorative context: repeat it in the input's label if it matters (\"Price in euro\").", "Icon-only buttons need an aria-label."],
+  },
+  "tag-input": {
+    name: "Tag Input",
+    description: "A field that turns typed values into removable tags: Enter or comma adds, Backspace removes the last, pasted lists are split.",
+    importName: "TagInput",
+    demos: [
+      { id: "basic", title: "Limit and validation", align: "stretch", Component: TagInputBasic },
+      { id: "sizes", title: "Sizes and disabled", align: "stretch", Component: TagInputSizes },
+    ],
+    props: [
+      { name: "value / defaultValue / onValueChange", type: "string[]", description: "Controlled or uncontrolled tags." },
+      { name: "validate", type: "(tag, current) => boolean | string", description: "Return true to accept; false or a message to reject (shown under the field)." },
+      { name: "max", type: "number", description: "Most tags allowed; the field locks when reached." },
+      { name: "addOnBlur", type: "boolean", default: "true", description: "Add the typed text when focus leaves." },
+      { name: "name", type: "string", description: "Submits the tags as one comma-separated value." },
+      { name: "variant / size / invalid / disabled", type: "", description: "Same as Input." },
+    ],
+    a11y: ["Each remove button is named \"Remove <tag>\".", "Rejections are announced through a status region and set aria-invalid.", "Duplicates are ignored case-insensitively.", "Name the field with a label (htmlFor + id) or aria-label."],
+  },
+  collapsible: {
+    name: "Collapsible",
+    description: "One region that shows and hides with an animated height, like \"Show 3 more stops\". For a list of sections use Accordion.",
+    importName: "Collapsible, CollapsibleTrigger, CollapsibleContent",
+    demos: [{ id: "basic", title: "Show more stops", align: "center", Component: CollapsibleBasic }],
+    props: [
+      { name: "open / defaultOpen / onOpenChange", type: "", description: "Controlled or uncontrolled state (Radix)." },
+      { name: "CollapsibleTrigger asChild", type: "boolean", description: "Render your own Button or row as the trigger." },
+      { name: "CollapsibleContent forceMount", type: "boolean", description: "Keep the content in the DOM while closed (Radix)." },
+    ],
+    a11y: ["The trigger gets aria-expanded and aria-controls.", "Space and Enter toggle it.", "The height animation is skipped when the user prefers reduced motion."],
   },
   textarea: {
     name: "Textarea",
@@ -1356,12 +1515,60 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
     name: "Select",
     description: "Pick one option from a list. The menu grows out of the trigger, with a checkmark on the selected row; full keyboard and typeahead support.",
     importName: "Select, SelectTrigger, SelectValue, SelectContent, SelectItem",
-    demos: [{ id: "basic", title: "Groups, descriptions, placeholder", align: "stretch", Component: SelectBasic }],
-    props: [
-      { name: "Select", type: "value, defaultValue, onValueChange, disabled", description: "Radix Select root." },
-      { name: "SelectTrigger", type: "variant, size, invalid, startAdornment", description: "Styled like Input." },
-      { name: "SelectItem", type: "value, disabled, description", description: "One option; description shows a second line." },
+    demos: [
+      { id: "basic", title: "Groups, descriptions, placeholder", align: "stretch", Component: SelectBasic },
+      { id: "sizes", title: "Sizes", description: "Same heights as Button at the same size name.", align: "stretch", Component: SelectSizes },
+      { id: "states", title: "Invalid and disabled", align: "stretch", Component: SelectStates },
     ],
+    props: [
+      { name: "Select", type: "value, defaultValue, onValueChange, open, onOpenChange, disabled, name, required", description: "Radix Select root." },
+      { name: "SelectTrigger / variant", type: '"filled" | "outline" | "surface" | "plain"', default: '"filled"', description: "Field look, same as Input." },
+      SIZE('"xs" | "sm" | "md" | "lg" | "xl"'),
+      { name: "SelectTrigger / invalid", type: "boolean", default: "false", description: "Red edge and aria-invalid." },
+      { name: "SelectTrigger / startAdornment", type: "ReactNode", description: "Icon or text before the value." },
+      { name: "SelectValue", type: "placeholder", description: "Shows the selected label, or the placeholder." },
+      { name: "SelectContent", type: "position, side, align", description: "Placement (Radix)." },
+      { name: "SelectItem", type: "value, disabled, description", description: "One option; description shows a second line." },
+      { name: "SelectGroup, SelectLabel, SelectSeparator", type: "", description: "Group options under a heading." },
+    ],
+  },
+  combobox: {
+    name: "Combobox",
+    description: "A text field with a filterable list of options (autocomplete). Options are plain data with groups, descriptions and icons; filter on the client or fetch as the user types.",
+    importName: "Combobox",
+    demos: [
+      { id: "basic", title: "Groups, descriptions, clearable", align: "stretch", Component: ComboboxBasic },
+      { id: "states", title: "Async search, sizes, invalid, disabled", align: "stretch", Component: ComboboxStates },
+    ],
+    props: [
+      { name: "options", type: "{ value, label, description?, icon?, disabled?, group? }[]", description: "The choices. Options sharing a group are listed under one heading." },
+      { name: "value / defaultValue / onValueChange", type: "string | null", description: "Chosen option value; controlled or uncontrolled." },
+      { name: "filter", type: "((option, query) => boolean) | false", description: "Custom matcher; the default ignores case and accents. false shows every option (server-side filtering)." },
+      { name: "onInputChange / loading", type: "(query: string) => void / boolean", description: "Fetch options as the user types and show a spinner meanwhile." },
+      { name: "emptyText", type: "ReactNode", default: '"No results"', description: "Shown when nothing matches." },
+      { name: "clearable", type: "boolean", description: "Adds a clear button once a value is chosen." },
+      { name: "variant / size / invalid / disabled", type: "like Input", description: "Same field look and heights as Input and Select." },
+      { name: "name", type: "string", description: "Adds a hidden input with the value for native forms." },
+    ],
+    a11y: ["ARIA combobox: the input keeps focus, with aria-expanded, aria-controls and aria-activedescendant pointing at the highlighted option in the listbox.", "Arrow keys move, Home and End jump, Enter chooses, Escape closes; typing opens the list.", "Give it an aria-label or aria-labelledby."],
+  },
+  "multi-select": {
+    name: "Multi Select",
+    description: "A Combobox that keeps several values as removable chips inside the field. Backspace removes the last chip; cap the count with max or add a select all row.",
+    importName: "MultiSelect",
+    demos: [
+      { id: "basic", title: "Travellers, select all, max", align: "stretch", Component: MultiSelectBasic },
+      { id: "sizes", title: "Sizes and states", align: "stretch", Component: MultiSelectSizes },
+    ],
+    props: [
+      { name: "options", type: "{ value, label, description?, icon?, disabled?, group? }[]", description: "The choices." },
+      { name: "value / defaultValue / onValueChange", type: "string[]", description: "Chosen values; controlled or uncontrolled." },
+      { name: "max", type: "number", description: "Most values allowed; the other options are disabled and the panel shows a count." },
+      { name: "selectAll", type: "string", description: "Label of a first row that selects or clears every option (hidden while searching or with max)." },
+      { name: "filter / onInputChange / loading / emptyText / clearable", type: "as Combobox", description: "Same as Combobox." },
+      { name: "variant / size / invalid / disabled / name", type: "as Combobox", description: "name adds one hidden input per value." },
+    ],
+    a11y: ["Same combobox pattern as Combobox with an aria-multiselectable listbox; chosen options report aria-selected.", "Each chip has a remove button named \"Remove <label>\"; Backspace on an empty input removes the last chip."],
   },
   checkbox: {
     name: "Checkbox",
@@ -1422,10 +1629,11 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
     importName: "Badge",
     demos: [{ id: "variants", title: "Variants, tones, counts", align: "start", Component: BadgeVariants }],
     props: [
-      { name: "variant", type: '"solid" | "soft" | "outline"', default: '"soft"', description: "Weight." },
+      { name: "variant", type: '"solid" | "soft" | "outline"', default: '"soft"', description: "Weight. \"filled\" and \"tinted\" are aliases of \"solid\" and \"soft\", matching Button." },
       { name: "tone", type: '"accent" | "neutral" | "success" | "warning" | "danger" | "info"', default: '"accent"', description: "Color role." },
       SIZE('"sm" | "md" | "lg"'),
       { name: "dot", type: "boolean", description: "Leading status dot." },
+      { name: "count / max", type: "number", default: "max 99", description: "Show a number instead of children; above max it reads \"99+\"." },
     ],
   },
   avatar: {
@@ -1673,7 +1881,7 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
       { name: "rows / getRowId", type: "T[] / (row) => string", description: "The current page." },
       { name: "sort / onSortChange", type: '{ key, direction: "asc" | "desc" } | null', description: "Sortable headers toggle the direction." },
       { name: "search / onSearchChange / debounceMs", type: "string / (value) => void / number", default: "300", description: "Shows the search field; debounced." },
-      { name: "page / pageCount / total / pageSize / onPageChange", type: "number", description: "Pagination with a \"21–40 of 134\" summary." },
+      { name: "page / pageCount / total / pageSize / onPageChange", type: "number", description: "Pagination with a \"21 to 40 of 134\" summary." },
       { name: "loading", type: "boolean", description: "Skeleton rows." },
       { name: "empty", type: "{ icon, title, description, actions }", description: "Empty state (a no results text while searching)." },
       { name: "toolbar / selectionActions", type: "ReactNode", description: "Filters; bulk actions while rows are selected." },

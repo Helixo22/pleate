@@ -144,7 +144,7 @@ export type BotFaceProps = {
   state?: BotState;
   /** Side in px: 24 for an avatar, up to a hero. */
   size?: number;
-  /** 0–1 loudness (a number, or a MotionValue from useAudioLevel) driving listening and speaking. */
+  /** Loudness from 0 to 1 (a number, or a MotionValue from useAudioLevel) driving listening and speaking. */
   level?: number | MotionValue<number>;
   /** Eyes follow the pointer while idle. One window listener per face: keep it to the large ones. */
   track?: boolean;
@@ -449,7 +449,7 @@ function LiveFace({ state = "idle", size = 64, track = false, seed, level, ...re
     };
   }, [state, reduced, track, pose, yaw, pitch, yawTarget, pitchTarget, alt, driven]);
 
-  // Blinks every 3–6 s, sometimes twice.
+  // Blinks every 3 to 6 s, sometimes twice.
   useEffect(() => {
     if (reduced || state === "happy" || state === "offline" || state === "error") return;
     let timer = 0;

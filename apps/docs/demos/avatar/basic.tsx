@@ -4,7 +4,7 @@ import { Avatar, AvatarGroup } from "pleate/avatar";
 export default function Demo() {
   return (
     <div className="grid gap-6">
-      <div className="flex flex-wrap items-end gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Avatar size="xs" name="Ada Lovelace" />
         <Avatar size="sm" name="Grace Hopper" />
         <Avatar size="md" name="Alan Turing" status="online" />

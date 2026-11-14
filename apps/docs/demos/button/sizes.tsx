@@ -11,9 +11,10 @@ export default function Demo() {
         <Button size="xl">Extra large</Button>
       </div>
       <div className="flex flex-wrap items-center gap-3">
-        <Button size="sm" shape="rounded" variant="tinted">Rounded</Button>
+        <Button variant="tinted">Pill (default)</Button>
         <Button shape="rounded" variant="tinted">Rounded</Button>
-        <Button size="lg" shape="rounded" variant="tinted">Rounded</Button>
+        <Button size="lg" variant="tinted">Pill large</Button>
+        <Button size="lg" shape="rounded" variant="tinted">Rounded large</Button>
       </div>
     </div>
   );

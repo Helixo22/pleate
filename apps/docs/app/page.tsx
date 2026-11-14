@@ -67,8 +67,8 @@ export default function Home() {
 
       <section className="relative isolate overflow-hidden rounded-3xl bg-surface shadow-[var(--pl-edge)]">
         {/* The field is quieter behind the copy and fully alive around the preview. */}
-        <AsciiRipple baseOpacity={0.3} className="absolute inset-0 -z-10 [mask-image:linear-gradient(180deg,rgb(0_0_0/0.3)_40%,#000)] xl:[mask-image:linear-gradient(100deg,rgb(0_0_0/0.3)_35%,#000_75%)]" />
-        <div className="grid grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-7 sm:px-10 sm:py-12 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+        <AsciiRipple baseOpacity={0.3} className="absolute inset-0 -z-10 [mask-image:linear-gradient(180deg,rgb(0_0_0/0.3)_40%,#000)]" />
+        <div className="grid grid-cols-[minmax(0,1fr)] items-center gap-10 px-5 py-7 sm:px-10 sm:py-12">
           <div>
             <p className="mb-4 font-mono text-footnote text-fg-muted">
               pleate 0.3 · React UI for Next.js
@@ -87,7 +87,7 @@ export default function Home() {
                   Browse components <ArrowRight />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="plain" tone="neutral">
+              <Button asChild size="lg" variant="gray" tone="neutral">
                 <Link href="/examples/landing">Example landing page</Link>
               </Button>
             </div>

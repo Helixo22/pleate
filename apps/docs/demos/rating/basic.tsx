@@ -18,11 +18,11 @@ export default function Demo() {
       </div>
       <ul className="grid gap-3">
         {STAYS.map((s) => (
-          <li key={s.name} className="flex items-center justify-between gap-4">
+          <li key={s.name} className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <span className="text-subhead text-fg">{s.name}</span>
             <span className="flex items-center gap-2">
               <Rating aria-label={s.name} value={s.score} readOnly allowHalf size="sm" showValue />
-              <span className="font-mono text-caption1 text-fg-subtle">{s.reviews}</span>
+              <span className="w-7 text-end font-mono text-caption1 text-fg-subtle">{s.reviews}</span>
             </span>
           </li>
         ))}

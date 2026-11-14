@@ -33,8 +33,8 @@ export default function Demo() {
         />
       </div>
       <p className="max-w-xl text-body">
-        Pastéis de Belém opens at 8:00 and the queue is shortest before 10<SourceChip index={1} href="https://example.com/a" site="lisbon-guide.example" />;
-        the monastery next door is free on Sundays for residents<SourceChip index={2} href="https://example.com/b" />.
+        Pastéis de Belém opens at 8:00 and the queue is shortest before 10;<SourceChip index={1} href="https://example.com/a" site="lisbon-guide.example" />
+        the monastery next door is free on Sundays for residents.<SourceChip index={2} href="https://example.com/b" />
       </p>
       <SourceList
         sources={[

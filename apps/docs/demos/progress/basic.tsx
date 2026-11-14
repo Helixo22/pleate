@@ -16,7 +16,7 @@ export default function Demo() {
     return () => clearInterval(id);
   }, []);
   return (
-    <div className="grid w-full max-w-md gap-6">
+    <div className="mx-auto grid w-full max-w-md gap-6">
       <div className="grid gap-2">
         <p className="px-4 text-footnote text-fg-muted">Offline maps</p>
         <ul className="overflow-hidden rounded-xl bg-fill-3">

@@ -1,5 +1,5 @@
 // Testimonials. TestimonialCard: a quote with its author, role, avatar and an optional star rating.
-// Testimonials lays several out as a "grid" (balanced columns), a "carousel" (swipe/scroll with snap and arrow
+// Testimonials lays several out as a "grid" (equal-height rows), a "carousel" (swipe/scroll with snap and arrow
 // buttons) or one "featured" large quote.
 "use client";
 
@@ -13,13 +13,13 @@ export type Testimonial = {
   name: string;
   role?: ReactNode;
   avatar?: string;
-  /** 1–5. */
+  /** 1 to 5. */
   rating?: number;
 };
 
 function Stars({ rating }: { rating: number }) {
   return (
-    <span className="flex gap-0.5 text-warning-ink" role="img" aria-label={`${rating} out of 5`}>
+    <span className="flex gap-0.5 text-accent" role="img" aria-label={`${rating} out of 5`}>
       {Array.from({ length: 5 }, (_, i) => (
         <svg key={i} viewBox="0 0 20 20" className={cn("size-4", i >= Math.round(rating) && "opacity-25")} fill="currentColor" aria-hidden="true">
           <path d="M10 1.8l2.5 5.1 5.6.8-4 3.9 1 5.6-5.1-2.6-5 2.6 1-5.6-4-3.9 5.5-.8z" />
@@ -105,10 +105,10 @@ export function Testimonials({ items, layout = "grid", label = "Testimonials", c
     );
   }
   return (
-    <ul aria-label={label} className={cn("columns-1 gap-4 sm:columns-2 lg:columns-3", className)}>
+    <ul aria-label={label} className={cn("grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3", className)}>
       {items.map((t, i) => (
-        <li key={i} className="mb-4 break-inside-avoid">
-          <TestimonialCard {...t} />
+        <li key={i} className="flex">
+          <TestimonialCard {...t} className="w-full" />
         </li>
       ))}
     </ul>

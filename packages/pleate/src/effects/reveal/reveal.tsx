@@ -35,7 +35,7 @@ export type RevealProps = {
   duration?: number;
   /** Animate once (default) or every time it enters. */
   once?: boolean;
-  /** How much must be visible first (0–1). */
+  /** How much must be visible first (0 to 1). */
   amount?: number;
   as?: "div" | "section" | "li" | "span" | "article";
   className?: string;

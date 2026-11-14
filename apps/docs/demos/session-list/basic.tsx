@@ -17,7 +17,7 @@ export default function Demo() {
   const [loading, setLoading] = useState(false);
   const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
   return (
-    <div className="grid w-full max-w-xl gap-4 rounded-xl bg-bg p-4">
+    <div className="mx-auto grid w-full max-w-xl gap-4 rounded-xl bg-bg p-4">
       <SessionList
         showTitle
         sessions={sessions}

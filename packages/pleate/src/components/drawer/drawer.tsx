@@ -8,19 +8,19 @@ import { Dialog } from "radix-ui";
 import type { ComponentProps, HTMLAttributes } from "react";
 import { cn } from "../../lib/cn.ts";
 import { XIcon } from "../../lib/icons.tsx";
-import { hairline, overlayBackdrop, sheetCloseButton } from "../../lib/overlay-styles.ts";
+import { hairline, overlayBackdrop, overlaySurface, sheetCloseButton } from "../../lib/overlay-styles.ts";
 
 export const Drawer = Dialog.Root;
 export const DrawerTrigger = Dialog.Trigger;
 export const DrawerClose = Dialog.Close;
 
-const contentVariants = cva("fixed z-(--pl-z-modal) flex flex-col overflow-hidden bg-elevated text-fg shadow-xl outline-none", {
+const contentVariants = cva(`fixed z-(--pl-z-modal) flex flex-col overflow-hidden outline-none ${overlaySurface}`, {
   variants: {
     side: {
       // pl-drawer slides along --pl-drawer-from; flipped under RTL so the panel enters from its own edge.
       start: "pl-drawer inset-y-0 start-0 w-[calc(100%-2rem)] pt-(--pl-safe-top) pb-(--pl-safe-bottom) [--pl-drawer-from:-100%] rtl:[--pl-drawer-from:100%]",
       end: "pl-drawer inset-y-0 end-0 w-[calc(100%-2rem)] pt-(--pl-safe-top) pb-(--pl-safe-bottom) [--pl-drawer-from:100%] rtl:[--pl-drawer-from:-100%]",
-      bottom: "pl-dialog-sheet inset-x-0 bottom-0 rounded-t-3xl pb-(--pl-safe-bottom)",
+      bottom: "pl-dialog-sheet inset-x-0 bottom-0 rounded-t-2xl pb-(--pl-safe-bottom)",
     },
     size: { sm: "", md: "", lg: "" },
   },
@@ -50,7 +50,7 @@ export function DrawerContent({ className, side, size, showClose = true, closeLa
         {children}
         {showClose && (
           <Dialog.Close className={cn(sheetCloseButton, "absolute end-4 top-[calc(var(--pl-safe-top)+1rem)]", side === "bottom" && "top-4")} aria-label={closeLabel}>
-            <XIcon strokeWidth={3} />
+            <XIcon strokeWidth={2} />
           </Dialog.Close>
         )}
       </Dialog.Content>

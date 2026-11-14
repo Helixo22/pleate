@@ -1,8 +1,10 @@
 "use client";
 
+import { Trash2, UserX } from "lucide-react";
 import { AlertDialog } from "pleate/alert-dialog";
 import { Button } from "pleate/button";
 import { Input } from "pleate/input";
+import { PasswordInput } from "pleate/password-input";
 import { toast } from "pleate/toast";
 
 export default function Demo() {
@@ -10,6 +12,7 @@ export default function Demo() {
     <>
       <AlertDialog
         trigger={<Button variant="tinted" tone="danger">Delete trip</Button>}
+        icon={<Trash2 />}
         title="Delete “Weekend in Lisbon”?"
         description="This removes the trip for all 4 travellers. You can't undo this."
         actions={[
@@ -17,6 +20,18 @@ export default function Demo() {
           { label: "Delete", role: "destructive", onSelect: () => toast.success("Trip deleted") },
         ]}
       />
+      <AlertDialog
+        trigger={<Button variant="gray" tone="danger">Delete account</Button>}
+        icon={<UserX />}
+        title="Delete your account"
+        description="This permanently deletes your trips, photos and payment history. You can't undo this."
+        actions={[
+          { label: "Cancel", role: "cancel" },
+          { label: "Delete", role: "destructive", onSelect: () => toast.success("Account deleted") },
+        ]}
+      >
+        <PasswordInput aria-label="Current password" placeholder="Current password" />
+      </AlertDialog>
       <AlertDialog
         trigger={<Button variant="gray">Three choices</Button>}
         title="Save changes?"

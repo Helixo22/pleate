@@ -91,7 +91,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
           <ul className="grid max-w-2xl gap-2.5 text-body text-fg-muted">
             {doc.a11y.map((line) => (
               <li key={line} className="flex gap-3">
-                <span aria-hidden className="mt-[0.6875rem] h-px w-3 shrink-0 bg-fg-subtle" />
+                <span aria-hidden className="mt-[0.6rem] size-1.5 shrink-0 rounded-full bg-fg-subtle" />
                 {line}
               </li>
             ))}

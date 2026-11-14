@@ -211,6 +211,15 @@
 }
 
 /* Horizontal scrollers (tab lists, chip rows) without a visible scrollbar. */
+/* Sideways scroller with a soft shadow on the edge that still has content behind it (cover and shadow layers). */
+@utility pl-scroll-x {
+  background:
+    linear-gradient(to right, var(--pl-surface) 30%, transparent) left / 2rem 100% local no-repeat,
+    linear-gradient(to left, var(--pl-surface) 30%, transparent) right / 2rem 100% local no-repeat,
+    radial-gradient(farthest-side at 0 50%, color-mix(in oklab, var(--pl-fg) 22%, transparent), transparent) left / 0.5rem 100% scroll no-repeat,
+    radial-gradient(farthest-side at 100% 50%, color-mix(in oklab, var(--pl-fg) 22%, transparent), transparent) right / 0.5rem 100% scroll no-repeat;
+}
+
 @utility pl-no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar {

@@ -1,12 +1,12 @@
-// ActionSheet: the iOS action sheet. A short list of centered choices rising from the bottom, a small centered title
-// and message on top, and Cancel in its own group below. Destructive actions are red. On wider screens it appears as
-// a centered card. Radix Dialog underneath.
+// ActionSheet: a short list of choices in one panel rising from the bottom, with an optional title and message on top
+// and Cancel as the last row, under a thin line. Rows are left-aligned with a leading icon; destructive ones are red.
+// On wider screens it appears as a centered card. Radix Dialog underneath.
 "use client";
 
 import { Dialog } from "radix-ui";
 import type { ReactNode } from "react";
 import { cn } from "../../lib/cn.ts";
-import { hairline, overlayBackdrop } from "../../lib/overlay-styles.ts";
+import { hairline, overlayBackdrop, overlaySurface } from "../../lib/overlay-styles.ts";
 
 export type ActionSheetAction = {
   label: ReactNode;
@@ -28,9 +28,9 @@ export type ActionSheetProps = {
 };
 
 const row =
-  "pl-focus-ring pl-touch flex min-h-14 w-full cursor-pointer items-center justify-center gap-2.5 px-4 text-title3 font-normal tracking-normal text-accent-ink " +
-  "outline-offset-[-2px] transition-colors hover:bg-fill-3 active:bg-fill-2 disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-5";
-const group = "overflow-hidden rounded-lg bg-elevated shadow-xl";
+  "pl-focus-ring pl-touch flex min-h-11 w-full cursor-pointer items-center gap-3 rounded-md px-3 text-start text-body text-fg " +
+  "transition-colors hover:bg-fill-3 active:bg-fill-2 disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-5 [&_svg]:text-fg-muted";
+const group = `overflow-hidden rounded-2xl p-1.5 ${overlaySurface}`;
 
 export function ActionSheet({ open, defaultOpen, onOpenChange, trigger, title, message, actions, cancelLabel = "Cancel" }: ActionSheetProps) {
   return (
@@ -53,9 +53,9 @@ export function ActionSheet({ open, defaultOpen, onOpenChange, trigger, title, m
         >
           <div className={group}>
             {(title || message) && (
-              <div className="flex flex-col gap-0.5 border-b border-(--pl-hair) px-4 py-3.5 text-center">
+              <div className="flex flex-col gap-0.5 px-3 pt-2.5 pb-2">
                 {title ? (
-                  <Dialog.Title className="text-footnote font-semibold text-fg-muted">{title}</Dialog.Title>
+                  <Dialog.Title className="text-subhead font-semibold text-fg">{title}</Dialog.Title>
                 ) : (
                   <Dialog.Title className="sr-only">Actions</Dialog.Title>
                 )}
@@ -63,21 +63,22 @@ export function ActionSheet({ open, defaultOpen, onOpenChange, trigger, title, m
               </div>
             )}
             {!title && !message && <Dialog.Title className="sr-only">Actions</Dialog.Title>}
-            <div className="flex flex-col divide-y divide-(--pl-hair)">
+            <div className="flex flex-col">
               {actions.map((action, i) => (
                 <Dialog.Close
                   key={i}
                   disabled={action.disabled}
                   onClick={action.onSelect}
-                  className={cn(row, action.destructive && "text-danger-ink")}
+                  className={cn(row, action.destructive && "text-danger-ink [&_svg]:text-danger-ink")}
                 >
                   {action.icon}
                   {action.label}
                 </Dialog.Close>
               ))}
             </div>
+            <div className="-mx-1.5 my-1.5 h-px bg-(--pl-hair)" />
+            <Dialog.Close className={cn(row, "justify-center font-medium text-fg-muted")}>{cancelLabel}</Dialog.Close>
           </div>
-          <Dialog.Close className={cn(group, row, "mt-2 font-semibold")}>{cancelLabel}</Dialog.Close>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

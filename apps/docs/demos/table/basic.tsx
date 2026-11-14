@@ -29,7 +29,7 @@ export default function Demo() {
     onSort: () => setSort((s) => ({ key, dir: s.key === key && s.dir === "asc" ? "desc" : "asc" })),
   });
   return (
-    <div className="w-full rounded-xl bg-bg p-4">
+    <div className="w-full">
     <Table stackOnMobile>
       <TableCaption>Bookings this week. On phones each row becomes a card.</TableCaption>
       <TableHeader>

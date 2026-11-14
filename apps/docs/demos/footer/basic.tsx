@@ -31,11 +31,11 @@ export default function Demo() {
         </FooterColumns>
         <FooterBottom>
           <span>© 2026 Plate. All rights reserved.</span>
-          <div className="flex gap-4">
+          <ul className="flex gap-4">
             <FooterLink href="#basic">Privacy</FooterLink>
             <FooterLink href="#basic">Terms</FooterLink>
             <FooterLink href="#basic">Cookies</FooterLink>
-          </div>
+          </ul>
         </FooterBottom>
       </Footer>
     </div>

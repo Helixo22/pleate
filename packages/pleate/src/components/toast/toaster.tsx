@@ -96,7 +96,7 @@ function ToastItem({ data, position, duration, closeLabel }: { data: ToastData; 
       onPointerLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
-      className="group pointer-events-auto relative flex min-h-14 w-full touch-none items-center gap-3 rounded-[1.75rem] bg-elevated py-2.5 ps-3.5 pe-5 text-fg shadow-[var(--pl-shadow-lg),var(--pl-edge)] select-none"
+      className="group pointer-events-auto relative flex min-h-14 w-full touch-none items-center gap-3 rounded-xl bg-elevated py-3 ps-3.5 pe-4 text-fg shadow-[var(--pl-shadow-xl),var(--pl-edge)] select-none dark:ring-1 dark:ring-white/10"
     >
       {data.icon ?? <ToneIcon tone={tone} />}
       <div className="flex min-w-0 flex-1 flex-col">
@@ -110,7 +110,7 @@ function ToastItem({ data, position, duration, closeLabel }: { data: ToastData; 
             data.action!.onClick();
             toast.dismiss(data.id);
           }}
-          className="pl-focus-ring pl-hit relative -me-2 shrink-0 cursor-pointer rounded-full px-2 py-1 text-subhead font-semibold text-accent-ink hover:bg-accent-soft"
+          className="pl-focus-ring pl-hit relative -me-2 shrink-0 cursor-pointer rounded-md px-2 py-1 text-subhead font-semibold text-accent-ink hover:bg-accent-soft"
         >
           {data.action.label}
         </button>

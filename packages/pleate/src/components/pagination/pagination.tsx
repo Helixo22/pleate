@@ -1,6 +1,6 @@
 // Pagination: move through pages. "pages" shows numbers with ellipses (fewer on phones), "compact" a
 // "3 of 12" label between arrows, "dots" the iOS page control. On phones "pages" keeps first, current and last. Pages are buttons (onPageChange) or links (getHref).
-// With `total` and `pageSize` a range summary ("21–40 of 134") sits before the controls.
+// With `total` and `pageSize` a range summary ("21 to 40 of 134") sits before the controls.
 "use client";
 
 import type { ReactNode } from "react";
@@ -16,7 +16,7 @@ export type PaginationProps = {
   variant?: "pages" | "compact" | "dots";
   /** Pages shown on each side of the current one. */
   siblings?: number;
-  size?: "sm" | "md";
+  size?: "sm" | "md" | "lg";
   label?: string;
   previousLabel?: string;
   nextLabel?: string;
@@ -59,13 +59,13 @@ export function Pagination({
   formatLabel = (p, n) => `${p} of ${n}`,
   total,
   pageSize,
-  formatRange = (start, end, count) => `${start.toLocaleString()}–${end.toLocaleString()} of ${count.toLocaleString()}`,
+  formatRange = (start, end, count) => `${start.toLocaleString()} to ${end.toLocaleString()} of ${count.toLocaleString()}`,
   className,
 }: PaginationProps) {
   const showRange = total !== undefined && pageSize !== undefined && pageSize > 0 && variant !== "dots";
   const rangeStart = showRange ? Math.min(total, (page - 1) * pageSize + 1) : 0;
   const rangeEnd = showRange ? Math.min(total, page * pageSize) : 0;
-  const box = size === "sm" ? "h-8 min-w-8 text-footnote" : "h-9 min-w-9 text-subhead sm:h-10 sm:min-w-10";
+  const box = { sm: "h-8 min-w-8 text-footnote", md: "h-9 min-w-9 text-subhead", lg: "h-11 min-w-11 text-callout" }[size];
   const cell = (target: number, content: ReactNode, extra: { label?: string; current?: boolean; disabled?: boolean; className?: string } = {}) => {
     const classes = cn(
       "pl-focus-ring pl-touch pl-hit relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-md px-2 font-medium pl-tabular",
@@ -131,19 +131,22 @@ export function Pagination({
       <ul className="flex items-center gap-1">
         <li>{arrow(-1)}</li>
         {variant === "compact" ? (
-          <li className={cn("px-3 font-medium text-fg-muted pl-tabular", size === "sm" ? "text-footnote" : "text-subhead")} aria-live="polite">
+          <li className={cn("px-3 font-medium text-fg-muted pl-tabular", size === "sm" ? "text-footnote" : size === "lg" ? "text-callout" : "text-subhead")} aria-live="polite">
             {formatLabel(page, pageCount)}
           </li>
         ) : (
           <>
+            {/* Phones: "3 of 7" instead of a row of numbers that cannot fit. */}
+            <li className="px-2 text-footnote font-medium text-fg-muted pl-tabular sm:hidden" aria-live="polite">
+              {formatLabel(page, pageCount)}
+            </li>
             {paginationRange(page, pageCount, siblings).map((item, i) =>
               item === "…" ? (
-                <li key={`gap-${i}`} aria-hidden="true" className={cn("grid place-items-center text-fg-subtle", box)}>
+                <li key={`gap-${i}`} aria-hidden="true" className={cn("grid place-items-center text-fg-subtle max-sm:hidden", box)}>
                   …
                 </li>
               ) : (
-                // Phones keep first, current and last only.
-                <li key={item} className={cn(item !== page && item !== 1 && item !== pageCount && "max-sm:hidden")}>
+                <li key={item} className="max-sm:hidden">
                   {cell(item, item, { current: item === page, label: `Page ${item}` })}
                 </li>
               ),
