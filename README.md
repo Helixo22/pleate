@@ -6,6 +6,8 @@
 </p>
 
 <p align="center">
+  <a href="https://pleate.duckdns.org"><b>Website</b></a>
+  .
   <a href="media/pleate-intro.mp4"><b>Watch the one-minute intro</b></a>
   ·
   <a href="#getting-started">Getting started</a>
