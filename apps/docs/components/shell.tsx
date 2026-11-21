@@ -24,7 +24,6 @@ import {
   MousePointerClick,
   Package,
   Paintbrush,
-  PencilRuler,
   Search,
   Server,
   Shapes,
@@ -186,6 +185,7 @@ const SECTION_ICONS: Record<string, ReactNode> = {
   Auth: <KeyRound />,
   AI: <Bot />,
   Effects: <Blend />,
+  "3D Scenes": <Box />,
   Marketing: <Megaphone />,
   "Text Animations": <Type />,
   Animations: <Film />,
@@ -205,7 +205,6 @@ const PAGE_ICONS: Record<string, ReactNode> = {
   "/tokens": <SwatchBook />,
   "/theming": <Paintbrush />,
   "/components": <LayoutGrid />,
-  "/composer": <PencilRuler />,
 };
 
 type Folding = ReturnType<typeof useFolds>;
@@ -308,8 +307,8 @@ export function Shell({ children }: { children: ReactNode }) {
   const [query, setQuery] = useState("");
   const folding = useFolds(area, pathname);
   const router = useRouter();
-  // Example pages and the Composer are full-bleed screens of their own: no docs chrome.
-  const bare = pathname.startsWith("/examples/") || pathname.startsWith("/composer");
+  // Example pages are full-bleed screens of their own: no docs chrome.
+  const bare = pathname.startsWith("/examples/");
   useEffect(() => setMenu(false), [pathname]);
   useEffect(() => {
     const open = () => setSearch(true);

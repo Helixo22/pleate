@@ -40,7 +40,6 @@ export const NAV: NavSection[] = [
       { name: "Tokens", href: "/tokens", ready: true },
       { name: "Theming", href: "/theming", ready: true },
       { name: "All components", href: "/components", ready: true },
-      { name: "Composer", href: "/composer", ready: true, isNew: true },
     ],
   },
   {
@@ -85,6 +84,14 @@ export const NAV: NavSection[] = [
     ],
   },
   { title: "Effects", area: "effects", items: [c("Animated Text", true), c("Reveal", true), c("Page Transition", true), c("Hover Effects", true), c("Motion Graphics", true), c("Scroll Effects", true), c("3D Effects", true)] },
+  {
+    title: "3D Scenes",
+    area: "effects",
+    items: [
+      { ...c("Scroll Scene", true), isNew: true },
+      { ...c("Three Scene", true), isNew: true },
+    ],
+  },
   { title: "Marketing", items: [c("Hero", true), c("Feature Grid", true), c("Pricing", true), c("Testimonial", true), c("CTA", true), { name: "Contact Form", href: "/components/contact", ready: true }, c("Logo Marquee", true)] },
   { title: "Text Animations", area: "effects", items: effects(NAV_TEXT) },
   { title: "Animations", area: "effects", items: effects(NAV_ANIMATIONS, NAV_ANIMATIONS_B) },

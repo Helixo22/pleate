@@ -71,6 +71,8 @@ import ThreeDCarousel from "./3d-effects/carousel";
 import ThreeDStack from "./3d-effects/stack";
 import ThreeDWall from "./3d-effects/wall";
 import ThreeDGlobe from "./3d-effects/globe";
+import ScrollSceneTrain from "./scroll-scene/train";
+import ThreeScenePleats from "./three-scene/pleats";
 import PageTransitionBasic from "./page-transition/basic";
 import RevealBasic from "./reveal/basic";
 import RevealProgress from "./reveal/progress";
@@ -636,6 +638,58 @@ const BASE_DOCS: Record<string, ComponentDoc> = {
       "Reduced motion swaps the turn for an instant change, keeps the stack flat, stops the wall and the globe.",
       "TiltWall reads each tile once: the loop copy is hidden and inert.",
       "DotGlobe is a named image listing its markers; drag or arrow keys turn it.",
+    ],
+  },
+  "scroll-scene": {
+    name: "Scroll Scene",
+    description: "A tall section with a pinned stage, so the scroll position drives what the stage shows. Text beats show for one stretch each, and a cue timeline blends any set of values between pinned points.",
+    importName: "ScrollScene, ScrollBeat, useSceneProgress, createTimeline, easings, range",
+    importPath: "pleate/effects/scroll-scene",
+    demos: [
+      { id: "train", title: "Lisbon to Porto", description: "Scroll the page: three cues pin the train at each station and the distance reads off the scroll. Scroll back up and it runs backwards.", align: "stretch", Component: ScrollSceneTrain },
+    ],
+    props: [
+      { name: "ScrollScene stage", type: "ReactNode", description: "The pinned layer, as wide and tall as the viewport: a ThreeScene, a video, a drawing." },
+      { name: "ScrollScene children", type: "ReactNode", description: "Laid over the stage, usually ScrollBeats." },
+      { name: "ScrollScene length / offset / label", type: "number / number (px) / string", default: "3 / 0", description: "Viewport heights of scrolling the pin lasts, the sticky header above it, and the section's name." },
+      { name: "ScrollBeat from / to", type: "number (0..1)", description: "The stretch of the scene where the beat shows." },
+      { name: "ScrollBeat fade / distance", type: "number / number (px)", default: "0.04 / 16", description: "Share of the scene spent fading in and out, and how far it rises." },
+      { name: "useSceneProgress()", type: "MotionValue<number>", description: "The enclosing scene's progress. Read it with useTransform for the DOM, or .get() in a render loop." },
+      { name: "createTimeline(base, cues, { ease })", type: "{ at, values?, ease? }[]", description: "Pins values (numbers or lists of numbers) at points from 0 to 1. Values a cue leaves out carry over. sample(t) returns one reused object and allocates nothing." },
+      { name: "easings / range(t, from, to)", type: "linear, smooth, smoother, out, in / number", description: "Curves for the stretches between cues, and a helper that splits one progress into chapters." },
+    ],
+    a11y: [
+      "The section can be named with label. Every beat stays in the reading order.",
+      "Focusing a link or button inside a hidden beat scrolls the page to the stretch where it shows.",
+      "Hidden beats ignore the pointer, so they never block the stage.",
+      "Reduced motion keeps the scene, since the scroll is the reader's own movement, and the beats only fade.",
+    ],
+  },
+  "three-scene": {
+    name: "Three Scene",
+    description: "A three.js canvas with one renderer and one loop that draws only when something changed. It follows the ScrollScene around it, keeps to the theme's colors and loads glTF models from Blender or any 3D tool.",
+    importName: "ThreeScene, loadModel, scrubAnimation, frameObject, disposeObject",
+    importPath: "pleate/effects/three-scene",
+    demos: [
+      { id: "pleats", title: "Folding sheet", description: "Scroll the page: a sheet in the accent color folds into twelve pleats while the camera moves through four cues. Switch the palette and it recolors.", align: "stretch", Component: ThreeScenePleats },
+    ],
+    props: [
+      { name: "setup(ctx)", type: "(ctx) => { frame?, theme?, dispose? } | Promise", description: "Builds the scene once per mount. ctx has renderer, scene, camera, canvas, palette (accent, fg, bg, surface as THREE.Color), phone, reduced and invalidate()." },
+      { name: "frame({ progress, time, delta })", type: "function", description: "Runs before each render. Set the camera and the objects from progress here." },
+      { name: "progress", type: "MotionValue<number>", description: "Defaults to the enclosing ScrollScene's progress." },
+      { name: "loop", type: '"demand" | "always"', default: '"demand"', description: "demand draws only when the progress, the size or the theme changes, or on invalidate(). always also runs the time clock." },
+      { name: "maxDpr / phoneMaxDpr / adaptive", type: "number / number / boolean", default: "1.75 / 1.25 / true", description: "Pixel ratio caps, and stepping the resolution down while frames run slow." },
+      { name: "shadows / transparent / fov", type: "boolean / boolean / number", default: "false / true / 35", description: "Shadow maps, a see-through canvas and the camera's field of view." },
+      { name: "fallback / label", type: "ReactNode / string", description: "Shown without WebGL2. A label makes the canvas a named image, otherwise it is decorative." },
+      { name: "loadModel(url, { draco, ktx2, renderer, shadows })", type: "Promise<GLTF>", description: "Loads .glb or .gltf. Meshopt works out of the box. Draco and KTX2 decoders are served from folders on your own site, never a CDN." },
+      { name: "scrubAnimation(root, clips, names?)", type: "{ mixer, duration, seek(t) }", description: "Puts a model's clips on the scroll: seek(progress) in frame()." },
+      { name: "frameObject(camera, object, margin)", type: "Vector3", default: "margin 1.2", description: "Backs the camera off until an object of any size fits, and returns its center." },
+    ],
+    a11y: [
+      "Pass label to describe the picture; without it the canvas is hidden from screen readers.",
+      "Nothing draws off screen or in a hidden tab, and the WebGL context is released on unmount.",
+      "Reduced motion stops the time clock of loop=\"always\". Scroll driven changes still draw, since the reader moves them.",
+      "Without WebGL2 the fallback shows in place of the canvas.",
     ],
   },
   reveal: {

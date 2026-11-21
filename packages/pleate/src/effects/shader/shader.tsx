@@ -55,6 +55,9 @@ float fbm(vec2 p) { float v = 0.0, a = 0.5; for (int i = 0; i < 5; i++) { v += a
 mat2 rot(float a) { float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
 `;
 
+// One 1x1 canvas for every color read, instead of a new canvas per call (theme switches read several at once).
+let colorProbe: CanvasRenderingContext2D | null | undefined;
+
 /** Reads a CSS color (any syntax the browser knows, tokens included) as rgb 0..1. */
 export function cssColorToRgb(color: string, el: Element = document.documentElement): [number, number, number] {
   const probe = document.createElement("span");
@@ -63,7 +66,8 @@ export function cssColorToRgb(color: string, el: Element = document.documentElem
   el.appendChild(probe);
   const value = getComputedStyle(probe).color;
   probe.remove();
-  const ctx = document.createElement("canvas").getContext("2d");
+  colorProbe ??= document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+  const ctx = colorProbe;
   if (!ctx) return [0, 0, 0];
   ctx.fillStyle = value;
   ctx.fillRect(0, 0, 1, 1);
@@ -163,25 +167,33 @@ export function ShaderCanvas({ fragment, uniforms, speed = 1, maxDpr = 1.5, inte
       host.addEventListener("pointerleave", onLeave);
     }
 
+    // Off screen or in a hidden tab the loop stops altogether, and starts again from the observers.
     let visible = true;
-    const viewWatch = new IntersectionObserver(([entry]) => (visible = entry.isIntersecting));
+    const resume = () => {
+      if (frame || !visible || document.hidden) return;
+      last = performance.now();
+      frame = requestAnimationFrame(draw);
+    };
+    const viewWatch = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible) (reduced ? still : resume)();
+    });
     viewWatch.observe(canvas);
+    const onVisibility = () => (reduced ? still() : resume());
+    document.addEventListener("visibilitychange", onVisibility);
 
     let time = 0;
     let last = performance.now();
     const draw = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.1);
       last = now;
-      if (!visible || document.hidden) {
-        frame = requestAnimationFrame(draw);
-        return;
-      }
+      frame = 0;
+      if (!visible || document.hidden) return;
       time += dt * live.current.speed;
       const ease = 1 - Math.exp(-dt * 8);
       pointer.x += (pointer.tx - pointer.x) * ease;
       pointer.y += (pointer.ty - pointer.y) * ease;
       pointer.active += (pointer.tActive - pointer.active) * ease;
-      resize();
       gl.uniform1f(uTime, time);
       gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform2f(uPointer, pointer.x, pointer.y);
@@ -206,6 +218,7 @@ export function ShaderCanvas({ fragment, uniforms, speed = 1, maxDpr = 1.5, inte
       themeWatch.disconnect();
       sizeWatch.disconnect();
       viewWatch.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
       host.removeEventListener("pointermove", onMove);
       host.removeEventListener("pointerleave", onLeave);
       gl.deleteProgram(program);

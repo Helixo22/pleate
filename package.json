@@ -11,7 +11,7 @@
     "build:lib": "npm run build -w pleate",
     "palettes": "npm run palettes -w pleate",
     "typecheck": "npm run typecheck -w pleate && npm run typecheck -w pleate-client && npm run typecheck -w docs",
-    "test": "npm run test -w pleate-client && cd packages/pleate-backend && uv run pytest"
+    "test": "npm run test -w pleate && npm run test -w pleate-client && cd packages/pleate-backend && uv run pytest"
   },
   "engines": {
     "node": ">=22.18"
