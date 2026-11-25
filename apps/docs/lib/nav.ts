@@ -92,12 +92,17 @@ export const NAV: NavSection[] = [
       { ...c("Three Scene", true), isNew: true },
     ],
   },
+  {
+    title: "Voxel3D",
+    area: "effects",
+    items: ["Voxel Scene", "Voxel View", "Voxel Gallery", "Pixel Art", "Pixel Canvas", "Pixel Gallery"].map((name) => ({ ...c(name, true), isNew: true })),
+  },
   { title: "Marketing", items: [c("Hero", true), c("Feature Grid", true), c("Pricing", true), c("Testimonial", true), c("CTA", true), { name: "Contact Form", href: "/components/contact", ready: true }, c("Logo Marquee", true)] },
   { title: "Text Animations", area: "effects", items: effects(NAV_TEXT) },
   { title: "Animations", area: "effects", items: effects(NAV_ANIMATIONS, NAV_ANIMATIONS_B) },
   { title: "Interactive", area: "effects", items: effects(NAV_COMPONENTS_A, NAV_COMPONENTS_B) },
   { title: "Backgrounds", area: "effects", items: effects(NAV_BACKGROUNDS_A, NAV_BACKGROUNDS_B, NAV_BACKGROUNDS_C, NAV_ASCII) },
-  { title: "Examples", items: [{ name: "Landing page", href: "/examples/landing", ready: true }] },
+  { title: "Examples", items: [{ name: "Landing page", href: "/examples/landing", ready: true }, { name: "Voxel landing page", href: "/examples/voxel3d", ready: true, isNew: true }] },
 ];
 
 // The Backend docs are a separate area of the site (header toggle), with their own sidebar.

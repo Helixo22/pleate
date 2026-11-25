@@ -1,0 +1,16 @@
+export {
+  voxelBoat,
+  voxelBurger,
+  voxelCamera,
+  voxelChest,
+  voxelCoffee,
+  voxelComputer,
+  voxelDrawing,
+  voxelHouse,
+  voxelLighthouse,
+  voxelModels,
+  voxelParcel,
+  voxelPlant,
+  voxelRamen,
+  voxelRocket,
+} from "./models.ts";

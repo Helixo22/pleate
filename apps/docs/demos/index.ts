@@ -9,6 +9,7 @@ import { DOCS_BACKGROUNDS_A } from "./bits/backgrounds-a";
 import { DOCS_BACKGROUNDS_B } from "./bits/backgrounds-b";
 import { DOCS_BACKGROUNDS_C } from "./bits/backgrounds-c";
 import { DOCS_ASCII } from "./bits/ascii";
+import { DOCS_VOXEL3D } from "./bits/voxel3d";
 import ApiKeyListBasic from "./api-key-list/basic";
 import AuthCardBasic from "./auth-card/basic";
 import ContactBasic from "./contact/basic";
@@ -2008,4 +2009,5 @@ export const DOCS: Record<string, ComponentDoc> = {
   ...DOCS_BACKGROUNDS_B,
   ...DOCS_BACKGROUNDS_C,
   ...DOCS_ASCII,
+  ...DOCS_VOXEL3D,
 };

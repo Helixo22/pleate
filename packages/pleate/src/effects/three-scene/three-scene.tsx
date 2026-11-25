@@ -223,8 +223,9 @@ export function ThreeScene({
     sizeWatch.observe(canvas);
     resize();
 
-    const viewWatch = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
+    const viewWatch = new IntersectionObserver((entries) => {
+      // On a busy page several changes can arrive together: the last one is the current one.
+      visible = entries[entries.length - 1].isIntersecting;
       if (visible) schedule();
     });
     viewWatch.observe(canvas);

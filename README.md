@@ -116,6 +116,7 @@ Each component lives at its own path, for example `pleate/button` or `pleate/ai/
 | AI (`pleate/ai/*`) | BotFace, ChatThread, Message, Composer, StreamingText, PromptSuggestions, ResultCard, ModelPicker, Reasoning |
 | Effects (`pleate/effects/*`) | BlurText, RotatingText, GradientText, CountUp, ScrollRevealText, Reveal, Parallax, PageTransition, Magnet, Spotlight, Tilt, ClickSpark, DrawPath, FlowLine, Orbit, Odometer, Waveform, StatusMark, FlipCard, Carousel3D |
 | 3D scenes (`pleate/effects/scroll-scene`, `pleate/effects/three-scene`) | ScrollScene, ScrollBeat, useSceneProgress, createTimeline, ThreeScene, loadModel, scrubAnimation, frameObject. `three-scene` needs `npm install three` (optional peer, 0.187 or later) |
+| Voxel3D (`pleate/effects/voxel-scene`, `voxel-gallery`, `pixel-art`, `pixel-gallery`) | VoxelScene, VoxelView, Volume, solids, loadVox, PixelArt, PixelCanvas, PixelFrame, PixelSteps, 12 voxel models and 40 pixel drawings. The voxel modules need `npm install three` |
 | Marketing (`pleate/marketing/*`) | Hero, FeatureGrid, Pricing, Testimonials, CTA, Newsletter, ContactForm, LogoMarquee |
 
 The documentation app shows every component with live examples, the code behind each one, its props and notes on
